@@ -53,7 +53,7 @@ export default function Haldi() {
             <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
               Haldi Collection
             </h1>
-            <p className="text-yellow-100 text-lg">
+            <p className="text-orange-100 text-lg">
               Embrace the vibrant spirit of Haldi ceremonies with our collection 
               of bright yellows, warm oranges, and festive traditional wear.
             </p>
