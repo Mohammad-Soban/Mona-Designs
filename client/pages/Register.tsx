@@ -281,7 +281,7 @@ export default function Register() {
                     placeholder="123456"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                    className="w-full px-4 py-3 border border-border rounded-md text-center text-2xl tracking-widest focus:outline-none focus:ring-2 focus:ring-gold mt-2"
+                    className="w-full px-4 py-3 border border-border rounded-md text-center text-2xl tracking-widest focus:outline-none focus:ring-2 focus:ring-gold mt-2 text-black"
                     maxLength={6}
                     required
                   />
