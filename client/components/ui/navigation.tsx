@@ -8,6 +8,7 @@ import {
   Heart,
   LogOut,
   MessageCircle,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -27,11 +28,31 @@ import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Home", href: "/" },
-  { name: "Sherwanis", href: "/sherwanis" },
-  { name: "Kurtas", href: "/kurtas" },
-  { name: "Suits", href: "/suits" },
-  { name: "Lehengas", href: "/lehengas" },
-  { name: "Collections", href: "/collections" },
+  {
+    name: "Occasions",
+    href: "#",
+    dropdown: [
+      { name: "Haldi", href: "/collections/haldi" },
+      { name: "Wedding", href: "/collections/wedding" },
+      { name: "Reception", href: "/collections/reception" },
+      { name: "Mehendi", href: "/collections/mehendi" },
+      { name: "Sangeet", href: "/collections/sangeet" },
+      { name: "General", href: "/collections/general" },
+    ]
+  },
+  {
+    name: "Royal Wardrobe",
+    href: "#",
+    dropdown: [
+      { name: "Kurtas", href: "/kurtas" },
+      { name: "Sherwanis", href: "/sherwanis" },
+      { name: "Suits", href: "/suits" },
+      { name: "Lehengas", href: "/lehengas" },
+    ]
+  },
+  { name: "Contact Us", href: "/contact" },
+  { name: "Accessories", href: "/accessories" },
+  { name: "Heritage Work", href: "/heritage-work" },
 ];
 
 export function Navigation() {
