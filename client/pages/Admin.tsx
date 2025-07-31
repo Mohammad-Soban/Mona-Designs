@@ -652,7 +652,7 @@ function ProtectedAdmin() {
   };
 
   // Check for existing admin session on component mount
-  useState(() => {
+  useEffect(() => {
     const isAdminAuthenticated = sessionStorage.getItem("mona-admin-auth") === "true";
     setIsAuthenticated(isAdminAuthenticated);
   }, []);
