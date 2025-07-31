@@ -228,7 +228,7 @@ export default function Register() {
                       value={formData.password}
                       onChange={(e) => handleInputChange("password", e.target.value)}
                       className={cn(
-                        "w-full pl-10 pr-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-gold",
+                        "w-full pl-10 pr-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black",
                         errors.password ? "border-red-500" : "border-border"
                       )}
                       required
