@@ -651,11 +651,11 @@ function ProtectedAdmin() {
     sessionStorage.setItem("mona-admin-auth", "true");
   };
 
-  // Check for existing admin session
+  // Check for existing admin session on component mount
   useState(() => {
     const isAdminAuthenticated = sessionStorage.getItem("mona-admin-auth") === "true";
     setIsAuthenticated(isAdminAuthenticated);
-  });
+  }, []);
 
   if (!isAuthenticated) {
     return <AdminLogin onLogin={handleLogin} />;
