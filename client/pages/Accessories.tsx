@@ -2,14 +2,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Watch, 
-  Crown, 
-  Gem, 
-  Shield, 
+import {
+  Watch,
+  Crown,
+  Gem,
+  Shield,
   Star,
   ShoppingCart,
-  Heart
+  Heart,
 } from "lucide-react";
 
 const accessoryCategories = [
@@ -18,29 +18,29 @@ const accessoryCategories = [
     name: "Traditional Jewelry",
     icon: Crown,
     description: "Exquisite handcrafted jewelry pieces",
-    items: ["Necklaces", "Earrings", "Bracelets", "Rings"]
+    items: ["Necklaces", "Earrings", "Bracelets", "Rings"],
   },
   {
     id: "watches",
     name: "Luxury Watches",
     icon: Watch,
     description: "Premium timepieces for special occasions",
-    items: ["Gold Watches", "Silver Watches", "Traditional Watches"]
+    items: ["Gold Watches", "Silver Watches", "Traditional Watches"],
   },
   {
     id: "gems",
     name: "Precious Stones",
     icon: Gem,
     description: "Authentic gemstones and precious stones",
-    items: ["Emeralds", "Rubies", "Sapphires", "Diamonds"]
+    items: ["Emeralds", "Rubies", "Sapphires", "Diamonds"],
   },
   {
     id: "accessories",
     name: "Wedding Accessories",
     icon: Shield,
     description: "Complete your wedding look",
-    items: ["Kalgi", "Sehra", "Mojari", "Clutches"]
-  }
+    items: ["Kalgi", "Sehra", "Mojari", "Clutches"],
+  },
 ];
 
 const featuredProducts = [
@@ -49,29 +49,29 @@ const featuredProducts = [
     name: "Royal Gold Necklace Set",
     price: "₹25,000",
     image: "/placeholder.svg",
-    category: "jewelry"
+    category: "jewelry",
   },
   {
     id: 2,
     name: "Traditional Kundan Earrings",
     price: "₹8,500",
     image: "/placeholder.svg",
-    category: "jewelry"
+    category: "jewelry",
   },
   {
     id: 3,
     name: "Antique Gold Watch",
     price: "₹45,000",
     image: "/placeholder.svg",
-    category: "watches"
+    category: "watches",
   },
   {
     id: 4,
     name: "Wedding Kalgi",
     price: "₹3,200",
     image: "/placeholder.svg",
-    category: "accessories"
-  }
+    category: "accessories",
+  },
 ];
 
 export default function Accessories() {
@@ -88,8 +88,9 @@ export default function Accessories() {
               Accessories Collection
             </h1>
             <p className="text-teal-100 text-lg">
-              Complete your ethnic look with our exquisite collection of traditional 
-              jewelry, luxury watches, and premium wedding accessories.
+              Complete your ethnic look with our exquisite collection of
+              traditional jewelry, luxury watches, and premium wedding
+              accessories.
             </p>
           </div>
         </div>
@@ -101,12 +102,12 @@ export default function Accessories() {
           <h2 className="text-3xl font-serif font-bold text-center mb-12">
             Browse by Category
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
             {accessoryCategories.map((category) => {
               const Icon = category.icon;
               return (
-                <Card 
+                <Card
                   key={category.id}
                   className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-gold/20"
                   onClick={() => setSelectedCategory(category.id)}
@@ -123,7 +124,10 @@ export default function Accessories() {
                     </p>
                     <div className="space-y-1">
                       {category.items.map((item, index) => (
-                        <div key={index} className="text-xs text-muted-foreground flex items-center">
+                        <div
+                          key={index}
+                          className="text-xs text-muted-foreground flex items-center"
+                        >
                           <Star className="h-3 w-3 mr-1 text-gold" />
                           {item}
                         </div>
@@ -143,13 +147,16 @@ export default function Accessories() {
           <h2 className="text-3xl font-serif font-bold text-center mb-12">
             Featured Accessories
           </h2>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map((product) => (
-              <Card key={product.id} className="group hover:shadow-lg transition-all duration-300">
+              <Card
+                key={product.id}
+                className="group hover:shadow-lg transition-all duration-300"
+              >
                 <div className="aspect-square bg-muted rounded-t-lg relative overflow-hidden">
-                  <img 
-                    src={product.image} 
+                  <img
+                    src={product.image}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -161,7 +168,9 @@ export default function Accessories() {
                 </div>
                 <CardContent className="p-4">
                   <h3 className="font-semibold mb-2">{product.name}</h3>
-                  <p className="text-gold font-bold text-lg mb-3">{product.price}</p>
+                  <p className="text-gold font-bold text-lg mb-3">
+                    {product.price}
+                  </p>
                   <Button className="w-full bg-gold hover:bg-gold/90">
                     <ShoppingCart className="h-4 w-4 mr-2" />
                     Add to Cart
@@ -185,7 +194,7 @@ export default function Accessories() {
           <h2 className="text-3xl font-serif font-bold text-center mb-12">
             Why Choose Our Accessories
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="mx-auto w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center mb-4">
@@ -193,27 +202,30 @@ export default function Accessories() {
               </div>
               <h3 className="text-xl font-semibold mb-2">Premium Quality</h3>
               <p className="text-muted-foreground">
-                Handcrafted accessories made with the finest materials and traditional techniques.
+                Handcrafted accessories made with the finest materials and
+                traditional techniques.
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="mx-auto w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center mb-4">
                 <Gem className="h-8 w-8 text-gold" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Authentic Designs</h3>
               <p className="text-muted-foreground">
-                Traditional designs passed down through generations, crafted by skilled artisans.
+                Traditional designs passed down through generations, crafted by
+                skilled artisans.
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="mx-auto w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center mb-4">
                 <Star className="h-8 w-8 text-gold" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Perfect Finishing</h3>
               <p className="text-muted-foreground">
-                Every piece is meticulously finished to ensure the highest quality and beauty.
+                Every piece is meticulously finished to ensure the highest
+                quality and beauty.
               </p>
             </div>
           </div>

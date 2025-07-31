@@ -52,8 +52,9 @@ export default function Sangeet() {
               Sangeet Collection
             </h1>
             <p className="text-pink-100 text-lg">
-              Dance the night away in our dazzling sangeet collection 
-              featuring flowing lehengas, comfortable kurtas, and party-ready traditional wear.
+              Dance the night away in our dazzling sangeet collection featuring
+              flowing lehengas, comfortable kurtas, and party-ready traditional
+              wear.
             </p>
           </div>
         </div>

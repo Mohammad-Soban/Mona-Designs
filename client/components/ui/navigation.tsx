@@ -38,7 +38,7 @@ const navigation = [
       { name: "Mehendi", href: "/collections/mehendi" },
       { name: "Sangeet", href: "/collections/sangeet" },
       { name: "General", href: "/collections/general" },
-    ]
+    ],
   },
   {
     name: "Royal Wardrobe",
@@ -48,7 +48,7 @@ const navigation = [
       { name: "Sherwanis", href: "/sherwanis" },
       { name: "Suits", href: "/suits" },
       { name: "Lehengas", href: "/lehengas" },
-    ]
+    ],
   },
   { name: "Contact Us", href: "/contact" },
   { name: "Accessories", href: "/accessories" },
@@ -206,7 +206,7 @@ export function Navigation() {
 
               {/* Navigation menu center */}
               <nav className="flex items-center space-x-8 mx-4">
-                {navigation.map((item) => (
+                {navigation.map((item) =>
                   item.dropdown ? (
                     <DropdownMenu key={item.name}>
                       <DropdownMenuTrigger asChild>
@@ -221,7 +221,10 @@ export function Navigation() {
                       >
                         {item.dropdown.map((subItem) => (
                           <DropdownMenuItem key={subItem.name} asChild>
-                            <Link to={subItem.href} className="flex items-center">
+                            <Link
+                              to={subItem.href}
+                              className="flex items-center"
+                            >
                               {subItem.name}
                             </Link>
                           </DropdownMenuItem>
@@ -236,8 +239,8 @@ export function Navigation() {
                     >
                       {item.name}
                     </Link>
-                  )
-                ))}
+                  ),
+                )}
               </nav>
 
               {/* Actions on right */}
@@ -345,7 +348,7 @@ export function Navigation() {
             )}
           >
             <div className="py-4 space-y-2 border-t border-white/20 bg-black/30 backdrop-blur-md rounded-b-lg">
-              {navigation.map((item) => (
+              {navigation.map((item) =>
                 item.dropdown ? (
                   <div key={item.name} className="mx-2">
                     <div className="px-3 py-2 text-sm font-medium text-gold/80 font-semibold">
@@ -373,8 +376,8 @@ export function Navigation() {
                   >
                     {item.name}
                   </Link>
-                )
-              ))}
+                ),
+              )}
             </div>
           </div>
         </div>

@@ -52,8 +52,9 @@ export default function Mehendi() {
               Mehendi Collection
             </h1>
             <p className="text-green-100 text-lg">
-              Celebrate the art of henna with our vibrant mehendi collection 
-              featuring comfortable kurtas, flowing lehengas, and festive traditional wear.
+              Celebrate the art of henna with our vibrant mehendi collection
+              featuring comfortable kurtas, flowing lehengas, and festive
+              traditional wear.
             </p>
           </div>
         </div>

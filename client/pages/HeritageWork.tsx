@@ -3,15 +3,15 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductGrid } from "@/components/ui/product-grid";
 import { allProducts } from "@/data/products";
-import { 
-  Palette, 
-  Scissors, 
-  Award, 
-  Users, 
+import {
+  Palette,
+  Scissors,
+  Award,
+  Users,
   Clock,
   Star,
   Camera,
-  MapPin
+  MapPin,
 } from "lucide-react";
 
 const heritageSkills = [
@@ -20,29 +20,29 @@ const heritageSkills = [
     name: "Traditional Embroidery",
     icon: Scissors,
     description: "Intricate handwork passed down through generations",
-    techniques: ["Zardozi", "Gota Patti", "Mirror Work", "Thread Embroidery"]
+    techniques: ["Zardozi", "Gota Patti", "Mirror Work", "Thread Embroidery"],
   },
   {
     id: "dyeing",
     name: "Natural Dyeing",
     icon: Palette,
     description: "Authentic colors using traditional methods",
-    techniques: ["Bandhani", "Leheria", "Block Printing", "Ajrakh"]
+    techniques: ["Bandhani", "Leheria", "Block Printing", "Ajrakh"],
   },
   {
     id: "weaving",
     name: "Handloom Weaving",
     icon: Award,
     description: "Pure handwoven fabrics with traditional patterns",
-    techniques: ["Banarasi", "Kanjivaram", "Patola", "Chanderi"]
+    techniques: ["Banarasi", "Kanjivaram", "Patola", "Chanderi"],
   },
   {
     id: "craftsmanship",
     name: "Artisan Craftsmanship",
     icon: Users,
     description: "Master craftsmen creating timeless pieces",
-    techniques: ["Hand Stitching", "Beadwork", "Sequin Work", "Cutwork"]
-  }
+    techniques: ["Hand Stitching", "Beadwork", "Sequin Work", "Cutwork"],
+  },
 ];
 
 const artisanStories = [
@@ -53,7 +53,8 @@ const artisanStories = [
     experience: "35 Years",
     location: "Lucknow, UP",
     image: "/placeholder.svg",
-    story: "Third generation artisan specializing in royal Zardozi work for bridal wear."
+    story:
+      "Third generation artisan specializing in royal Zardozi work for bridal wear.",
   },
   {
     id: 2,
@@ -62,7 +63,8 @@ const artisanStories = [
     experience: "28 Years",
     location: "Jaipur, Rajasthan",
     image: "/placeholder.svg",
-    story: "Expert in traditional Bandhani techniques, creating vibrant patterns."
+    story:
+      "Expert in traditional Bandhani techniques, creating vibrant patterns.",
   },
   {
     id: 3,
@@ -71,35 +73,36 @@ const artisanStories = [
     experience: "42 Years",
     location: "Sanganer, Rajasthan",
     image: "/placeholder.svg",
-    story: "Master block printer preserving ancient printing techniques."
-  }
+    story: "Master block printer preserving ancient printing techniques.",
+  },
 ];
 
 const heritageProcess = [
   {
     step: 1,
     title: "Design Creation",
-    description: "Traditional patterns are sketched and refined by master designers",
-    icon: Palette
+    description:
+      "Traditional patterns are sketched and refined by master designers",
+    icon: Palette,
   },
   {
     step: 2,
     title: "Material Selection",
     description: "Premium fabrics and authentic materials are carefully chosen",
-    icon: Award
+    icon: Award,
   },
   {
     step: 3,
     title: "Handcrafting",
     description: "Skilled artisans begin the meticulous handwork process",
-    icon: Scissors
+    icon: Scissors,
   },
   {
     step: 4,
     title: "Quality Check",
     description: "Each piece undergoes thorough quality inspection",
-    icon: Star
-  }
+    icon: Star,
+  },
 ];
 
 export default function HeritageWork() {
@@ -114,7 +117,7 @@ export default function HeritageWork() {
               Heritage Craftsmanship
             </h1>
             <p className="text-slate-100 text-xl mb-8">
-              Preserving centuries-old traditions through masterful artisanship. 
+              Preserving centuries-old traditions through masterful artisanship.
               Each piece tells a story of cultural heritage and timeless beauty.
             </p>
             <Button size="lg" className="bg-gold hover:bg-gold/90">
@@ -132,15 +135,19 @@ export default function HeritageWork() {
               Traditional Crafts
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Our artisans master various traditional techniques, each requiring years of training and practice.
+              Our artisans master various traditional techniques, each requiring
+              years of training and practice.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {heritageSkills.map((skill) => {
               const Icon = skill.icon;
               return (
-                <Card key={skill.id} className="group hover:shadow-xl transition-all duration-300 border-gold/20">
+                <Card
+                  key={skill.id}
+                  className="group hover:shadow-xl transition-all duration-300 border-gold/20"
+                >
                   <CardHeader className="text-center">
                     <div className="mx-auto w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-gold/20 transition-colors">
                       <Icon className="h-10 w-10 text-gold" />
@@ -153,7 +160,11 @@ export default function HeritageWork() {
                     </p>
                     <div className="space-y-2">
                       {skill.techniques.map((technique, index) => (
-                        <Badge key={index} variant="secondary" className="mr-2 mb-2">
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="mr-2 mb-2"
+                        >
                           {technique}
                         </Badge>
                       ))}
@@ -174,8 +185,9 @@ export default function HeritageWork() {
               Heritage Crafted Products
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Discover our exquisite collection of heritage products, each piece lovingly crafted
-              using traditional techniques and showcasing the finest artisanship.
+              Discover our exquisite collection of heritage products, each piece
+              lovingly crafted using traditional techniques and showcasing the
+              finest artisanship.
             </p>
           </div>
 
@@ -201,10 +213,11 @@ export default function HeritageWork() {
               Our Craft Process
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              From concept to creation, every step is guided by traditional methods and modern quality standards.
+              From concept to creation, every step is guided by traditional
+              methods and modern quality standards.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {heritageProcess.map((process) => {
               const Icon = process.icon;
@@ -218,7 +231,9 @@ export default function HeritageWork() {
                       {process.step}
                     </div>
                   </div>
-                  <h3 className="text-xl font-semibold mb-3">{process.title}</h3>
+                  <h3 className="text-xl font-semibold mb-3">
+                    {process.title}
+                  </h3>
                   <p className="text-muted-foreground">{process.description}</p>
                 </div>
               );
@@ -235,16 +250,20 @@ export default function HeritageWork() {
               Meet Our Master Artisans
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              The hands behind our heritage. These master craftsmen have dedicated their lives to preserving traditional arts.
+              The hands behind our heritage. These master craftsmen have
+              dedicated their lives to preserving traditional arts.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {artisanStories.map((artisan) => (
-              <Card key={artisan.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <Card
+                key={artisan.id}
+                className="overflow-hidden hover:shadow-lg transition-shadow"
+              >
                 <div className="aspect-square bg-muted relative">
-                  <img 
-                    src={artisan.image} 
+                  <img
+                    src={artisan.image}
                     alt={artisan.name}
                     className="w-full h-full object-cover"
                   />
@@ -262,7 +281,9 @@ export default function HeritageWork() {
                     <MapPin className="h-4 w-4 mr-1" />
                     {artisan.location}
                   </div>
-                  <p className="text-muted-foreground text-sm">{artisan.story}</p>
+                  <p className="text-muted-foreground text-sm">
+                    {artisan.story}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -278,10 +299,11 @@ export default function HeritageWork() {
               Preserving Heritage for Future Generations
             </h2>
             <p className="text-muted-foreground text-lg max-w-3xl mx-auto mb-12">
-              We believe in keeping traditional crafts alive by supporting artisan communities, 
-              using authentic techniques, and creating pieces that honor our cultural heritage.
+              We believe in keeping traditional crafts alive by supporting
+              artisan communities, using authentic techniques, and creating
+              pieces that honor our cultural heritage.
             </p>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
               <div className="text-center">
                 <div className="text-3xl font-bold text-gold mb-2">500+</div>
@@ -296,7 +318,7 @@ export default function HeritageWork() {
                 <p className="text-muted-foreground">Years of Experience</p>
               </div>
             </div>
-            
+
             <Button size="lg" className="bg-gold hover:bg-gold/90">
               Support Our Artisans
             </Button>

@@ -52,8 +52,9 @@ export default function General() {
               General Collection
             </h1>
             <p className="text-blue-100 text-lg">
-              Perfect for any celebration or gathering, our general collection 
-              offers versatile ethnic wear suitable for various occasions and festivities.
+              Perfect for any celebration or gathering, our general collection
+              offers versatile ethnic wear suitable for various occasions and
+              festivities.
             </p>
           </div>
         </div>

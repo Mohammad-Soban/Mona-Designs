@@ -52,8 +52,9 @@ export default function Reception() {
               Reception Collection
             </h1>
             <p className="text-purple-100 text-lg">
-              Make a statement at your reception with our elegant collection 
-              of sophisticated suits, contemporary sherwanis, and graceful lehengas.
+              Make a statement at your reception with our elegant collection of
+              sophisticated suits, contemporary sherwanis, and graceful
+              lehengas.
             </p>
           </div>
         </div>

@@ -54,7 +54,7 @@ export default function Haldi() {
               Haldi Collection
             </h1>
             <p className="text-orange-100 text-lg">
-              Embrace the vibrant spirit of Haldi ceremonies with our collection 
+              Embrace the vibrant spirit of Haldi ceremonies with our collection
               of bright yellows, warm oranges, and festive traditional wear.
             </p>
           </div>

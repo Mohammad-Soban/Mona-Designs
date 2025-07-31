@@ -54,8 +54,9 @@ export default function Wedding() {
               Wedding Collection
             </h1>
             <p className="text-red-100 text-lg">
-              Celebrate your special day with our exquisite wedding collection 
-              featuring heavy embroidered sherwanis, designer lehengas, and royal attire.
+              Celebrate your special day with our exquisite wedding collection
+              featuring heavy embroidered sherwanis, designer lehengas, and
+              royal attire.
             </p>
           </div>
         </div>
