@@ -224,6 +224,15 @@ export default function Login() {
 
             <div className="text-center text-sm text-muted-foreground">
               <p>
+                Don't have an account?{" "}
+                <Link to="/register" className="text-gold hover:underline">
+                  Sign up here
+                </Link>
+              </p>
+            </div>
+
+            <div className="text-center text-sm text-muted-foreground">
+              <p>
                 By continuing, you agree to our{" "}
                 <Link to="/terms" className="text-gold hover:underline">
                   Terms of Service
