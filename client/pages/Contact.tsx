@@ -241,7 +241,7 @@ export default function Contact() {
                         rows={6}
                         value={formData.message}
                         onChange={handleChange}
-                        className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold resize-none"
+                        className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold resize-none text-black"
                         placeholder="Tell us how we can help you..."
                         required
                       />
