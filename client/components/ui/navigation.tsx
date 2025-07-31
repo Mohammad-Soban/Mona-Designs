@@ -85,7 +85,7 @@ export function Navigation() {
                   className="p-2 hover:bg-white/20 rounded-md transition-colors border border-white/20"
                   title="Contact us on WhatsApp"
                 >
-                  <MessageCircle className="h-4 w-4 text-green-400" />
+                  <MessageCircle className="h-4 w-4 text-gold" />
                 </button>
                 <div className="border border-white/20 rounded-md">
                   <ThemeToggle />
