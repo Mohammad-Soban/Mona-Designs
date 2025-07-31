@@ -104,8 +104,8 @@ export default function HeritageWork() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-96 bg-gradient-to-r from-amber-700/90 to-orange-800/90 flex items-center">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-800/20 to-red-900/20" />
+      <section className="relative h-96 bg-gradient-to-r from-slate-700/90 to-gray-800/90 flex items-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-800/20 to-gray-900/20" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-6">
