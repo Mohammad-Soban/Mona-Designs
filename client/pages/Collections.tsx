@@ -1,13 +1,9 @@
 import { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductGrid } from "@/components/ui/product-grid";
 import { allProducts, getProductsByCategory, sortProducts } from "@/data/products";
-import { 
-  Filter, 
-  Grid3X3, 
-  List,
-  ChevronDown 
+import {
+  ChevronDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
