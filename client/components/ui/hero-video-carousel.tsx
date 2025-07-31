@@ -95,7 +95,7 @@ export function HeroVideoCarousel() {
   };
 
   return (
-    <section className="relative h-[85vh] md:h-[90vh] overflow-hidden">
+    <section className="relative h-screen overflow-hidden">
       {/* Background Animation */}
       <AnimatedBackground variant="hero" />
       
