@@ -57,7 +57,7 @@ export function Navigation() {
 
             {/* Centered Logo */}
             <Link to="/" className="order-1 flex items-center mx-auto">
-              <img src="/static/images/logo.webp" alt="Mona Designs Logo" className="h-18 w-auto" />
+              <img src="/static/images/logo.webp" alt="Mona Designs Logo" className="h-10 w-auto" />
             </Link>
 
             {/* WhatsApp and ThemeToggle after logo */}
