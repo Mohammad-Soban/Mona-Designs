@@ -205,7 +205,7 @@ export function Navigation() {
                 >
                   <MessageCircle className="h-5 w-5 text-gold" />
                 </button>
-                <div className="border border-white/20 rounded-md">
+                <div className="border border-gold/30 rounded-md">
                   <ThemeToggle />
                 </div>
                 <Link to="/wishlist">
