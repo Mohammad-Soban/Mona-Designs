@@ -677,27 +677,57 @@ const AdminDashboard = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {mockProducts.map((product) => (
-                      <div key={product.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
-                            <Package className="h-5 w-5 text-muted-foreground" />
+                      <div key={product.id} className="border rounded-lg">
+                        {/* Desktop Layout */}
+                        <div className="hidden md:flex items-center justify-between p-4">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
+                              <Package className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                            <div>
+                              <h3 className="font-medium">{product.name}</h3>
+                              <p className="text-sm text-muted-foreground">{product.category}</p>
+                            </div>
                           </div>
-                          <div>
-                            <h3 className="font-medium">{product.name}</h3>
-                            <p className="text-sm text-muted-foreground">{product.category}</p>
+                          <div className="flex items-center space-x-4">
+                            <div className="text-right">
+                              <p className="font-semibold">{product.stock} units</p>
+                              <p className="text-xs text-muted-foreground">{product.sales} sold</p>
+                            </div>
+                            <Badge className={getStatusColor(product.status)}>
+                              {product.status}
+                            </Badge>
+                            <Button variant="outline" size="sm">
+                              Update Stock
+                            </Button>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-4">
-                          <div className="text-right">
-                            <p className="font-semibold">{product.stock} units</p>
-                            <p className="text-xs text-muted-foreground">{product.sales} sold</p>
+
+                        {/* Mobile Layout */}
+                        <div className="md:hidden p-4 space-y-3">
+                          <div className="flex items-start space-x-3">
+                            <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Package className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-medium text-sm truncate">{product.name}</h3>
+                              <p className="text-xs text-muted-foreground">{product.category}</p>
+                              <div className="flex items-center justify-between mt-2">
+                                <div>
+                                  <span className="font-semibold text-sm">{product.stock} units</span>
+                                  <span className="text-xs text-muted-foreground ml-2">({product.sales} sold)</span>
+                                </div>
+                                <Badge className={`${getStatusColor(product.status)} text-xs`}>
+                                  {product.status}
+                                </Badge>
+                              </div>
+                            </div>
                           </div>
-                          <Badge className={getStatusColor(product.status)}>
-                            {product.status}
-                          </Badge>
-                          <Button variant="outline" size="sm">
-                            Update Stock
-                          </Button>
+                          <div className="flex justify-end pt-2 border-t">
+                            <Button variant="outline" size="sm" className="h-8 text-xs">
+                              Update Stock
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ))}
