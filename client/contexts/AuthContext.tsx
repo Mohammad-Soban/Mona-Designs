@@ -18,6 +18,8 @@ interface AuthContextType {
   state: AuthState;
   sendOTP: (phone: string) => Promise<{ success: boolean; message: string }>;
   verifyOTP: (phone: string, otp: string) => Promise<{ success: boolean; message: string; user?: User }>;
+  registerUser: (userData: { email: string; username: string; password: string; mobile: string }) => Promise<{ success: boolean; message: string }>;
+  verifyRegistrationOTP: (mobile: string, otp: string, userData: { email: string; username: string; password: string; mobile: string }) => Promise<{ success: boolean; message: string; user?: User }>;
   logout: () => void;
   updateProfile: (data: Partial<User>) => void;
 }
