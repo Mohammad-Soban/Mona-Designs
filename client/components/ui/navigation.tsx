@@ -281,7 +281,7 @@ export function Navigation() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-white hover:bg-white/20 border border-white/20"
+                      className="text-gold hover:bg-gold/20 hover:text-gold border border-gold/30"
                     >
                       <User className="h-5 w-5" />
                     </Button>
