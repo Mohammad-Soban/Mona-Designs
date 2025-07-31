@@ -122,11 +122,8 @@ export default function Collections() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {filteredAndSortedProducts.length > 0 ? (
             <>
-              <ProductGrid 
-                products={filteredAndSortedProducts} 
-                className={cn(
-                  viewMode === "list" && "grid-cols-1 md:grid-cols-2 gap-4"
-                )}
+              <ProductGrid
+                products={filteredAndSortedProducts}
               />
 
               {/* Load More */}
