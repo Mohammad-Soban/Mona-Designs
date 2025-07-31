@@ -127,6 +127,72 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const registerUser = async (userData: { email: string; username: string; password: string; mobile: string }): Promise<{ success: boolean; message: string }> => {
+    try {
+      // Simulate API call to register user and send OTP
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+
+      // In real app, this would:
+      // 1. Check if email/username/mobile already exists
+      // 2. Hash the password
+      // 3. Store user data temporarily
+      // 4. Send OTP to mobile number
+
+      // For demo purposes, we'll always return success
+      return {
+        success: true,
+        message: `OTP sent to ${userData.mobile}. Use 123456 for demo.`
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: "Registration failed. Please try again."
+      };
+    }
+  };
+
+  const verifyRegistrationOTP = async (mobile: string, otp: string, userData: { email: string; username: string; password: string; mobile: string }): Promise<{ success: boolean; message: string; user?: User }> => {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+
+      // For demo purposes, accept "123456" as valid OTP
+      if (otp === "123456") {
+        const user: User = {
+          id: `user_${Date.now()}`,
+          phone: mobile,
+          email: userData.email,
+          username: userData.username,
+          name: userData.username, // Use username as display name initially
+        };
+
+        // Store user in localStorage
+        localStorage.setItem("mona-user", JSON.stringify(user));
+
+        setState({
+          user,
+          isLoading: false,
+          isAuthenticated: true,
+        });
+
+        return {
+          success: true,
+          message: "Account created successfully!",
+          user
+        };
+      } else {
+        return {
+          success: false,
+          message: "Invalid OTP. Please try again."
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: "Verification failed. Please try again."
+      };
+    }
+  };
+
   const updateProfile = (data: Partial<User>) => {
     if (state.user) {
       const updatedUser = { ...state.user, ...data };
@@ -142,6 +208,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     state,
     sendOTP,
     verifyOTP,
+    registerUser,
+    verifyRegistrationOTP,
     logout,
     updateProfile,
   };
