@@ -58,7 +58,7 @@ export default function Contact() {
             <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
               Contact Us
             </h1>
-            <p className="text-amber-100 text-lg">
+            <p className="text-blue-100 text-lg">
               Get in touch with us for any questions about our ethnic wear collections, 
               custom designs, or assistance with your orders.
             </p>
