@@ -78,6 +78,14 @@ export default function App() {
                     <Route path="/suits" element={<Suits />} />
                     <Route path="/lehengas" element={<Lehengas />} />
                     <Route path="/collections" element={<Collections />} />
+                    <Route path="/collections/haldi" element={<Haldi />} />
+                    <Route path="/collections/wedding" element={<Wedding />} />
+                    <Route path="/collections/reception" element={<Reception />} />
+                    <Route path="/collections/mehendi" element={<Mehendi />} />
+                    <Route path="/collections/sangeet" element={<Sangeet />} />
+                    <Route path="/collections/general" element={<General />} />
+                    <Route path="/accessories" element={<Accessories />} />
+                    <Route path="/heritage-work" element={<HeritageWork />} />
                     <Route path="/cart" element={<PlaceholderPage title="Shopping Cart" />} />
                     <Route path="/wishlist" element={<Wishlist />} />
                     <Route path="/login" element={<Login />} />
