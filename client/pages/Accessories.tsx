@@ -87,7 +87,7 @@ export default function Accessories() {
             <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
               Accessories Collection
             </h1>
-            <p className="text-amber-100 text-lg">
+            <p className="text-teal-100 text-lg">
               Complete your ethnic look with our exquisite collection of traditional 
               jewelry, luxury watches, and premium wedding accessories.
             </p>
