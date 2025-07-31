@@ -113,66 +113,7 @@ export default function Collections() {
             </div>
           </div>
 
-          {/* Filters Panel */}
-          {showFilters && (
-            <div className="pb-4 border-t">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
-                <div>
-                  <h3 className="font-medium mb-2">Price Range</h3>
-                  <div className="space-y-2">
-                    <label className="flex items-center space-x-2 text-sm">
-                      <input type="checkbox" className="rounded" />
-                      <span>Under ₹5,000</span>
-                    </label>
-                    <label className="flex items-center space-x-2 text-sm">
-                      <input type="checkbox" className="rounded" />
-                      <span>₹5,000 - ₹15,000</span>
-                    </label>
-                    <label className="flex items-center space-x-2 text-sm">
-                      <input type="checkbox" className="rounded" />
-                      <span>Above ₹15,000</span>
-                    </label>
-                  </div>
-                </div>
 
-                <div>
-                  <h3 className="font-medium mb-2">Size</h3>
-                  <div className="space-y-2">
-                    {["XS", "S", "M", "L", "XL", "XXL"].map((size) => (
-                      <label key={size} className="flex items-center space-x-2 text-sm">
-                        <input type="checkbox" className="rounded" />
-                        <span>{size}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-medium mb-2">Occasion</h3>
-                  <div className="space-y-2">
-                    {["Wedding", "Party", "Festival", "Casual", "Formal"].map((occasion) => (
-                      <label key={occasion} className="flex items-center space-x-2 text-sm">
-                        <input type="checkbox" className="rounded" />
-                        <span>{occasion}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-medium mb-2">Fabric</h3>
-                  <div className="space-y-2">
-                    {["Silk", "Cotton", "Velvet", "Brocade", "Georgette"].map((fabric) => (
-                      <label key={fabric} className="flex items-center space-x-2 text-sm">
-                        <input type="checkbox" className="rounded" />
-                        <span>{fabric}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </section>
 
