@@ -446,6 +446,68 @@ const AdminDashboard = () => {
                         rows={3}
                       />
                     </div>
+
+                    {/* Key Features Section */}
+                    <div>
+                      <Label>Key Features (5 points)</Label>
+                      <div className="space-y-2 mt-2">
+                        {newProduct.keyFeatures.map((feature, index) => (
+                          <Input
+                            key={index}
+                            value={feature}
+                            onChange={(e) => {
+                              const updatedFeatures = [...newProduct.keyFeatures];
+                              updatedFeatures[index] = e.target.value;
+                              setNewProduct({...newProduct, keyFeatures: updatedFeatures});
+                            }}
+                            placeholder={`Key feature ${index + 1}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* What's Included Section */}
+                    <div>
+                      <Label>What's Included (1-4 items)</Label>
+                      <div className="space-y-2 mt-2">
+                        {newProduct.whatsIncluded.map((item, index) => (
+                          <Input
+                            key={index}
+                            value={item}
+                            onChange={(e) => {
+                              const updatedItems = [...newProduct.whatsIncluded];
+                              updatedItems[index] = e.target.value;
+                              setNewProduct({...newProduct, whatsIncluded: updatedItems});
+                            }}
+                            placeholder={`Item ${index + 1} (optional ${index > 0 ? 'for items 2-4' : ''})`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Fit Section */}
+                    <div>
+                      <Label htmlFor="fit">Fit</Label>
+                      <Input
+                        id="fit"
+                        value={newProduct.fit}
+                        onChange={(e) => setNewProduct({...newProduct, fit: e.target.value})}
+                        placeholder="e.g., Regular fit, Slim fit, Loose fit"
+                      />
+                    </div>
+
+                    {/* Care Instructions Section */}
+                    <div>
+                      <Label htmlFor="careInstructions">Care Instructions</Label>
+                      <Textarea
+                        id="careInstructions"
+                        value={newProduct.careInstructions}
+                        onChange={(e) => setNewProduct({...newProduct, careInstructions: e.target.value})}
+                        placeholder="Enter care instructions (e.g., Dry clean only, Hand wash with cold water, etc.)"
+                        rows={3}
+                      />
+                    </div>
+
                     <div className="flex space-x-2">
                       <Button onClick={handleAddProduct} className="bg-gold hover:bg-gold/90">
                         <Save className="h-4 w-4 mr-2" />
