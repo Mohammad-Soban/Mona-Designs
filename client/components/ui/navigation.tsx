@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import { Menu, X, ShoppingCart, User, Heart, Settings, LogOut, MessageCircle } from "lucide-react"
+import { Menu, X, ShoppingCart, User, Heart, LogOut, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { Badge } from "@/components/ui/badge"
@@ -139,12 +139,6 @@ export function Navigation() {
                         Profile
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile" className="flex items-center">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Settings
-                      </Link>
-                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={logout} className="flex items-center">
                       <LogOut className="mr-2 h-4 w-4" />
@@ -207,12 +201,6 @@ export function Navigation() {
                         Profile
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile" className="flex items-center">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Settings
-                      </Link>
-                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={logout} className="flex items-center">
                       <LogOut className="mr-2 h-4 w-4" />
@@ -231,7 +219,7 @@ export function Navigation() {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation - Cleaned up dropdown without duplicate buttons */}
         <div
           className={cn(
             "md:hidden transition-all duration-300 ease-in-out",
@@ -276,29 +264,6 @@ export function Navigation() {
                   </Button>
                 </Link>
               )}
-              <div className="flex space-x-2">
-                <Link to="/wishlist" onClick={() => setIsOpen(false)} className="flex-1">
-                  <Button className="w-full" variant="outline">
-                    <Heart className="mr-2 h-4 w-4" />
-                    Wishlist ({getWishlistCount()})
-                  </Button>
-                </Link>
-                <Button className="flex-1" variant="outline" onClick={toggleCart}>
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  Cart ({getCartItemsCount()})
-                </Button>
-              </div>
-              <Button
-                className="w-full"
-                variant="outline"
-                onClick={() => {
-                  handleWhatsAppClick();
-                  setIsOpen(false);
-                }}
-              >
-                <MessageCircle className="mr-2 h-4 w-4 text-green-600" />
-                WhatsApp Us
-              </Button>
             </div>
           </div>
         </div>
