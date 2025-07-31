@@ -42,7 +42,7 @@ export function Navigation() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/20 backdrop-blur-md supports-[backdrop-filter]:bg-background/10 shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between">
+        <div className="flex h-16 items-center justify-between">
           {/* Mobile Navbar Layout */}
           <div className="flex w-full items-center justify-between md:hidden">
             {/* Menu on right */}
