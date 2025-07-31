@@ -228,7 +228,8 @@ const AdminDashboard = () => {
       <SectionWrapper variant="default" padding="lg">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 h-12 bg-muted/30">
+            {/* Desktop Tab Navigation */}
+            <TabsList className="hidden md:grid w-full grid-cols-4 h-12 bg-muted/30">
               <TabsTrigger value="analytics" className="flex items-center space-x-2">
                 <BarChart3 className="h-4 w-4" />
                 <span>Analytics</span>
@@ -246,6 +247,23 @@ const AdminDashboard = () => {
                 <span>Orders</span>
               </TabsTrigger>
             </TabsList>
+
+            {/* Mobile Dropdown Navigation */}
+            <div className="md:hidden">
+              <div className="relative">
+                <select
+                  value={activeTab}
+                  onChange={(e) => setActiveTab(e.target.value)}
+                  className="w-full appearance-none bg-background border border-border rounded-md px-4 py-3 pr-8 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gold"
+                >
+                  <option value="analytics">📊 Analytics</option>
+                  <option value="products">📦 Products</option>
+                  <option value="inventory">📈 Inventory</option>
+                  <option value="orders">🛒 Orders</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none" />
+              </div>
+            </div>
 
             {/* Analytics Tab */}
             <TabsContent value="analytics" className="space-y-6">
