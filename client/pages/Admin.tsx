@@ -176,7 +176,11 @@ const AdminDashboard = () => {
       fabric: "",
       occasion: "",
       sizes: "",
-      colors: ""
+      colors: "",
+      keyFeatures: ["", "", "", "", ""],
+      whatsIncluded: ["", "", "", ""],
+      fit: "",
+      careInstructions: ""
     });
   };
 
