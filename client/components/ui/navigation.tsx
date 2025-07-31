@@ -1,9 +1,17 @@
-import { useState } from "react"
-import { Link } from "react-router-dom"
-import { Menu, X, ShoppingCart, User, Heart, LogOut, MessageCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
-import { Badge } from "@/components/ui/badge"
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Menu,
+  X,
+  ShoppingCart,
+  User,
+  Heart,
+  LogOut,
+  MessageCircle,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,11 +19,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useCart } from "@/contexts/CartContext"
-import { useAuth } from "@/contexts/AuthContext"
-import { useWishlist } from "@/contexts/WishlistContext"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/dropdown-menu";
+import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -24,20 +32,20 @@ const navigation = [
   { name: "Suits", href: "/suits" },
   { name: "Lehengas", href: "/lehengas" },
   { name: "Collections", href: "/collections" },
-]
+];
 
 export function Navigation() {
-  const [isOpen, setIsOpen] = useState(false)
-  const { toggleCart, getCartItemsCount } = useCart()
-  const { getWishlistCount } = useWishlist()
-  const { state: authState, logout } = useAuth()
+  const [isOpen, setIsOpen] = useState(false);
+  const { toggleCart, getCartItemsCount } = useCart();
+  const { getWishlistCount } = useWishlist();
+  const { state: authState, logout } = useAuth();
 
   const handleWhatsAppClick = () => {
-    const message = "Hi, there I am interested in buying products from you"
-    const phoneNumber = "917435898915" // +91 74358 98915
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
-    window.open(whatsappUrl, '_blank')
-  }
+    const message = "Hi, there I am interested in buying products from you";
+    const phoneNumber = "917435898915"; // +91 74358 98915
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/20 backdrop-blur-md supports-[backdrop-filter]:bg-background/10 shadow-sm">
@@ -52,12 +60,20 @@ export function Navigation() {
               onClick={() => setIsOpen(!isOpen)}
               className="order-3 ml-auto"
             >
-              {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+              {isOpen ? (
+                <X className="h-4 w-4" />
+              ) : (
+                <Menu className="h-4 w-4" />
+              )}
             </Button>
 
             {/* Centered Logo */}
             <Link to="/" className="order-1 flex items-center mx-auto">
-              <img src="/static/images/logo.webp" alt="Mona Designs Logo" className="h-10 w-auto" />
+              <img
+                src="/static/images/logo.webp"
+                alt="Mona Designs Logo"
+                className="h-10 w-auto"
+              />
             </Link>
 
             {/* WhatsApp and ThemeToggle after logo */}
@@ -77,7 +93,11 @@ export function Navigation() {
           <div className="hidden md:flex w-full items-center justify-between">
             {/* Logo for desktop */}
             <Link to="/" className="hidden md:flex items-center">
-              <img src="/static/images/logo.webp" alt="Mona Designs Logo" className="h-10 w-auto" />
+              <img
+                src="/static/images/logo.webp"
+                alt="Mona Designs Logo"
+                className="h-10 w-auto"
+              />
             </Link>
 
             {/* Navigation menu center */}
@@ -107,16 +127,27 @@ export function Navigation() {
                 <Button variant="ghost" size="icon" className="relative">
                   <Heart className="h-5 w-5" />
                   {getWishlistCount() > 0 && (
-                    <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs">
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs"
+                    >
                       {getWishlistCount()}
                     </Badge>
                   )}
                 </Button>
               </Link>
-              <Button variant="ghost" size="icon" className="relative" onClick={toggleCart}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative"
+                onClick={toggleCart}
+              >
                 <ShoppingCart className="h-5 w-5" />
                 {getCartItemsCount() > 0 && (
-                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs">
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs"
+                  >
                     {getCartItemsCount()}
                   </Badge>
                 )}
@@ -140,7 +171,10 @@ export function Navigation() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout} className="flex items-center">
+                    <DropdownMenuItem
+                      onClick={logout}
+                      className="flex items-center"
+                    >
                       <LogOut className="mr-2 h-4 w-4" />
                       Logout
                     </DropdownMenuItem>
@@ -165,7 +199,10 @@ export function Navigation() {
                 <Button variant="ghost" size="icon" className="relative">
                   <Heart className="h-5 w-5" />
                   {getWishlistCount() > 0 && (
-                    <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs">
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs"
+                    >
                       {getWishlistCount()}
                     </Badge>
                   )}
@@ -173,10 +210,18 @@ export function Navigation() {
               </Link>
 
               {/* Cart */}
-              <Button variant="ghost" size="icon" className="relative" onClick={toggleCart}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative"
+                onClick={toggleCart}
+              >
                 <ShoppingCart className="h-5 w-5" />
                 {getCartItemsCount() > 0 && (
-                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs">
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs"
+                  >
                     {getCartItemsCount()}
                   </Badge>
                 )}
@@ -202,7 +247,10 @@ export function Navigation() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout} className="flex items-center">
+                    <DropdownMenuItem
+                      onClick={logout}
+                      className="flex items-center"
+                    >
                       <LogOut className="mr-2 h-4 w-4" />
                       Logout
                     </DropdownMenuItem>
@@ -225,7 +273,7 @@ export function Navigation() {
             "md:hidden transition-all duration-300 ease-in-out",
             isOpen
               ? "max-h-64 opacity-100"
-              : "max-h-0 opacity-0 pointer-events-none"
+              : "max-h-0 opacity-0 pointer-events-none",
           )}
         >
           <div className="py-4 space-y-2 border-t">
@@ -269,5 +317,5 @@ export function Navigation() {
         </div>
       </div>
     </header>
-  )
+  );
 }
