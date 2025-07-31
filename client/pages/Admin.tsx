@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { AdminLogin } from "@/components/ui/admin-login";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,11 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { 
-  BarChart3, 
-  Package, 
-  ShoppingCart, 
-  Users, 
+import {
+  BarChart3,
+  Package,
+  ShoppingCart,
+  Users,
   IndianRupee,
   TrendingUp,
   TrendingDown,
@@ -32,7 +33,8 @@ import {
   Star,
   Activity,
   PieChart,
-  LineChart
+  LineChart,
+  ChevronDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionWrapper } from "@/components/ui/section-wrapper";
@@ -60,7 +62,11 @@ const AdminDashboard = () => {
     fabric: "",
     occasion: "",
     sizes: "",
-    colors: ""
+    colors: "",
+    keyFeatures: ["", "", "", "", ""],
+    whatsIncluded: ["", "", "", ""],
+    fit: "",
+    careInstructions: ""
   });
 
   // Mock data for admin dashboard
@@ -171,7 +177,11 @@ const AdminDashboard = () => {
       fabric: "",
       occasion: "",
       sizes: "",
-      colors: ""
+      colors: "",
+      keyFeatures: ["", "", "", "", ""],
+      whatsIncluded: ["", "", "", ""],
+      fit: "",
+      careInstructions: ""
     });
   };
 
@@ -219,7 +229,8 @@ const AdminDashboard = () => {
       <SectionWrapper variant="default" padding="lg">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 h-12 bg-muted/30">
+            {/* Desktop Tab Navigation */}
+            <TabsList className="hidden md:grid w-full grid-cols-4 h-12 bg-muted/30">
               <TabsTrigger value="analytics" className="flex items-center space-x-2">
                 <BarChart3 className="h-4 w-4" />
                 <span>Analytics</span>
@@ -237,6 +248,23 @@ const AdminDashboard = () => {
                 <span>Orders</span>
               </TabsTrigger>
             </TabsList>
+
+            {/* Mobile Dropdown Navigation */}
+            <div className="md:hidden">
+              <div className="relative">
+                <select
+                  value={activeTab}
+                  onChange={(e) => setActiveTab(e.target.value)}
+                  className="w-full appearance-none bg-background border border-border rounded-md px-4 py-3 pr-8 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gold"
+                >
+                  <option value="analytics">📊 Analytics</option>
+                  <option value="products">📦 Products</option>
+                  <option value="inventory">📈 Inventory</option>
+                  <option value="orders">🛒 Orders</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none" />
+              </div>
+            </div>
 
             {/* Analytics Tab */}
             <TabsContent value="analytics" className="space-y-6">
@@ -441,6 +469,68 @@ const AdminDashboard = () => {
                         rows={3}
                       />
                     </div>
+
+                    {/* Key Features Section */}
+                    <div>
+                      <Label>Key Features (5 points)</Label>
+                      <div className="space-y-2 mt-2">
+                        {newProduct.keyFeatures.map((feature, index) => (
+                          <Input
+                            key={index}
+                            value={feature}
+                            onChange={(e) => {
+                              const updatedFeatures = [...newProduct.keyFeatures];
+                              updatedFeatures[index] = e.target.value;
+                              setNewProduct({...newProduct, keyFeatures: updatedFeatures});
+                            }}
+                            placeholder={`Key feature ${index + 1}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* What's Included Section */}
+                    <div>
+                      <Label>What's Included (1-4 items)</Label>
+                      <div className="space-y-2 mt-2">
+                        {newProduct.whatsIncluded.map((item, index) => (
+                          <Input
+                            key={index}
+                            value={item}
+                            onChange={(e) => {
+                              const updatedItems = [...newProduct.whatsIncluded];
+                              updatedItems[index] = e.target.value;
+                              setNewProduct({...newProduct, whatsIncluded: updatedItems});
+                            }}
+                            placeholder={`Item ${index + 1} (optional ${index > 0 ? 'for items 2-4' : ''})`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Fit Section */}
+                    <div>
+                      <Label htmlFor="fit">Fit</Label>
+                      <Input
+                        id="fit"
+                        value={newProduct.fit}
+                        onChange={(e) => setNewProduct({...newProduct, fit: e.target.value})}
+                        placeholder="e.g., Regular fit, Slim fit, Loose fit"
+                      />
+                    </div>
+
+                    {/* Care Instructions Section */}
+                    <div>
+                      <Label htmlFor="careInstructions">Care Instructions</Label>
+                      <Textarea
+                        id="careInstructions"
+                        value={newProduct.careInstructions}
+                        onChange={(e) => setNewProduct({...newProduct, careInstructions: e.target.value})}
+                        placeholder="Enter care instructions (e.g., Dry clean only, Hand wash with cold water, etc.)"
+                        rows={3}
+                      />
+                    </div>
+
                     <div className="flex space-x-2">
                       <Button onClick={handleAddProduct} className="bg-gold hover:bg-gold/90">
                         <Save className="h-4 w-4 mr-2" />
@@ -461,35 +551,74 @@ const AdminDashboard = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {mockProducts.map((product) => (
-                      <div key={product.id} className="flex items-center justify-between p-4 border rounded-lg hover:shadow-md transition-all">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
-                            <Package className="h-6 w-6 text-muted-foreground" />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold">{product.name}</h3>
-                            <p className="text-sm text-muted-foreground">{product.category}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-6">
-                          <div className="text-right">
-                            <p className="font-semibold">{product.price}</p>
-                            <div className="flex items-center space-x-1">
-                              <Star className="h-3 w-3 text-gold fill-current" />
-                              <span className="text-xs">{product.rating}</span>
+                      <div key={product.id} className="border rounded-lg hover:shadow-md transition-all">
+                        {/* Desktop Layout */}
+                        <div className="hidden md:flex items-center justify-between p-4">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
+                              <Package className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold">{product.name}</h3>
+                              <p className="text-sm text-muted-foreground">{product.category}</p>
                             </div>
                           </div>
-                          <Badge className={getStatusColor(product.status)}>
-                            {product.status}
-                          </Badge>
-                          <div className="flex items-center space-x-2">
-                            <Button variant="ghost" size="sm">
+                          <div className="flex items-center space-x-6">
+                            <div className="text-right">
+                              <p className="font-semibold">{product.price}</p>
+                              <div className="flex items-center space-x-1">
+                                <Star className="h-3 w-3 text-gold fill-current" />
+                                <span className="text-xs">{product.rating}</span>
+                              </div>
+                            </div>
+                            <Badge className={getStatusColor(product.status)}>
+                              {product.status}
+                            </Badge>
+                            <div className="flex items-center space-x-2">
+                              <Button variant="ghost" size="sm">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm">
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Mobile Layout */}
+                        <div className="md:hidden p-4 space-y-3">
+                          <div className="flex items-start space-x-3">
+                            <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Package className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-sm truncate">{product.name}</h3>
+                              <p className="text-xs text-muted-foreground">{product.category}</p>
+                              <div className="flex items-center justify-between mt-2">
+                                <div className="flex items-center space-x-2">
+                                  <span className="font-semibold text-sm">{product.price}</span>
+                                  <div className="flex items-center space-x-1">
+                                    <Star className="h-3 w-3 text-gold fill-current" />
+                                    <span className="text-xs">{product.rating}</span>
+                                  </div>
+                                </div>
+                                <Badge className={`${getStatusColor(product.status)} text-xs`}>
+                                  {product.status}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex justify-end space-x-2 pt-2 border-t">
+                            <Button variant="ghost" size="sm" className="h-8 px-2">
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" className="h-8 px-2">
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" className="h-8 px-2">
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
@@ -503,16 +632,16 @@ const AdminDashboard = () => {
 
             {/* Inventory Tab */}
             <TabsContent value="inventory" className="space-y-6">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <h2 className="text-2xl font-semibold">Inventory Management</h2>
                 <div className="flex space-x-2">
-                  <Button variant="outline">
-                    <Download className="h-4 w-4 mr-2" />
-                    Export
+                  <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                    <Download className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Export</span>
                   </Button>
-                  <Button variant="outline">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Import
+                  <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                    <Upload className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Import</span>
                   </Button>
                 </div>
               </div>
@@ -548,27 +677,57 @@ const AdminDashboard = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {mockProducts.map((product) => (
-                      <div key={product.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
-                            <Package className="h-5 w-5 text-muted-foreground" />
+                      <div key={product.id} className="border rounded-lg">
+                        {/* Desktop Layout */}
+                        <div className="hidden md:flex items-center justify-between p-4">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
+                              <Package className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                            <div>
+                              <h3 className="font-medium">{product.name}</h3>
+                              <p className="text-sm text-muted-foreground">{product.category}</p>
+                            </div>
                           </div>
-                          <div>
-                            <h3 className="font-medium">{product.name}</h3>
-                            <p className="text-sm text-muted-foreground">{product.category}</p>
+                          <div className="flex items-center space-x-4">
+                            <div className="text-right">
+                              <p className="font-semibold">{product.stock} units</p>
+                              <p className="text-xs text-muted-foreground">{product.sales} sold</p>
+                            </div>
+                            <Badge className={getStatusColor(product.status)}>
+                              {product.status}
+                            </Badge>
+                            <Button variant="outline" size="sm">
+                              Update Stock
+                            </Button>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-4">
-                          <div className="text-right">
-                            <p className="font-semibold">{product.stock} units</p>
-                            <p className="text-xs text-muted-foreground">{product.sales} sold</p>
+
+                        {/* Mobile Layout */}
+                        <div className="md:hidden p-4 space-y-3">
+                          <div className="flex items-start space-x-3">
+                            <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Package className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-medium text-sm truncate">{product.name}</h3>
+                              <p className="text-xs text-muted-foreground">{product.category}</p>
+                              <div className="flex items-center justify-between mt-2">
+                                <div>
+                                  <span className="font-semibold text-sm">{product.stock} units</span>
+                                  <span className="text-xs text-muted-foreground ml-2">({product.sales} sold)</span>
+                                </div>
+                                <Badge className={`${getStatusColor(product.status)} text-xs`}>
+                                  {product.status}
+                                </Badge>
+                              </div>
+                            </div>
                           </div>
-                          <Badge className={getStatusColor(product.status)}>
-                            {product.status}
-                          </Badge>
-                          <Button variant="outline" size="sm">
-                            Update Stock
-                          </Button>
+                          <div className="flex justify-end pt-2 border-t">
+                            <Button variant="outline" size="sm" className="h-8 text-xs">
+                              Update Stock
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -600,29 +759,62 @@ const AdminDashboard = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {recentOrders.map((order) => (
-                      <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg hover:shadow-md transition-all">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
-                            <ShoppingCart className="h-5 w-5 text-muted-foreground" />
+                      <div key={order.id} className="border rounded-lg hover:shadow-md transition-all">
+                        {/* Desktop Layout */}
+                        <div className="hidden md:flex items-center justify-between p-4">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
+                              <ShoppingCart className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                            <div>
+                              <h3 className="font-medium">{order.id}</h3>
+                              <p className="text-sm text-muted-foreground">{order.customer}</p>
+                            </div>
                           </div>
-                          <div>
-                            <h3 className="font-medium">{order.id}</h3>
-                            <p className="text-sm text-muted-foreground">{order.customer}</p>
+                          <div className="flex items-center space-x-4">
+                            <div className="text-right">
+                              <p className="font-semibold">{order.amount}</p>
+                              <p className="text-xs text-muted-foreground">{order.date}</p>
+                            </div>
+                            <Badge className={getOrderStatusColor(order.status)}>
+                              {order.status}
+                            </Badge>
+                            <div className="flex items-center space-x-2">
+                              <Button variant="ghost" size="sm">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm">
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-4">
-                          <div className="text-right">
-                            <p className="font-semibold">{order.amount}</p>
-                            <p className="text-xs text-muted-foreground">{order.date}</p>
+
+                        {/* Mobile Layout */}
+                        <div className="md:hidden p-4 space-y-3">
+                          <div className="flex items-start space-x-3">
+                            <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                              <ShoppingCart className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-medium text-sm">{order.id}</h3>
+                              <p className="text-xs text-muted-foreground truncate">{order.customer}</p>
+                              <div className="flex items-center justify-between mt-2">
+                                <div>
+                                  <span className="font-semibold text-sm">{order.amount}</span>
+                                  <span className="text-xs text-muted-foreground ml-2">{order.date}</span>
+                                </div>
+                                <Badge className={`${getOrderStatusColor(order.status)} text-xs`}>
+                                  {order.status}
+                                </Badge>
+                              </div>
+                            </div>
                           </div>
-                          <Badge className={getOrderStatusColor(order.status)}>
-                            {order.status}
-                          </Badge>
-                          <div className="flex items-center space-x-2">
-                            <Button variant="ghost" size="sm">
+                          <div className="flex justify-end space-x-2 pt-2 border-t">
+                            <Button variant="ghost" size="sm" className="h-8 px-2">
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" className="h-8 px-2">
                               <Edit className="h-4 w-4" />
                             </Button>
                           </div>
@@ -640,4 +832,27 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+// Protected Admin Component with Login
+function ProtectedAdmin() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    // Store admin session (you might want to use a more secure approach in production)
+    sessionStorage.setItem("mona-admin-auth", "true");
+  };
+
+  // Check for existing admin session on component mount
+  useEffect(() => {
+    const isAdminAuthenticated = sessionStorage.getItem("mona-admin-auth") === "true";
+    setIsAuthenticated(isAdminAuthenticated);
+  }, []);
+
+  if (!isAuthenticated) {
+    return <AdminLogin onLogin={handleLogin} />;
+  }
+
+  return <AdminDashboard />;
+}
+
+export default ProtectedAdmin;

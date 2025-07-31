@@ -23,6 +23,7 @@ import Lehengas from "./pages/Lehengas";
 import Collections from "./pages/Collections";
 import ProductDetail from "./pages/ProductDetail";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
@@ -72,6 +73,7 @@ export default function App() {
                     <Route path="/cart" element={<PlaceholderPage title="Shopping Cart" />} />
                     <Route path="/wishlist" element={<Wishlist />} />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
                     <Route path="/product/:id" element={<ProductDetail />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/profile" element={<Profile />} />
