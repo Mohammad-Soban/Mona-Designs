@@ -5,6 +5,7 @@ import { allProducts, getProductsByCategory, sortProducts } from "@/data/product
 import {
   ChevronDown
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const sortOptions = [
   { value: "featured", label: "Featured" },
