@@ -311,7 +311,6 @@ export function Navigation() {
                   {item.name}
                 </Link>
               ))}
-
             </div>
           </div>
         </div>
