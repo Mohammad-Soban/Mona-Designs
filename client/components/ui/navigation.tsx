@@ -110,7 +110,7 @@ export function Navigation() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="relative text-white hover:bg-white/20 border border-white/20"
+                  className="relative text-gold hover:bg-gold/20 hover:text-gold border border-gold/30"
                   onClick={toggleCart}
                 >
                   <ShoppingCart className="h-4 w-4" />
