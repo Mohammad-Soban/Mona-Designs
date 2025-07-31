@@ -78,25 +78,15 @@ export default function Collections() {
         </div>
       </section>
 
-      {/* Filters & Sort Bar */}
+      {/* Sort Bar */}
       <section className="sticky top-16 z-40 bg-background/95 backdrop-blur border-b">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center space-x-2"
-              >
-                <Filter className="h-4 w-4" />
-                <span>Filters</span>
-              </Button>
-              
-              <Badge variant="secondary" className="hidden md:flex">
+              <Badge variant="secondary" className="flex">
                 {filteredAndSortedProducts.length} Products
               </Badge>
-              
+
               {sortBy !== "featured" && (
                 <Badge variant="outline" className="text-xs">
                   Sorted by: {sortOptions.find(opt => opt.value === sortBy)?.label}
@@ -119,26 +109,6 @@ export default function Collections() {
                   ))}
                 </select>
                 <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none" />
-              </div>
-
-              {/* View Mode Toggle */}
-              <div className="flex border border-border rounded-md overflow-hidden">
-                <Button
-                  variant={viewMode === "grid" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                  className="rounded-none"
-                >
-                  <Grid3X3 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "list" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                  className="rounded-none"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
               </div>
             </div>
           </div>
