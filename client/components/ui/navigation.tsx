@@ -48,270 +48,277 @@ export function Navigation() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/20 backdrop-blur-md supports-[backdrop-filter]:bg-background/10 shadow-sm">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          {/* Mobile Navbar Layout */}
-          <div className="flex w-full items-center justify-between md:hidden">
-            {/* Menu on right */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsOpen(!isOpen)}
-              className="order-3 ml-auto"
-            >
-              {isOpen ? (
-                <X className="h-4 w-4" />
-              ) : (
-                <Menu className="h-4 w-4" />
-              )}
-            </Button>
-
-            {/* Centered Logo */}
-            <Link to="/" className="order-1 flex items-center mx-auto">
-              <img
-                src="/static/images/logo.webp"
-                alt="Mona Designs Logo"
-                className="h-10 w-auto"
-              />
-            </Link>
-
-            {/* WhatsApp and ThemeToggle after logo */}
-            <div className="order-2 flex items-center space-x-2">
-              <button
-                onClick={handleWhatsAppClick}
-                className="p-2 hover:bg-muted rounded-md transition-colors"
-                title="Contact us on WhatsApp"
+    <header className="fixed top-0 z-50 w-full">
+      {/* Transparent navbar with glass effect */}
+      <div className="bg-transparent backdrop-blur-lg border-b border-white/10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            {/* Mobile Navbar Layout */}
+            <div className="flex w-full items-center justify-between md:hidden">
+              {/* Menu on right */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsOpen(!isOpen)}
+                className="order-3 ml-auto text-white hover:bg-white/20 border border-white/20"
               >
-                <MessageCircle className="h-5 w-5 text-green-600" />
-              </button>
-              <ThemeToggle />
+                {isOpen ? (
+                  <X className="h-4 w-4" />
+                ) : (
+                  <Menu className="h-4 w-4" />
+                )}
+              </Button>
+
+              {/* Centered Logo */}
+              <Link to="/" className="order-1 flex items-center mx-auto">
+                <img
+                  src="/static/images/logo.webp"
+                  alt="Mona Designs Logo"
+                  className="h-10 w-auto drop-shadow-lg"
+                />
+              </Link>
+
+              {/* WhatsApp and ThemeToggle after logo */}
+              <div className="order-2 flex items-center space-x-2">
+                <button
+                  onClick={handleWhatsAppClick}
+                  className="p-2 hover:bg-white/20 rounded-md transition-colors border border-white/20"
+                  title="Contact us on WhatsApp"
+                >
+                  <MessageCircle className="h-5 w-5 text-green-400" />
+                </button>
+                <div className="border border-white/20 rounded-md">
+                  <ThemeToggle />
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex w-full items-center justify-between">
+              {/* Logo for desktop */}
+              <Link to="/" className="hidden md:flex items-center">
+                <img
+                  src="/static/images/logo.webp"
+                  alt="Mona Designs Logo"
+                  className="h-10 w-auto drop-shadow-lg"
+                />
+              </Link>
+
+              {/* Navigation menu center */}
+              <nav className="flex items-center space-x-8 mx-4">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className="text-sm font-medium transition-colors hover:text-gold text-white/90 hover:text-gold drop-shadow-sm"
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </nav>
+
+              {/* Actions on right */}
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={handleWhatsAppClick}
+                  className="p-2 hover:bg-white/20 rounded-md transition-colors border border-white/20"
+                  title="Contact us on WhatsApp"
+                >
+                  <MessageCircle className="h-5 w-5 text-green-400" />
+                </button>
+                <div className="border border-white/20 rounded-md">
+                  <ThemeToggle />
+                </div>
+                <Link to="/wishlist">
+                  <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/20 border border-white/20">
+                    <Heart className="h-5 w-5" />
+                    {getWishlistCount() > 0 && (
+                      <Badge
+                        variant="destructive"
+                        className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs"
+                      >
+                        {getWishlistCount()}
+                      </Badge>
+                    )}
+                  </Button>
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative text-white hover:bg-white/20 border border-white/20"
+                  onClick={toggleCart}
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  {getCartItemsCount() > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs"
+                    >
+                      {getCartItemsCount()}
+                    </Badge>
+                  )}
+                </Button>
+                {authState.isAuthenticated ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 border border-white/20">
+                        <User className="h-5 w-5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 bg-background/95 backdrop-blur-sm border-white/20">
+                      <DropdownMenuLabel>
+                        {authState.user?.name || "My Account"}
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/profile" className="flex items-center">
+                          <User className="mr-2 h-4 w-4" />
+                          Profile
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={logout}
+                        className="flex items-center"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Logout
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Link to="/login">
+                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 border border-white/20">
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center space-x-2">
+              {/* Mobile Actions */}
+              <div className="flex items-center space-x-2 md:hidden">
+                {/* Wishlist */}
+                <Link to="/wishlist">
+                  <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/20 border border-white/20">
+                    <Heart className="h-5 w-5" />
+                    {getWishlistCount() > 0 && (
+                      <Badge
+                        variant="destructive"
+                        className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs"
+                      >
+                        {getWishlistCount()}
+                      </Badge>
+                    )}
+                  </Button>
+                </Link>
+
+                {/* Cart */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative text-white hover:bg-white/20 border border-white/20"
+                  onClick={toggleCart}
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  {getCartItemsCount() > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs"
+                    >
+                      {getCartItemsCount()}
+                    </Badge>
+                  )}
+                </Button>
+
+                {/* User Account */}
+                {authState.isAuthenticated ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 border border-white/20">
+                        <User className="h-5 w-5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 bg-background/95 backdrop-blur-sm border-white/20">
+                      <DropdownMenuLabel>
+                        {authState.user?.name || "My Account"}
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/profile" className="flex items-center">
+                          <User className="mr-2 h-4 w-4" />
+                          Profile
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={logout}
+                        className="flex items-center"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Logout
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Link to="/login">
+                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 border border-white/20">
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex w-full items-center justify-between">
-            {/* Logo for desktop */}
-            <Link to="/" className="hidden md:flex items-center">
-              <img
-                src="/static/images/logo.webp"
-                alt="Mona Designs Logo"
-                className="h-10 w-auto"
-              />
-            </Link>
-
-            {/* Navigation menu center */}
-            <nav className="flex items-center space-x-8 mx-4">
+          {/* Mobile Navigation - Improved dropdown with glass effect */}
+          <div
+            className={cn(
+              "md:hidden transition-all duration-300 ease-in-out overflow-hidden",
+              isOpen
+                ? "max-h-96 opacity-100"
+                : "max-h-0 opacity-0 pointer-events-none",
+            )}
+          >
+            <div className="py-4 space-y-2 border-t border-white/20 bg-black/30 backdrop-blur-md rounded-b-lg">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className="text-sm font-medium transition-colors hover:text-primary"
+                  className="block px-3 py-2 text-sm font-medium transition-colors hover:text-gold text-white/90 hover:bg-white/10 rounded-md mx-2"
+                  onClick={() => setIsOpen(false)}
                 >
                   {item.name}
                 </Link>
               ))}
-            </nav>
-
-            {/* Actions on right */}
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={handleWhatsAppClick}
-                className="p-2 hover:bg-muted rounded-md transition-colors"
-                title="Contact us on WhatsApp"
-              >
-                <MessageCircle className="h-5 w-5 text-green-600" />
-              </button>
-              <ThemeToggle />
-              <Link to="/wishlist">
-                <Button variant="ghost" size="icon" className="relative">
-                  <Heart className="h-5 w-5" />
-                  {getWishlistCount() > 0 && (
-                    <Badge
-                      variant="destructive"
-                      className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs"
-                    >
-                      {getWishlistCount()}
-                    </Badge>
-                  )}
-                </Button>
-              </Link>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative"
-                onClick={toggleCart}
-              >
-                <ShoppingCart className="h-5 w-5" />
-                {getCartItemsCount() > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs"
-                  >
-                    {getCartItemsCount()}
-                  </Badge>
-                )}
-              </Button>
-              {authState.isAuthenticated ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <User className="h-5 w-5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuLabel>
-                      {authState.user?.name || "My Account"}
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile" className="flex items-center">
+              <div className="px-3 py-2 space-y-2">
+                {authState.isAuthenticated ? (
+                  <div className="space-y-2">
+                    <div className="text-sm text-center text-white/80">
+                      Welcome, {authState.user?.name || "Guest"}
+                    </div>
+                    <Link to="/profile" onClick={() => setIsOpen(false)}>
+                      <Button className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30" variant="outline">
                         <User className="mr-2 h-4 w-4" />
                         Profile
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={logout}
-                      className="flex items-center"
-                    >
+                      </Button>
+                    </Link>
+                    <Button className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30" variant="outline" onClick={logout}>
                       <LogOut className="mr-2 h-4 w-4" />
                       Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Link to="/login">
-                  <Button variant="ghost" size="icon">
-                    <User className="h-5 w-5" />
-                  </Button>
-                </Link>
-              )}
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center space-x-2">
-            {/* Mobile Actions */}
-            <div className="flex items-center space-x-2 md:hidden">
-              {/* Wishlist */}
-              <Link to="/wishlist">
-                <Button variant="ghost" size="icon" className="relative">
-                  <Heart className="h-5 w-5" />
-                  {getWishlistCount() > 0 && (
-                    <Badge
-                      variant="destructive"
-                      className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs"
-                    >
-                      {getWishlistCount()}
-                    </Badge>
-                  )}
-                </Button>
-              </Link>
-
-              {/* Cart */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative"
-                onClick={toggleCart}
-              >
-                <ShoppingCart className="h-5 w-5" />
-                {getCartItemsCount() > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs"
-                  >
-                    {getCartItemsCount()}
-                  </Badge>
-                )}
-              </Button>
-
-              {/* User Account */}
-              {authState.isAuthenticated ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <User className="h-5 w-5" />
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuLabel>
-                      {authState.user?.name || "My Account"}
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile" className="flex items-center">
-                        <User className="mr-2 h-4 w-4" />
-                        Profile
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={logout}
-                      className="flex items-center"
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Link to="/login">
-                  <Button variant="ghost" size="icon">
-                    <User className="h-5 w-5" />
-                  </Button>
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Navigation - Cleaned up dropdown without duplicate buttons */}
-        <div
-          className={cn(
-            "md:hidden transition-all duration-300 ease-in-out",
-            isOpen
-              ? "max-h-64 opacity-100"
-              : "max-h-0 opacity-0 pointer-events-none",
-          )}
-        >
-          <div className="py-4 space-y-2 border-t">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="block px-3 py-2 text-sm font-medium transition-colors hover:text-primary"
-                onClick={() => setIsOpen(false)}
-              >
-                {item.name}
-              </Link>
-            ))}
-            <div className="px-3 py-2 space-y-2">
-              {authState.isAuthenticated ? (
-                <div className="space-y-2">
-                  <div className="text-sm text-center">
-                    Welcome, {authState.user?.name || "Guest"}
                   </div>
-                  <Link to="/profile" onClick={() => setIsOpen(false)}>
-                    <Button className="w-full" variant="outline">
+                ) : (
+                  <Link to="/login" onClick={() => setIsOpen(false)}>
+                    <Button className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30" variant="outline">
                       <User className="mr-2 h-4 w-4" />
-                      Profile
+                      Login / Sign Up
                     </Button>
                   </Link>
-                  <Button className="w-full" variant="outline" onClick={logout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
-                  </Button>
-                </div>
-              ) : (
-                <Link to="/login" onClick={() => setIsOpen(false)}>
-                  <Button className="w-full" variant="outline">
-                    <User className="mr-2 h-4 w-4" />
-                    Login / Sign Up
-                  </Button>
-                </Link>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
