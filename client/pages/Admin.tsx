@@ -9,11 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { 
-  BarChart3, 
-  Package, 
-  ShoppingCart, 
-  Users, 
+import {
+  BarChart3,
+  Package,
+  ShoppingCart,
+  Users,
   IndianRupee,
   TrendingUp,
   TrendingDown,
@@ -33,7 +33,8 @@ import {
   Star,
   Activity,
   PieChart,
-  LineChart
+  LineChart,
+  ChevronDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionWrapper } from "@/components/ui/section-wrapper";
