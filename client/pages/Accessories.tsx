@@ -80,8 +80,8 @@ export default function Accessories() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-64 bg-gradient-to-r from-amber-500/90 to-yellow-600/90 flex items-center">
-        <div className="absolute inset-0 bg-gradient-to-br from-gold/20 to-amber-600/20" />
+      <section className="relative h-64 bg-gradient-to-r from-teal-600/90 to-cyan-600/90 flex items-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-700/20 to-cyan-700/20" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
