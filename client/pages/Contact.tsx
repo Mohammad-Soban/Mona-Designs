@@ -51,7 +51,7 @@ export default function Contact() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-64 bg-gradient-to-r from-blue-600/90 to-indigo-600/90 flex items-center">
+      <section className="relative h-64 bg-gradient-to-r from-blue-600/90 to-indigo-600/90 flex items-center mt-20">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-700/20 to-indigo-700/20" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
