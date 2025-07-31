@@ -207,13 +207,36 @@ export function Navigation() {
               {/* Navigation menu center */}
               <nav className="flex items-center space-x-8 mx-4">
                 {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className="text-sm font-medium transition-colors text-gold hover:text-gold/80 drop-shadow-sm font-semibold"
-                  >
-                    {item.name}
-                  </Link>
+                  item.dropdown ? (
+                    <DropdownMenu key={item.name}>
+                      <DropdownMenuTrigger asChild>
+                        <button className="text-sm font-medium transition-colors text-gold hover:text-gold/80 drop-shadow-sm font-semibold flex items-center space-x-1">
+                          <span>{item.name}</span>
+                          <ChevronDown className="h-3 w-3" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="start"
+                        className="w-48 bg-background/95 backdrop-blur-sm border-white/20"
+                      >
+                        {item.dropdown.map((subItem) => (
+                          <DropdownMenuItem key={subItem.name} asChild>
+                            <Link to={subItem.href} className="flex items-center">
+                              {subItem.name}
+                            </Link>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      className="text-sm font-medium transition-colors text-gold hover:text-gold/80 drop-shadow-sm font-semibold"
+                    >
+                      {item.name}
+                    </Link>
+                  )
                 ))}
               </nav>
 
