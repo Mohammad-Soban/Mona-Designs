@@ -182,7 +182,7 @@ export default function Contact() {
                           type="text"
                           value={formData.name}
                           onChange={handleChange}
-                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                           required
                         />
                       </div>
@@ -194,7 +194,7 @@ export default function Contact() {
                           type="email"
                           value={formData.email}
                           onChange={handleChange}
-                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                           required
                         />
                       </div>
@@ -209,7 +209,7 @@ export default function Contact() {
                           type="tel"
                           value={formData.phone}
                           onChange={handleChange}
-                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                         />
                       </div>
                       <div>
@@ -219,7 +219,7 @@ export default function Contact() {
                           name="subject"
                           value={formData.subject}
                           onChange={handleChange}
-                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                           required
                         >
                           <option value="">Select a subject</option>
