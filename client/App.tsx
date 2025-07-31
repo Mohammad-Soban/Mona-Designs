@@ -30,6 +30,14 @@ import Profile from "./pages/Profile";
 import SizeGuide from "./pages/SizeGuide";
 import Returns from "./pages/Returns";
 import Wishlist from "./pages/Wishlist";
+import Accessories from "./pages/Accessories";
+import HeritageWork from "./pages/HeritageWork";
+import Haldi from "./pages/occasions/Haldi";
+import Wedding from "./pages/occasions/Wedding";
+import Reception from "./pages/occasions/Reception";
+import Mehendi from "./pages/occasions/Mehendi";
+import Sangeet from "./pages/occasions/Sangeet";
+import General from "./pages/occasions/General";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
