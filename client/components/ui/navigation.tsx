@@ -346,14 +346,34 @@ export function Navigation() {
           >
             <div className="py-4 space-y-2 border-t border-white/20 bg-black/30 backdrop-blur-md rounded-b-lg">
               {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className="block px-3 py-2 text-sm font-medium transition-colors text-gold hover:text-gold/80 hover:bg-white/10 rounded-md mx-2 font-semibold"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.name}
-                </Link>
+                item.dropdown ? (
+                  <div key={item.name} className="mx-2">
+                    <div className="px-3 py-2 text-sm font-medium text-gold/80 font-semibold">
+                      {item.name}
+                    </div>
+                    <div className="ml-4 space-y-1">
+                      {item.dropdown.map((subItem) => (
+                        <Link
+                          key={subItem.name}
+                          to={subItem.href}
+                          className="block px-3 py-2 text-sm font-medium transition-colors text-gold hover:text-gold/80 hover:bg-white/10 rounded-md"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {subItem.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className="block px-3 py-2 text-sm font-medium transition-colors text-gold hover:text-gold/80 hover:bg-white/10 rounded-md mx-2 font-semibold"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                )
               ))}
             </div>
           </div>
