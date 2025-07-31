@@ -232,42 +232,7 @@ export function Navigation() {
                   {item.name}
                 </Link>
               ))}
-              <div className="px-3 py-2 space-y-2">
-                {authState.isAuthenticated ? (
-                  <div className="space-y-2">
-                    <div className="text-sm text-center text-white/80">
-                      Welcome, {authState.user?.name || "Guest"}
-                    </div>
-                    <Link to="/profile" onClick={() => setIsOpen(false)}>
-                      <Button
-                        className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30"
-                        variant="outline"
-                      >
-                        <User className="mr-2 h-4 w-4" />
-                        Profile
-                      </Button>
-                    </Link>
-                    <Button
-                      className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30"
-                      variant="outline"
-                      onClick={logout}
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Logout
-                    </Button>
-                  </div>
-                ) : (
-                  <Link to="/login" onClick={() => setIsOpen(false)}>
-                    <Button
-                      className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30"
-                      variant="outline"
-                    >
-                      <User className="mr-2 h-4 w-4" />
-                      Login / Sign Up
-                    </Button>
-                  </Link>
-                )}
-              </div>
+
             </div>
           </div>
         </div>
