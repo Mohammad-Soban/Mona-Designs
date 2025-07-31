@@ -77,7 +77,7 @@ export function Navigation() {
           <div className="hidden md:flex w-full items-center justify-between">
             {/* Logo for desktop */}
             <Link to="/" className="hidden md:flex items-center">
-              <img src="/static/images/logo.webp" alt="Mona Designs Logo" className="h-18 w-auto" />
+              <img src="/static/images/logo.webp" alt="Mona Designs Logo" className="h-10 w-auto" />
             </Link>
 
             {/* Navigation menu center */}
