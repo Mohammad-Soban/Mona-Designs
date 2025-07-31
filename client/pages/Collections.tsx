@@ -18,10 +18,8 @@ const sortOptions = [
 const categories = ["All", "Sherwanis", "Kurtas", "Suits", "Lehengas"];
 
 export default function Collections() {
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState("featured");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [showFilters, setShowFilters] = useState(false);
 
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
