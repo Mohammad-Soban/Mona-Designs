@@ -100,7 +100,7 @@ export function Navigation() {
                 <img
                   src="/static/images/logo.webp"
                   alt="Mona Designs Logo"
-                  className="h-10 w-auto drop-shadow-lg"
+                  className="h-12 w-auto drop-shadow-lg"
                 />
               </Link>
 
@@ -110,7 +110,7 @@ export function Navigation() {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className="text-sm font-medium transition-colors hover:text-gold text-white/90 hover:text-gold drop-shadow-sm"
+                    className="text-sm font-medium transition-colors text-gold hover:text-gold/80 drop-shadow-sm font-semibold"
                   >
                     {item.name}
                   </Link>
