@@ -551,35 +551,74 @@ const AdminDashboard = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {mockProducts.map((product) => (
-                      <div key={product.id} className="flex items-center justify-between p-4 border rounded-lg hover:shadow-md transition-all">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
-                            <Package className="h-6 w-6 text-muted-foreground" />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold">{product.name}</h3>
-                            <p className="text-sm text-muted-foreground">{product.category}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-6">
-                          <div className="text-right">
-                            <p className="font-semibold">{product.price}</p>
-                            <div className="flex items-center space-x-1">
-                              <Star className="h-3 w-3 text-gold fill-current" />
-                              <span className="text-xs">{product.rating}</span>
+                      <div key={product.id} className="border rounded-lg hover:shadow-md transition-all">
+                        {/* Desktop Layout */}
+                        <div className="hidden md:flex items-center justify-between p-4">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
+                              <Package className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold">{product.name}</h3>
+                              <p className="text-sm text-muted-foreground">{product.category}</p>
                             </div>
                           </div>
-                          <Badge className={getStatusColor(product.status)}>
-                            {product.status}
-                          </Badge>
-                          <div className="flex items-center space-x-2">
-                            <Button variant="ghost" size="sm">
+                          <div className="flex items-center space-x-6">
+                            <div className="text-right">
+                              <p className="font-semibold">{product.price}</p>
+                              <div className="flex items-center space-x-1">
+                                <Star className="h-3 w-3 text-gold fill-current" />
+                                <span className="text-xs">{product.rating}</span>
+                              </div>
+                            </div>
+                            <Badge className={getStatusColor(product.status)}>
+                              {product.status}
+                            </Badge>
+                            <div className="flex items-center space-x-2">
+                              <Button variant="ghost" size="sm">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm">
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Mobile Layout */}
+                        <div className="md:hidden p-4 space-y-3">
+                          <div className="flex items-start space-x-3">
+                            <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Package className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-sm truncate">{product.name}</h3>
+                              <p className="text-xs text-muted-foreground">{product.category}</p>
+                              <div className="flex items-center justify-between mt-2">
+                                <div className="flex items-center space-x-2">
+                                  <span className="font-semibold text-sm">{product.price}</span>
+                                  <div className="flex items-center space-x-1">
+                                    <Star className="h-3 w-3 text-gold fill-current" />
+                                    <span className="text-xs">{product.rating}</span>
+                                  </div>
+                                </div>
+                                <Badge className={`${getStatusColor(product.status)} text-xs`}>
+                                  {product.status}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex justify-end space-x-2 pt-2 border-t">
+                            <Button variant="ghost" size="sm" className="h-8 px-2">
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" className="h-8 px-2">
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" className="h-8 px-2">
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
