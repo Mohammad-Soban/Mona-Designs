@@ -179,7 +179,7 @@ export function Navigation() {
                 <img
                   src="/static/images/logo.webp"
                   alt="Mona Designs Logo"
-                  className="h-12 w-auto drop-shadow-lg"
+                  className="h-16 w-auto drop-shadow-lg"
                 />
               </Link>
 
