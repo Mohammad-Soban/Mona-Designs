@@ -632,16 +632,16 @@ const AdminDashboard = () => {
 
             {/* Inventory Tab */}
             <TabsContent value="inventory" className="space-y-6">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <h2 className="text-2xl font-semibold">Inventory Management</h2>
                 <div className="flex space-x-2">
-                  <Button variant="outline">
-                    <Download className="h-4 w-4 mr-2" />
-                    Export
+                  <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                    <Download className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Export</span>
                   </Button>
-                  <Button variant="outline">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Import
+                  <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                    <Upload className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Import</span>
                   </Button>
                 </div>
               </div>
