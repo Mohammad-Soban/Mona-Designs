@@ -60,7 +60,7 @@ export function Navigation() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsOpen(!isOpen)}
-                className="text-white hover:bg-white/20 border border-white/20"
+                className="text-gold hover:bg-gold/20 hover:text-gold border border-gold/30"
               >
                 {isOpen ? (
                   <X className="h-4 w-4" />
