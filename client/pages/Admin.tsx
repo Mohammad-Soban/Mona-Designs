@@ -641,4 +641,27 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+// Protected Admin Component with Login
+function ProtectedAdmin() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    // Store admin session (you might want to use a more secure approach in production)
+    sessionStorage.setItem("mona-admin-auth", "true");
+  };
+
+  // Check for existing admin session
+  useState(() => {
+    const isAdminAuthenticated = sessionStorage.getItem("mona-admin-auth") === "true";
+    setIsAuthenticated(isAdminAuthenticated);
+  });
+
+  if (!isAuthenticated) {
+    return <AdminLogin onLogin={handleLogin} />;
+  }
+
+  return <AdminDashboard />;
+}
+
+export default ProtectedAdmin;
