@@ -252,7 +252,7 @@ export default function Register() {
                       value={formData.mobile}
                       onChange={(e) => handleInputChange("mobile", e.target.value.replace(/\D/g, ""))}
                       className={cn(
-                        "w-full pl-16 pr-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-gold",
+                        "w-full pl-16 pr-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black",
                         errors.mobile ? "border-red-500" : "border-border"
                       )}
                       maxLength={10}
