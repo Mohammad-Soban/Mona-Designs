@@ -196,24 +196,24 @@ export default function SizeGuide() {
               </div>
             </div>
 
-            <h2 className="text-3xl font-serif font-bold mb-6 text-white">
+            <h2 className="text-3xl font-serif font-bold mb-6 text-foreground">
               Still Need Help?
             </h2>
-            <p className="text-white/90 text-lg mb-8">
+            <p className="text-muted-foreground text-lg mb-8">
               Our sizing experts are here to help you find the perfect fit
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="tel:+919876543210" className="inline-flex">
-                <div className="bg-white/20 backdrop-blur-md rounded-lg px-6 py-4 flex items-center space-x-3 hover:bg-white/30 transition-all duration-300">
-                  <Phone className="h-5 w-5 text-white" />
-                  <span className="text-white font-medium">Call: +91 98765 43210</span>
+                <div className="bg-gold/10 border border-gold/20 rounded-lg px-6 py-4 flex items-center space-x-3 hover:bg-gold/20 transition-all duration-300">
+                  <Phone className="h-5 w-5 text-gold" />
+                  <span className="text-foreground font-medium">Call: +91 98765 43210</span>
                 </div>
               </a>
               <a href="mailto:hello@monadesigners.com" className="inline-flex">
-                <div className="bg-white/20 backdrop-blur-md rounded-lg px-6 py-4 flex items-center space-x-3 hover:bg-white/30 transition-all duration-300">
-                  <Info className="h-5 w-5 text-white" />
-                  <span className="text-white font-medium">Email Support</span>
+                <div className="bg-gold/10 border border-gold/20 rounded-lg px-6 py-4 flex items-center space-x-3 hover:bg-gold/20 transition-all duration-300">
+                  <Info className="h-5 w-5 text-gold" />
+                  <span className="text-foreground font-medium">Email Support</span>
                 </div>
               </a>
             </div>
