@@ -55,12 +55,12 @@ export function Navigation() {
           <div className="flex h-16 items-center justify-between">
             {/* Mobile Navbar Layout */}
             <div className="flex w-full items-center justify-between md:hidden">
-              {/* Menu on right */}
+              {/* Left side - Menu button */}
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsOpen(!isOpen)}
-                className="order-3 ml-auto text-white hover:bg-white/20 border border-white/20"
+                className="text-white hover:bg-white/20 border border-white/20"
               >
                 {isOpen ? (
                   <X className="h-4 w-4" />
@@ -69,8 +69,8 @@ export function Navigation() {
                 )}
               </Button>
 
-              {/* Centered Logo */}
-              <Link to="/" className="order-1 flex items-center mx-auto">
+              {/* Center - Logo */}
+              <Link to="/" className="flex items-center">
                 <img
                   src="/static/images/logo.webp"
                   alt="Mona Designs Logo"
@@ -78,18 +78,97 @@ export function Navigation() {
                 />
               </Link>
 
-              {/* WhatsApp and ThemeToggle after logo */}
-              <div className="order-2 flex items-center space-x-2">
+              {/* Right side - Actions */}
+              <div className="flex items-center space-x-1">
                 <button
                   onClick={handleWhatsAppClick}
                   className="p-2 hover:bg-white/20 rounded-md transition-colors border border-white/20"
                   title="Contact us on WhatsApp"
                 >
-                  <MessageCircle className="h-5 w-5 text-green-400" />
+                  <MessageCircle className="h-4 w-4 text-green-400" />
                 </button>
                 <div className="border border-white/20 rounded-md">
                   <ThemeToggle />
                 </div>
+                <Link to="/wishlist">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative text-white hover:bg-white/20 border border-white/20"
+                  >
+                    <Heart className="h-4 w-4" />
+                    {getWishlistCount() > 0 && (
+                      <Badge
+                        variant="destructive"
+                        className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs"
+                      >
+                        {getWishlistCount()}
+                      </Badge>
+                    )}
+                  </Button>
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative text-white hover:bg-white/20 border border-white/20"
+                  onClick={toggleCart}
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                  {getCartItemsCount() > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs"
+                    >
+                      {getCartItemsCount()}
+                    </Badge>
+                  )}
+                </Button>
+                {authState.isAuthenticated ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-white hover:bg-white/20 border border-white/20"
+                      >
+                        <User className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-48 bg-background/95 backdrop-blur-sm border-white/20"
+                    >
+                      <DropdownMenuLabel>
+                        {authState.user?.name || "My Account"}
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/profile" className="flex items-center">
+                          <User className="mr-2 h-4 w-4" />
+                          Profile
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={logout}
+                        className="flex items-center"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Logout
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Link to="/login">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-white hover:bg-white/20 border border-white/20"
+                    >
+                      <User className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
 
