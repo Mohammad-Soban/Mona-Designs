@@ -166,6 +166,33 @@ export default function HeritageWork() {
         </div>
       </section>
 
+      {/* Heritage Products Showcase */}
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-serif font-bold mb-4">
+              Heritage Crafted Products
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Discover our exquisite collection of heritage products, each piece lovingly crafted
+              using traditional techniques and showcasing the finest artisanship.
+            </p>
+          </div>
+
+          {/* Featured Heritage Products */}
+          <ProductGrid products={allProducts.slice(0, 8)} />
+
+          <div className="text-center mt-12">
+            <Button size="lg" className="bg-gold hover:bg-gold/90 mr-4">
+              Shop Heritage Collection
+            </Button>
+            <Button variant="outline" size="lg">
+              View All Products
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* Heritage Process */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
