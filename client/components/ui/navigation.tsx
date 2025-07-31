@@ -52,7 +52,7 @@ export function Navigation() {
       {/* Transparent navbar with glass effect */}
       <div className="bg-transparent backdrop-blur-lg border-b border-white/10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
+          <div className="flex h-20 items-center justify-between">
             {/* Mobile Navbar Layout */}
             <div className="flex w-full items-center justify-between md:hidden">
               {/* Left side - Menu button */}
