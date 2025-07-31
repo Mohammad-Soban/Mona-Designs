@@ -2,10 +2,12 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductGrid } from "@/components/ui/product-grid";
-import { allProducts, getProductsByCategory, sortProducts } from "@/data/products";
 import {
-  ChevronDown
-} from "lucide-react";
+  allProducts,
+  getProductsByCategory,
+  sortProducts,
+} from "@/data/products";
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const sortOptions = [
@@ -13,7 +15,7 @@ const sortOptions = [
   { value: "price-low", label: "Price: Low to High" },
   { value: "price-high", label: "Price: High to Low" },
   { value: "newest", label: "Newest First" },
-  { value: "rating", label: "Highest Rated" }
+  { value: "rating", label: "Highest Rated" },
 ];
 
 const categories = ["All", "Sherwanis", "Kurtas", "Suits", "Lehengas"];
@@ -47,8 +49,8 @@ export default function Collections() {
               All Collections
             </h1>
             <p className="text-amber-100 text-lg">
-              Discover our complete range of premium ethnic wear for every celebration. 
-              From traditional kurtas to designer lehengas.
+              Discover our complete range of premium ethnic wear for every
+              celebration. From traditional kurtas to designer lehengas.
             </p>
           </div>
         </div>
@@ -66,12 +68,14 @@ export default function Collections() {
                   "whitespace-nowrap pb-2 text-sm font-medium transition-colors",
                   selectedCategory === category
                     ? "border-b-2 border-gold text-gold"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {category}
                 <Badge variant="secondary" className="ml-2 text-xs">
-                  {category === "All" ? allProducts.length : getProductsByCategory(category).length}
+                  {category === "All"
+                    ? allProducts.length
+                    : getProductsByCategory(category).length}
                 </Badge>
               </button>
             ))}
@@ -90,7 +94,8 @@ export default function Collections() {
 
               {sortBy !== "featured" && (
                 <Badge variant="outline" className="text-xs">
-                  Sorted by: {sortOptions.find(opt => opt.value === sortBy)?.label}
+                  Sorted by:{" "}
+                  {sortOptions.find((opt) => opt.value === sortBy)?.label}
                 </Badge>
               )}
             </div>
@@ -113,8 +118,6 @@ export default function Collections() {
               </div>
             </div>
           </div>
-
-
         </div>
       </section>
 
@@ -123,9 +126,7 @@ export default function Collections() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {filteredAndSortedProducts.length > 0 ? (
             <>
-              <ProductGrid
-                products={filteredAndSortedProducts}
-              />
+              <ProductGrid products={filteredAndSortedProducts} />
 
               {/* Load More */}
               <div className="text-center mt-12">
