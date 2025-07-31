@@ -23,6 +23,7 @@ import Lehengas from "./pages/Lehengas";
 import Collections from "./pages/Collections";
 import ProductDetail from "./pages/ProductDetail";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
