@@ -130,7 +130,11 @@ export function Navigation() {
                   <ThemeToggle />
                 </div>
                 <Link to="/wishlist">
-                  <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/20 border border-white/20">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative text-white hover:bg-white/20 border border-white/20"
+                  >
                     <Heart className="h-5 w-5" />
                     {getWishlistCount() > 0 && (
                       <Badge
@@ -161,11 +165,18 @@ export function Navigation() {
                 {authState.isAuthenticated ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 border border-white/20">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-white hover:bg-white/20 border border-white/20"
+                      >
                         <User className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48 bg-background/95 backdrop-blur-sm border-white/20">
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-48 bg-background/95 backdrop-blur-sm border-white/20"
+                    >
                       <DropdownMenuLabel>
                         {authState.user?.name || "My Account"}
                       </DropdownMenuLabel>
@@ -188,7 +199,11 @@ export function Navigation() {
                   </DropdownMenu>
                 ) : (
                   <Link to="/login">
-                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 border border-white/20">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-white hover:bg-white/20 border border-white/20"
+                    >
                       <User className="h-5 w-5" />
                     </Button>
                   </Link>
@@ -224,19 +239,29 @@ export function Navigation() {
                       Welcome, {authState.user?.name || "Guest"}
                     </div>
                     <Link to="/profile" onClick={() => setIsOpen(false)}>
-                      <Button className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30" variant="outline">
+                      <Button
+                        className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30"
+                        variant="outline"
+                      >
                         <User className="mr-2 h-4 w-4" />
                         Profile
                       </Button>
                     </Link>
-                    <Button className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30" variant="outline" onClick={logout}>
+                    <Button
+                      className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30"
+                      variant="outline"
+                      onClick={logout}
+                    >
                       <LogOut className="mr-2 h-4 w-4" />
                       Logout
                     </Button>
                   </div>
                 ) : (
                   <Link to="/login" onClick={() => setIsOpen(false)}>
-                    <Button className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30" variant="outline">
+                    <Button
+                      className="w-full bg-white/20 border-white/30 text-white hover:bg-white/30"
+                      variant="outline"
+                    >
                       <User className="mr-2 h-4 w-4" />
                       Login / Sign Up
                     </Button>

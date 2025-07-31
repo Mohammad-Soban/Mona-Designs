@@ -2,13 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  ArrowRight, 
-  ChevronLeft, 
-  ChevronRight, 
+import {
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
   Play,
   Pause,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimatedBackground } from "./animated-background";
@@ -31,36 +31,42 @@ const videoCarousel: VideoSlide[] = [
     id: 1,
     title: "Royal Wedding Collection",
     subtitle: "Premium Ethnic Wear",
-    description: "Discover our exclusive range of handcrafted sherwanis and lehengas, perfect for your special day",
-    thumbnail: "bg-gradient-to-br from-red-600/30 via-orange-500/20 to-yellow-500/30",
+    description:
+      "Discover our exclusive range of handcrafted sherwanis and lehengas, perfect for your special day",
+    thumbnail:
+      "bg-gradient-to-br from-red-600/30 via-orange-500/20 to-yellow-500/30",
     video: "/static/hero_video.mp4",
     cta: {
       primary: { text: "Shop Collection", href: "/collections" },
-      secondary: { text: "View Lookbook", href: "/collections" }
-    }
+      secondary: { text: "View Lookbook", href: "/collections" },
+    },
   },
   {
     id: 2,
     title: "Festive Kurta Collection",
     subtitle: "Comfort Meets Elegance",
-    description: "Traditional kurtas reimagined with contemporary cuts and premium fabrics for every celebration",
-    thumbnail: "bg-gradient-to-br from-blue-600/30 via-purple-500/20 to-pink-500/30",
+    description:
+      "Traditional kurtas reimagined with contemporary cuts and premium fabrics for every celebration",
+    thumbnail:
+      "bg-gradient-to-br from-blue-600/30 via-purple-500/20 to-pink-500/30",
     cta: {
       primary: { text: "Explore Kurtas", href: "/kurtas" },
-      secondary: { text: "Size Guide", href: "/size-guide" }
-    }
+      secondary: { text: "Size Guide", href: "/size-guide" },
+    },
   },
   {
     id: 3,
     title: "Designer Suit Collection",
     subtitle: "Sophisticated & Timeless",
-    description: "Expertly tailored suits that blend traditional craftsmanship with modern aesthetics",
-    thumbnail: "bg-gradient-to-br from-green-600/30 via-teal-500/20 to-blue-500/30",
+    description:
+      "Expertly tailored suits that blend traditional craftsmanship with modern aesthetics",
+    thumbnail:
+      "bg-gradient-to-br from-green-600/30 via-teal-500/20 to-blue-500/30",
     cta: {
       primary: { text: "Shop Suits", href: "/suits" },
-      secondary: { text: "Custom Tailoring", href: "/contact" }
-    }
-  }
+      secondary: { text: "Custom Tailoring", href: "/contact" },
+    },
+  },
 ];
 
 export function HeroVideoCarousel() {
@@ -91,14 +97,16 @@ export function HeroVideoCarousel() {
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + videoCarousel.length) % videoCarousel.length);
+    setCurrentSlide(
+      (prev) => (prev - 1 + videoCarousel.length) % videoCarousel.length,
+    );
   };
 
   return (
     <section className="relative h-screen overflow-hidden">
       {/* Background Animation */}
       <AnimatedBackground variant="hero" />
-      
+
       {/* Slides */}
       <div className="relative w-full h-full">
         {videoCarousel.map((slide, index) => (
@@ -109,8 +117,8 @@ export function HeroVideoCarousel() {
               index === currentSlide
                 ? "opacity-100 translate-x-0"
                 : index < currentSlide
-                ? "opacity-0 -translate-x-full"
-                : "opacity-0 translate-x-full"
+                  ? "opacity-0 -translate-x-full"
+                  : "opacity-0 translate-x-full",
             )}
           >
             {/* Slide Background or Video */}
@@ -123,7 +131,7 @@ export function HeroVideoCarousel() {
                   muted
                   playsInline
                   className="w-full h-full object-cover"
-                  style={{ width: '100%', height: '100%' }}
+                  style={{ width: "100%", height: "100%" }}
                 />
               </div>
             ) : (
@@ -132,38 +140,38 @@ export function HeroVideoCarousel() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
               </div>
             )}
-            
+
             {/* Content Overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center text-white space-y-8 max-w-5xl px-4">
                 {/* Badge */}
                 <div className="flex justify-center">
-                  <Badge 
-                    variant="secondary" 
+                  <Badge
+                    variant="secondary"
                     className="text-sm bg-gold/20 text-gold border-gold/30 backdrop-blur-sm"
                   >
                     <Sparkles className="w-3 h-3 mr-1" />
                     {slide.subtitle}
                   </Badge>
                 </div>
-                
+
                 {/* Title */}
                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold tracking-tight">
                   <span className="bg-gradient-to-r from-white via-gold/90 to-white bg-clip-text text-transparent">
                     {slide.title}
                   </span>
                 </h1>
-                
+
                 {/* Description */}
                 <p className="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
                   {slide.description}
                 </p>
-                
+
                 {/* CTA Buttons */}
                 <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                   <Link to={slide.cta.primary.href}>
-                    <Button 
-                      size="lg" 
+                    <Button
+                      size="lg"
                       className="text-lg px-8 py-6 bg-gold hover:bg-gold/90 border border-gold/50 shadow-2xl hover:shadow-gold/20 transition-all duration-300 hover:scale-105"
                     >
                       {slide.cta.primary.text}
@@ -203,9 +211,9 @@ export function HeroVideoCarousel() {
               key={index}
               className={cn(
                 "w-3 h-3 rounded-full transition-all duration-500",
-                index === currentSlide 
-                  ? "bg-gold scale-125 shadow-lg shadow-gold/50" 
-                  : "bg-white/50 hover:bg-white/70"
+                index === currentSlide
+                  ? "bg-gold scale-125 shadow-lg shadow-gold/50"
+                  : "bg-white/50 hover:bg-white/70",
               )}
               onClick={() => setCurrentSlide(index)}
             />
@@ -258,7 +266,7 @@ export function HeroVideoCarousel() {
       >
         <ChevronLeft className="h-8 w-8" />
       </Button>
-      
+
       <Button
         variant="ghost"
         size="icon"
