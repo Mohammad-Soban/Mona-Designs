@@ -57,9 +57,11 @@ const navigation = [
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mobileDropdowns, setMobileDropdowns] = useState<Record<string, boolean>>({});
   const { toggleCart, getCartItemsCount } = useCart();
   const { getWishlistCount } = useWishlist();
   const { state: authState, logout } = useAuth();
+  const location = useLocation();
 
   const handleWhatsAppClick = () => {
     const message = "Hi, there I am interested in buying products from you";
