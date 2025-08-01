@@ -21,6 +21,7 @@ import Kurtas from "./pages/Kurtas";
 import Suits from "./pages/Suits";
 import Lehengas from "./pages/Lehengas";
 import Collections from "./pages/Collections";
+import NewArrivals from "./pages/NewArrivals";
 import ProductDetail from "./pages/ProductDetail";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
