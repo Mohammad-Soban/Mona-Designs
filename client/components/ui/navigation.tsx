@@ -266,10 +266,10 @@ export function Navigation() {
                       <span className="relative">
                         {item.name}
                         <span className={cn(
-                          "absolute bottom-0 left-0 h-0.5 bg-gold transition-all duration-300",
+                          "absolute -bottom-1 h-0.5 bg-gold transition-all duration-300",
                           isActiveRoute(item.href)
-                            ? "w-full"
-                            : "w-0 group-hover:w-full"
+                            ? "w-full left-0"
+                            : "w-0 left-1/2 group-hover:w-full group-hover:left-0 transform -translate-x-1/2 group-hover:translate-x-0"
                         )}></span>
                       </span>
                     </Link>
