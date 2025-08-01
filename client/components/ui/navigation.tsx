@@ -70,6 +70,19 @@ export function Navigation() {
     window.open(whatsappUrl, "_blank");
   };
 
+  const toggleMobileDropdown = (itemName: string) => {
+    setMobileDropdowns(prev => ({
+      ...prev,
+      [itemName]: !prev[itemName]
+    }));
+  };
+
+  const isActiveRoute = (href: string) => {
+    if (href === "/" && location.pathname === "/") return true;
+    if (href !== "/" && location.pathname.startsWith(href)) return true;
+    return false;
+  };
+
   return (
     <header className="fixed top-0 z-50 w-full">
       {/* Transparent navbar with glass effect */}
