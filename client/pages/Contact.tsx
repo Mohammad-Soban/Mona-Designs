@@ -30,8 +30,25 @@ export default function Contact() {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Create WhatsApp message
+    const whatsappMessage = `Hello, I'm ${formData.name}
+
+Subject: ${formData.subject}
+Email: ${formData.email}
+Phone: ${formData.phone || 'Not provided'}
+
+Message: ${formData.message}
+
+Please get back to me. Thank you!`;
+
+    const phoneNumber = "917435898915"; // +91 74358 98915
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+
     // Simulate form submission
     await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Open WhatsApp
+    window.open(whatsappUrl, "_blank");
 
     setIsSubmitting(false);
     setSubmitted(true);
