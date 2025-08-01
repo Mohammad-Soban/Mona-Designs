@@ -73,12 +73,13 @@ export default function App() {
                     <Navigation />
                     <main className="flex-1">
                       <Routes>
-                        <Route path="/" element={<Index />} />
-                        <Route path="/sherwanis" element={<Sherwanis />} />
-                        <Route path="/kurtas" element={<Kurtas />} />
-                        <Route path="/suits" element={<Suits />} />
-                        <Route path="/lehengas" element={<Lehengas />} />
-                        <Route path="/collections" element={<Collections />} />
+                    <Route path="/" element={<Index />} />
+                    <Route path="/new-arrivals" element={<NewArrivals />} />
+                    <Route path="/sherwanis" element={<Sherwanis />} />
+                    <Route path="/kurtas" element={<Kurtas />} />
+                    <Route path="/suits" element={<Suits />} />
+                    <Route path="/lehengas" element={<Lehengas />} />
+                    <Route path="/collections" element={<Collections />} />
                         <Route path="/collections/haldi" element={<Haldi />} />
                         <Route
                           path="/collections/wedding"
