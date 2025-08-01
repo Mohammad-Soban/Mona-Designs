@@ -225,20 +225,26 @@ export function Navigation() {
                   item.dropdown ? (
                     <DropdownMenu key={item.name}>
                       <DropdownMenuTrigger asChild>
-                        <button className="text-sm font-medium transition-colors text-gold hover:text-gold/80 drop-shadow-sm font-semibold flex items-center space-x-1">
-                          <span>{item.name}</span>
+                        <button className="relative text-sm font-medium transition-colors text-gold hover:text-gold/80 drop-shadow-sm font-semibold flex items-center space-x-1 group">
+                          <span className="relative">
+                            {item.name}
+                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover:w-full"></span>
+                          </span>
                           <ChevronDown className="h-3 w-3" />
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="start"
-                        className="w-48 bg-background/95 backdrop-blur-sm border-white/20"
+                        className="w-48 bg-background/95 backdrop-blur-sm border-white/20 max-h-80 overflow-y-auto"
                       >
                         {item.dropdown.map((subItem) => (
                           <DropdownMenuItem key={subItem.name} asChild>
                             <Link
                               to={subItem.href}
-                              className="flex items-center"
+                              className={cn(
+                                "flex items-center",
+                                isActiveRoute(subItem.href) ? "bg-gold/20 text-gold" : ""
+                              )}
                             >
                               {subItem.name}
                             </Link>
@@ -250,9 +256,22 @@ export function Navigation() {
                     <Link
                       key={item.name}
                       to={item.href}
-                      className="text-sm font-medium transition-colors text-gold hover:text-gold/80 drop-shadow-sm font-semibold"
+                      className={cn(
+                        "relative text-sm font-medium transition-colors drop-shadow-sm font-semibold group",
+                        isActiveRoute(item.href)
+                          ? "text-gold"
+                          : "text-gold hover:text-gold/80"
+                      )}
                     >
-                      {item.name}
+                      <span className="relative">
+                        {item.name}
+                        <span className={cn(
+                          "absolute bottom-0 left-0 h-0.5 bg-gold transition-all duration-300",
+                          isActiveRoute(item.href)
+                            ? "w-full"
+                            : "w-0 group-hover:w-full"
+                        )}></span>
+                      </span>
                     </Link>
                   ),
                 )}
