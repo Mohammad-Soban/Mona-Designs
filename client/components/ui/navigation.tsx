@@ -228,7 +228,7 @@ export function Navigation() {
                         <button className="relative text-sm font-medium transition-colors text-gold hover:text-gold/80 drop-shadow-sm font-semibold flex items-center space-x-1 group">
                           <span className="relative">
                             {item.name}
-                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover:w-full"></span>
+                            <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 bg-gold transition-all duration-300 group-hover:w-full group-hover:left-0 transform -translate-x-1/2 group-hover:translate-x-0"></span>
                           </span>
                           <ChevronDown className="h-3 w-3" />
                         </button>
