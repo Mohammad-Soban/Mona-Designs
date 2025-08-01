@@ -381,19 +381,32 @@ export function Navigation() {
                 : "max-h-0 opacity-0 pointer-events-none",
             )}
           >
-            <div className="py-4 space-y-2 border-t border-white/20 bg-black/30 backdrop-blur-md rounded-b-lg">
+            <div className="py-4 space-y-2 border-t border-white/20 bg-black/30 backdrop-blur-md rounded-b-lg max-h-80 overflow-y-auto">
               {navigation.map((item) =>
                 item.dropdown ? (
                   <div key={item.name} className="mx-2">
-                    <div className="px-3 py-2 text-sm font-medium text-gold/80 font-semibold">
+                    <button
+                      onClick={() => toggleMobileDropdown(item.name)}
+                      className="w-full text-left px-3 py-2 text-sm font-medium text-gold/80 font-semibold flex items-center justify-between hover:bg-white/10 rounded-md transition-colors"
+                    >
                       {item.name}
-                    </div>
-                    <div className="ml-4 space-y-1">
+                      <ChevronDown className={cn(
+                        "h-4 w-4 transition-transform duration-200",
+                        mobileDropdowns[item.name] ? "rotate-180" : ""
+                      )} />
+                    </button>
+                    <div className={cn(
+                      "ml-4 space-y-1 transition-all duration-200 overflow-hidden",
+                      mobileDropdowns[item.name] ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                    )}>
                       {item.dropdown.map((subItem) => (
                         <Link
                           key={subItem.name}
                           to={subItem.href}
-                          className="block px-3 py-2 text-sm font-medium transition-colors text-gold hover:text-gold/80 hover:bg-white/10 rounded-md"
+                          className={cn(
+                            "block px-3 py-2 text-sm font-medium transition-colors hover:text-gold/80 hover:bg-white/10 rounded-md",
+                            isActiveRoute(subItem.href) ? "text-gold bg-gold/10" : "text-gold"
+                          )}
                           onClick={() => setIsOpen(false)}
                         >
                           {subItem.name}
@@ -405,7 +418,10 @@ export function Navigation() {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className="block px-3 py-2 text-sm font-medium transition-colors text-gold hover:text-gold/80 hover:bg-white/10 rounded-md mx-2 font-semibold"
+                    className={cn(
+                      "block px-3 py-2 text-sm font-medium transition-colors hover:text-gold/80 hover:bg-white/10 rounded-md mx-2 font-semibold",
+                      isActiveRoute(item.href) ? "text-gold bg-gold/10" : "text-gold"
+                    )}
                     onClick={() => setIsOpen(false)}
                   >
                     {item.name}
