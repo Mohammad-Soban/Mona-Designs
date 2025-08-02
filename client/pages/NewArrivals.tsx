@@ -60,8 +60,9 @@ export default function NewArrivals() {
               New Arrivals
             </h1>
             <p className="text-emerald-100 text-base sm:text-lg md:text-xl mb-6 sm:mb-8 leading-relaxed">
-              Discover our latest collection of premium ethnic wear. From contemporary
-              designs to traditional masterpieces, explore what's trending now.
+              Discover our latest collection of premium ethnic wear. From
+              contemporary designs to traditional masterpieces, explore what's
+              trending now.
             </p>
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-6">
               <div className="flex items-center space-x-2 text-emerald-200">
@@ -183,14 +184,20 @@ export default function NewArrivals() {
 
               {/* Load More */}
               <div className="text-center mt-12">
-                <Button variant="outline" size="lg" className="border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white"
+                >
                   Load More New Arrivals
                 </Button>
               </div>
             </>
           ) : (
             <div className="text-center py-16">
-              <h3 className="text-lg font-semibold mb-2">No new arrivals found</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                No new arrivals found
+              </h3>
               <p className="text-muted-foreground">
                 Try adjusting your filters or check back soon for new products.
               </p>
@@ -207,10 +214,11 @@ export default function NewArrivals() {
               Why Shop New Arrivals?
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Stay ahead of fashion trends with our carefully curated new arrivals.
+              Stay ahead of fashion trends with our carefully curated new
+              arrivals.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="mx-auto w-16 h-16 bg-emerald-600/10 rounded-full flex items-center justify-center mb-4">
@@ -218,27 +226,30 @@ export default function NewArrivals() {
               </div>
               <h3 className="text-xl font-semibold mb-2">Latest Trends</h3>
               <p className="text-muted-foreground">
-                Be the first to wear the latest designs fresh from our designers.
+                Be the first to wear the latest designs fresh from our
+                designers.
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="mx-auto w-16 h-16 bg-emerald-600/10 rounded-full flex items-center justify-center mb-4">
                 <Star className="h-8 w-8 text-emerald-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Premium Quality</h3>
               <p className="text-muted-foreground">
-                Every new arrival undergoes strict quality checks for perfection.
+                Every new arrival undergoes strict quality checks for
+                perfection.
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="mx-auto w-16 h-16 bg-emerald-600/10 rounded-full flex items-center justify-center mb-4">
                 <Clock className="h-8 w-8 text-emerald-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Limited Edition</h3>
               <p className="text-muted-foreground">
-                Many new arrivals are limited editions - get them before they're gone.
+                Many new arrivals are limited editions - get them before they're
+                gone.
               </p>
             </div>
           </div>
