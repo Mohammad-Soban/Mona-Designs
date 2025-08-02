@@ -4,16 +4,24 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Check, 
-  Star, 
-  User, 
-  ThumbsUp, 
+import {
+  Check,
+  Star,
+  User,
+  ThumbsUp,
   Package,
   Shirt,
   Droplets,
-  Shield
+  Shield,
+  ChevronDown
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Product } from "@/data/products";
 
 interface ProductDetailTabsProps {
