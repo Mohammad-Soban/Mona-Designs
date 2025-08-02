@@ -116,13 +116,10 @@ export default function HeritageWork() {
             <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-6">
               Heritage Craftsmanship
             </h1>
-            <p className="text-slate-100 text-xl mb-8">
+            <p className="text-slate-100 text-xl">
               Preserving centuries-old traditions through masterful artisanship.
               Each piece tells a story of cultural heritage and timeless beauty.
             </p>
-            <Button size="lg" className="bg-gold hover:bg-gold/90">
-              Explore Our Heritage
-            </Button>
           </div>
         </div>
       </section>
