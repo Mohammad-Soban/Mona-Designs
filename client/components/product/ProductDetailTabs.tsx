@@ -4,16 +4,24 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Check, 
-  Star, 
-  User, 
-  ThumbsUp, 
+import {
+  Check,
+  Star,
+  User,
+  ThumbsUp,
   Package,
   Shirt,
   Droplets,
-  Shield
+  Shield,
+  ChevronDown,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Product } from "@/data/products";
 
 interface ProductDetailTabsProps {
@@ -28,9 +36,10 @@ const mockReviews = [
     rating: 5,
     date: "2024-01-20",
     title: "Excellent quality!",
-    comment: "Beautiful sherwani with excellent craftsmanship. The fabric quality is premium and the fit is perfect. Highly recommended for weddings!",
+    comment:
+      "Beautiful sherwani with excellent craftsmanship. The fabric quality is premium and the fit is perfect. Highly recommended for weddings!",
     verified: true,
-    helpful: 12
+    helpful: 12,
   },
   {
     id: 2,
@@ -38,9 +47,10 @@ const mockReviews = [
     rating: 4,
     date: "2024-01-15",
     title: "Good purchase",
-    comment: "Nice design and good quality fabric. The delivery was quick and packaging was excellent. Size runs slightly large.",
+    comment:
+      "Nice design and good quality fabric. The delivery was quick and packaging was excellent. Size runs slightly large.",
     verified: true,
-    helpful: 8
+    helpful: 8,
   },
   {
     id: 3,
@@ -48,33 +58,38 @@ const mockReviews = [
     rating: 5,
     date: "2024-01-10",
     title: "Perfect for my wedding",
-    comment: "Wore this for my wedding ceremony. Got so many compliments! The gold embroidery work is stunning and the comfort is amazing.",
+    comment:
+      "Wore this for my wedding ceremony. Got so many compliments! The gold embroidery work is stunning and the comfort is amazing.",
     verified: true,
-    helpful: 15
-  }
+    helpful: 15,
+  },
 ];
 
 const careInstructions = [
   {
     icon: <Droplets className="h-5 w-5" />,
     title: "Dry Clean Only",
-    description: "Professional dry cleaning recommended to maintain fabric quality and embroidery"
+    description:
+      "Professional dry cleaning recommended to maintain fabric quality and embroidery",
   },
   {
     icon: <Shield className="h-5 w-5" />,
     title: "Fabric Protection",
-    description: "Store in breathable garment bags to prevent dust and moisture damage"
+    description:
+      "Store in breathable garment bags to prevent dust and moisture damage",
   },
   {
     icon: <Shirt className="h-5 w-5" />,
     title: "Wrinkle Care",
-    description: "Steam iron on low heat with cloth protection to avoid direct contact"
+    description:
+      "Steam iron on low heat with cloth protection to avoid direct contact",
   },
   {
     icon: <Package className="h-5 w-5" />,
     title: "Storage",
-    description: "Hang on padded hangers or fold carefully with tissue paper between layers"
-  }
+    description:
+      "Hang on padded hangers or fold carefully with tissue paper between layers",
+  },
 ];
 
 export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
@@ -102,16 +117,46 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
 
   const getRatingDistribution = () => {
     const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    mockReviews.forEach(review => {
+    mockReviews.forEach((review) => {
       distribution[review.rating as keyof typeof distribution]++;
     });
     return distribution;
   };
 
+  const tabOptions = [
+    { value: "description", label: "Description" },
+    { value: "specifications", label: "Specifications" },
+    { value: "reviews", label: `Reviews (${product.reviews})` },
+    { value: "care", label: "Size & Care" },
+  ];
+
+  const getCurrentTabLabel = () => {
+    return (
+      tabOptions.find((tab) => tab.value === activeTab)?.label || "Select Tab"
+    );
+  };
+
   return (
     <div className="mt-16">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 h-12 bg-muted/30">
+        {/* Mobile Dropdown */}
+        <div className="md:hidden mb-6">
+          <Select value={activeTab} onValueChange={setActiveTab}>
+            <SelectTrigger className="w-full h-12">
+              <SelectValue>{getCurrentTabLabel()}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {tabOptions.map((tab) => (
+                <SelectItem key={tab.value} value={tab.value}>
+                  {tab.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Desktop Tabs */}
+        <TabsList className="hidden md:grid w-full grid-cols-4 h-12 bg-muted/30">
           <TabsTrigger value="description" className="text-sm font-medium">
             Description
           </TabsTrigger>
@@ -129,32 +174,45 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
         <TabsContent value="description" className="mt-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <h3 className="text-xl font-semibold mb-4">Product Description</h3>
+              <h3 className="text-xl font-semibold mb-4">
+                Product Description
+              </h3>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                {product.description || "Experience the perfect blend of traditional craftsmanship and contemporary style with this exquisite piece. Each garment is carefully crafted using premium fabrics and adorned with intricate details that reflect the rich heritage of Indian ethnic wear."}
+                {product.description ||
+                  "Experience the perfect blend of traditional craftsmanship and contemporary style with this exquisite piece. Each garment is carefully crafted using premium fabrics and adorned with intricate details that reflect the rich heritage of Indian ethnic wear."}
               </p>
-              
+
               <h4 className="font-semibold mb-4">Key Features</h4>
               <ul className="space-y-3">
                 <li className="flex items-center space-x-3">
                   <Check className="h-5 w-5 text-green-600 flex-shrink-0" />
-                  <span className="text-muted-foreground">Premium {product.fabric || 'Fabric'} construction</span>
+                  <span className="text-muted-foreground">
+                    Premium {product.fabric || "Fabric"} construction
+                  </span>
                 </li>
                 <li className="flex items-center space-x-3">
                   <Check className="h-5 w-5 text-green-600 flex-shrink-0" />
-                  <span className="text-muted-foreground">Traditional design with modern fit</span>
+                  <span className="text-muted-foreground">
+                    Traditional design with modern fit
+                  </span>
                 </li>
                 <li className="flex items-center space-x-3">
                   <Check className="h-5 w-5 text-green-600 flex-shrink-0" />
-                  <span className="text-muted-foreground">Perfect for {product.occasion || 'special occasions'}</span>
+                  <span className="text-muted-foreground">
+                    Perfect for {product.occasion || "special occasions"}
+                  </span>
                 </li>
                 <li className="flex items-center space-x-3">
                   <Check className="h-5 w-5 text-green-600 flex-shrink-0" />
-                  <span className="text-muted-foreground">Expert craftsmanship and attention to detail</span>
+                  <span className="text-muted-foreground">
+                    Expert craftsmanship and attention to detail
+                  </span>
                 </li>
                 <li className="flex items-center space-x-3">
                   <Check className="h-5 w-5 text-green-600 flex-shrink-0" />
-                  <span className="text-muted-foreground">Comfortable and breathable fabric</span>
+                  <span className="text-muted-foreground">
+                    Comfortable and breathable fabric
+                  </span>
                 </li>
               </ul>
             </div>
@@ -194,11 +252,14 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
                     </div>
                   </>
                 )}
-                {(product.category === "Kurtas" || product.category === "Suits") && (
+                {(product.category === "Kurtas" ||
+                  product.category === "Suits") && (
                   <>
                     <div className="flex items-center space-x-3 p-3 bg-muted/30 rounded-lg">
                       <Package className="h-5 w-5 text-gold" />
-                      <span>Premium {product.category.slice(0, -1).toLowerCase()}</span>
+                      <span>
+                        Premium {product.category.slice(0, -1).toLowerCase()}
+                      </span>
                     </div>
                     <div className="flex items-center space-x-3 p-3 bg-muted/30 rounded-lg">
                       <Package className="h-5 w-5 text-gold" />
@@ -215,30 +276,48 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4">Product Specifications</h3>
+                <h3 className="text-xl font-semibold mb-4">
+                  Product Specifications
+                </h3>
                 <div className="space-y-4">
                   <div className="flex justify-between py-3 border-b border-border/50">
-                    <span className="font-medium text-muted-foreground">Fabric</span>
-                    <span className="font-semibold">{product.fabric || 'Premium Fabric'}</span>
+                    <span className="font-medium text-muted-foreground">
+                      Fabric
+                    </span>
+                    <span className="font-semibold">
+                      {product.fabric || "Premium Fabric"}
+                    </span>
                   </div>
                   <div className="flex justify-between py-3 border-b border-border/50">
-                    <span className="font-medium text-muted-foreground">Category</span>
+                    <span className="font-medium text-muted-foreground">
+                      Category
+                    </span>
                     <span className="font-semibold">{product.category}</span>
                   </div>
                   <div className="flex justify-between py-3 border-b border-border/50">
-                    <span className="font-medium text-muted-foreground">Occasion</span>
-                    <span className="font-semibold">{product.occasion || 'Special Events'}</span>
+                    <span className="font-medium text-muted-foreground">
+                      Occasion
+                    </span>
+                    <span className="font-semibold">
+                      {product.occasion || "Special Events"}
+                    </span>
                   </div>
                   <div className="flex justify-between py-3 border-b border-border/50">
-                    <span className="font-medium text-muted-foreground">Fit</span>
+                    <span className="font-medium text-muted-foreground">
+                      Fit
+                    </span>
                     <span className="font-semibold">Regular Fit</span>
                   </div>
                   <div className="flex justify-between py-3 border-b border-border/50">
-                    <span className="font-medium text-muted-foreground">Care Instructions</span>
+                    <span className="font-medium text-muted-foreground">
+                      Care Instructions
+                    </span>
                     <span className="font-semibold">Dry Clean Only</span>
                   </div>
                   <div className="flex justify-between py-3 border-b border-border/50">
-                    <span className="font-medium text-muted-foreground">Country of Origin</span>
+                    <span className="font-medium text-muted-foreground">
+                      Country of Origin
+                    </span>
                     <span className="font-semibold">India</span>
                   </div>
                 </div>
@@ -250,11 +329,14 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
                 <h3 className="text-xl font-semibold mb-4">Size Information</h3>
                 <div className="space-y-4">
                   <p className="text-muted-foreground text-sm">
-                    This garment follows standard Indian ethnic wear sizing. Please refer to our size guide for accurate measurements.
+                    This garment follows standard Indian ethnic wear sizing.
+                    Please refer to our size guide for accurate measurements.
                   </p>
                   <div className="space-y-3">
                     <div className="flex justify-between py-2">
-                      <span className="text-muted-foreground">Model Height</span>
+                      <span className="text-muted-foreground">
+                        Model Height
+                      </span>
                       <span className="font-medium">5'8" (172 cm)</span>
                     </div>
                     <div className="flex justify-between py-2">
@@ -282,26 +364,43 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
               <CardContent className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-gold mb-2">{getAverageRating()}</div>
-                    <div className="flex justify-center mb-2">
-                      {renderStarRating(Math.round(parseFloat(getAverageRating())))}
+                    <div className="text-4xl font-bold text-gold mb-2">
+                      {getAverageRating()}
                     </div>
-                    <p className="text-muted-foreground">Based on {mockReviews.length} reviews</p>
+                    <div className="flex justify-center mb-2">
+                      {renderStarRating(
+                        Math.round(parseFloat(getAverageRating())),
+                      )}
+                    </div>
+                    <p className="text-muted-foreground">
+                      Based on {mockReviews.length} reviews
+                    </p>
                   </div>
-                  
+
                   <div className="space-y-2">
-                    {Object.entries(getRatingDistribution()).reverse().map(([rating, count]) => (
-                      <div key={rating} className="flex items-center space-x-3">
-                        <span className="text-sm font-medium w-8">{rating}★</span>
-                        <div className="flex-1 bg-muted rounded-full h-2">
-                          <div 
-                            className="bg-gold h-2 rounded-full" 
-                            style={{ width: `${(count / mockReviews.length) * 100}%` }}
-                          />
+                    {Object.entries(getRatingDistribution())
+                      .reverse()
+                      .map(([rating, count]) => (
+                        <div
+                          key={rating}
+                          className="flex items-center space-x-3"
+                        >
+                          <span className="text-sm font-medium w-8">
+                            {rating}★
+                          </span>
+                          <div className="flex-1 bg-muted rounded-full h-2">
+                            <div
+                              className="bg-gold h-2 rounded-full"
+                              style={{
+                                width: `${(count / mockReviews.length) * 100}%`,
+                              }}
+                            />
+                          </div>
+                          <span className="text-sm text-muted-foreground w-8">
+                            {count}
+                          </span>
                         </div>
-                        <span className="text-sm text-muted-foreground w-8">{count}</span>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </div>
               </CardContent>
@@ -328,15 +427,19 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
                           </div>
                           <div className="flex items-center space-x-2 mt-1">
                             {renderStarRating(review.rating)}
-                            <span className="text-sm text-muted-foreground">{review.date}</span>
+                            <span className="text-sm text-muted-foreground">
+                              {review.date}
+                            </span>
                           </div>
                         </div>
                       </div>
                     </div>
-                    
+
                     <h4 className="font-semibold mb-2">{review.title}</h4>
-                    <p className="text-muted-foreground mb-4">{review.comment}</p>
-                    
+                    <p className="text-muted-foreground mb-4">
+                      {review.comment}
+                    </p>
+
                     <div className="flex items-center space-x-4">
                       <Button variant="ghost" size="sm">
                         <ThumbsUp className="h-4 w-4 mr-1" />
@@ -363,8 +466,12 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
                           {instruction.icon}
                         </div>
                         <div>
-                          <h4 className="font-semibold mb-1">{instruction.title}</h4>
-                          <p className="text-sm text-muted-foreground">{instruction.description}</p>
+                          <h4 className="font-semibold mb-1">
+                            {instruction.title}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            {instruction.description}
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -378,17 +485,20 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
               <Card>
                 <CardContent className="p-6">
                   <p className="text-muted-foreground mb-4">
-                    For the perfect fit, please measure yourself and compare with our size chart.
+                    For the perfect fit, please measure yourself and compare
+                    with our size chart.
                   </p>
-                  
+
                   <div className="space-y-4">
                     <div className="text-center p-4 bg-gold/10 rounded-lg">
-                      <p className="font-semibold text-gold">Need help with sizing?</p>
+                      <p className="font-semibold text-gold">
+                        Need help with sizing?
+                      </p>
                       <p className="text-sm text-muted-foreground mt-1">
                         Our customer service team is here to help
                       </p>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Button variant="outline" className="w-full">
                         View Detailed Size Chart

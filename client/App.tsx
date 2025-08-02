@@ -1,5 +1,5 @@
-import './global.css';
-import HeroVideo from './components/ui/HeroVideo';
+import "./global.css";
+import HeroVideo from "./components/ui/HeroVideo";
 import "./global.css";
 
 import { Toaster } from "@/components/ui/toaster";
@@ -21,6 +21,7 @@ import Kurtas from "./pages/Kurtas";
 import Suits from "./pages/Suits";
 import Lehengas from "./pages/Lehengas";
 import Collections from "./pages/Collections";
+import NewArrivals from "./pages/NewArrivals";
 import ProductDetail from "./pages/ProductDetail";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -30,6 +31,14 @@ import Profile from "./pages/Profile";
 import SizeGuide from "./pages/SizeGuide";
 import Returns from "./pages/Returns";
 import Wishlist from "./pages/Wishlist";
+import Accessories from "./pages/Accessories";
+import HeritageWork from "./pages/HeritageWork";
+import Haldi from "./pages/occasions/Haldi";
+import Wedding from "./pages/occasions/Wedding";
+import Reception from "./pages/occasions/Reception";
+import Mehendi from "./pages/occasions/Mehendi";
+import Sangeet from "./pages/occasions/Sangeet";
+import General from "./pages/occasions/General";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -55,40 +64,73 @@ export default function App() {
         <AuthProvider>
           <WishlistProvider>
             <CartProvider>
-            <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <ScrollToTop />
-              <div className="min-h-screen flex flex-col">
-                <Navigation />
-                <main className="flex-1">
-                  <Routes>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <ScrollToTop />
+                  <div className="min-h-screen flex flex-col">
+                    <Navigation />
+                    <main className="flex-1">
+                      <Routes>
                     <Route path="/" element={<Index />} />
+                    <Route path="/new-arrivals" element={<NewArrivals />} />
                     <Route path="/sherwanis" element={<Sherwanis />} />
                     <Route path="/kurtas" element={<Kurtas />} />
                     <Route path="/suits" element={<Suits />} />
                     <Route path="/lehengas" element={<Lehengas />} />
                     <Route path="/collections" element={<Collections />} />
-                    <Route path="/cart" element={<PlaceholderPage title="Shopping Cart" />} />
-                    <Route path="/wishlist" element={<Wishlist />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/product/:id" element={<ProductDetail />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/size-guide" element={<SizeGuide />} />
-                    <Route path="/returns" element={<Returns />} />
-                    <Route path="/admin" element={<Admin />} />
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </main>
-                <Footer />
-              </div>
-              <CartSidebar />
-            </BrowserRouter>
-            </TooltipProvider>
+                        <Route path="/collections/haldi" element={<Haldi />} />
+                        <Route
+                          path="/collections/wedding"
+                          element={<Wedding />}
+                        />
+                        <Route
+                          path="/collections/reception"
+                          element={<Reception />}
+                        />
+                        <Route
+                          path="/collections/mehendi"
+                          element={<Mehendi />}
+                        />
+                        <Route
+                          path="/collections/sangeet"
+                          element={<Sangeet />}
+                        />
+                        <Route
+                          path="/collections/general"
+                          element={<General />}
+                        />
+                        <Route path="/accessories" element={<Accessories />} />
+                        <Route
+                          path="/heritage-work"
+                          element={<HeritageWork />}
+                        />
+                        <Route
+                          path="/cart"
+                          element={<PlaceholderPage title="Shopping Cart" />}
+                        />
+                        <Route path="/wishlist" element={<Wishlist />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route
+                          path="/product/:id"
+                          element={<ProductDetail />}
+                        />
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/size-guide" element={<SizeGuide />} />
+                        <Route path="/returns" element={<Returns />} />
+                        <Route path="/admin" element={<Admin />} />
+                        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </main>
+                    <Footer />
+                  </div>
+                  <CartSidebar />
+                </BrowserRouter>
+              </TooltipProvider>
             </CartProvider>
           </WishlistProvider>
         </AuthProvider>

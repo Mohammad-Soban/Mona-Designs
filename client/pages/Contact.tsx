@@ -3,16 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Clock, 
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Clock,
   Send,
   MessageCircle,
   Instagram,
   Twitter,
-  Facebook
+  Facebook,
 } from "lucide-react";
 
 export default function Contact() {
@@ -21,7 +21,7 @@ export default function Contact() {
     email: "",
     phone: "",
     subject: "",
-    message: ""
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -30,9 +30,26 @@ export default function Contact() {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Create WhatsApp message
+    const whatsappMessage = `Hello, I'm ${formData.name}
+
+Subject: ${formData.subject}
+Email: ${formData.email}
+Phone: ${formData.phone || 'Not provided'}
+
+Message: ${formData.message}
+
+Please get back to me. Thank you!`;
+
+    const phoneNumber = "917435898915"; // +91 74358 98915
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+
     // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Open WhatsApp
+    window.open(whatsappUrl, "_blank");
+
     setIsSubmitting(false);
     setSubmitted(true);
     setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
@@ -41,26 +58,30 @@ export default function Contact() {
     setTimeout(() => setSubmitted(false), 3000);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData(prev => ({
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-64 bg-gradient-to-r from-gold/90 to-amber-600/90 flex items-center">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-yellow-600/20" />
+      <section className="relative h-64 bg-gradient-to-r from-blue-600/90 to-indigo-600/90 flex items-center mt-20">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-700/20 to-indigo-700/20" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
               Contact Us
             </h1>
-            <p className="text-amber-100 text-lg">
-              Get in touch with us for any questions about our ethnic wear collections, 
-              custom designs, or assistance with your orders.
+            <p className="text-blue-100 text-lg">
+              Get in touch with us for any questions about our ethnic wear
+              collections, custom designs, or assistance with your orders.
             </p>
           </div>
         </div>
@@ -72,9 +93,12 @@ export default function Contact() {
             {/* Contact Information */}
             <div className="space-y-8">
               <div>
-                <h2 className="text-2xl font-serif font-bold mb-6">Get in Touch</h2>
+                <h2 className="text-2xl font-serif font-bold mb-6">
+                  Get in Touch
+                </h2>
                 <p className="text-muted-foreground mb-8">
-                  We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+                  We'd love to hear from you. Send us a message and we'll
+                  respond as soon as possible.
                 </p>
               </div>
 
@@ -97,8 +121,12 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">Email</h3>
-                    <p className="text-muted-foreground">hello@monadesigners.com</p>
-                    <p className="text-muted-foreground">orders@monadesigners.com</p>
+                    <p className="text-muted-foreground">
+                      hello@monadesigners.com
+                    </p>
+                    <p className="text-muted-foreground">
+                      orders@monadesigners.com
+                    </p>
                   </div>
                 </div>
 
@@ -109,8 +137,10 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold mb-1">Address</h3>
                     <p className="text-muted-foreground">
-                      123 Fashion Street, Designer District<br />
-                      Mumbai, Maharashtra 400001<br />
+                      123 Fashion Street, Designer District
+                      <br />
+                      Mumbai, Maharashtra 400001
+                      <br />
                       India
                     </p>
                   </div>
@@ -123,7 +153,8 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold mb-1">Business Hours</h3>
                     <p className="text-muted-foreground">
-                      Monday - Saturday: 10:00 AM - 8:00 PM<br />
+                      Monday - Saturday: 10:00 AM - 8:00 PM
+                      <br />
                       Sunday: 11:00 AM - 6:00 PM
                     </p>
                   </div>
@@ -134,20 +165,20 @@ export default function Contact() {
               <div>
                 <h3 className="font-semibold mb-4">Follow Us</h3>
                 <div className="flex space-x-4">
-                  <a 
-                    href="#" 
+                  <a
+                    href="#"
                     className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center text-gold hover:bg-gold hover:text-white transition-colors"
                   >
                     <Instagram className="h-5 w-5" />
                   </a>
-                  <a 
-                    href="#" 
+                  <a
+                    href="#"
                     className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center text-gold hover:bg-gold hover:text-white transition-colors"
                   >
                     <Facebook className="h-5 w-5" />
                   </a>
-                  <a 
-                    href="#" 
+                  <a
+                    href="#"
                     className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center text-gold hover:bg-gold hover:text-white transition-colors"
                   >
                     <Twitter className="h-5 w-5" />
@@ -168,7 +199,8 @@ export default function Contact() {
                 <CardContent>
                   {submitted && (
                     <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md text-green-700">
-                      Thank you for your message! We'll get back to you within 24 hours.
+                      Thank you for your message! We'll get back to you within
+                      24 hours.
                     </div>
                   )}
 
@@ -182,7 +214,7 @@ export default function Contact() {
                           type="text"
                           value={formData.name}
                           onChange={handleChange}
-                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                           required
                         />
                       </div>
@@ -194,7 +226,7 @@ export default function Contact() {
                           type="email"
                           value={formData.email}
                           onChange={handleChange}
-                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                           required
                         />
                       </div>
@@ -209,7 +241,7 @@ export default function Contact() {
                           type="tel"
                           value={formData.phone}
                           onChange={handleChange}
-                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                         />
                       </div>
                       <div>
@@ -219,7 +251,7 @@ export default function Contact() {
                           name="subject"
                           value={formData.subject}
                           onChange={handleChange}
-                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                          className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                           required
                         >
                           <option value="">Select a subject</option>
@@ -241,15 +273,15 @@ export default function Contact() {
                         rows={6}
                         value={formData.message}
                         onChange={handleChange}
-                        className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold resize-none"
+                        className="w-full mt-2 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold resize-none text-black"
                         placeholder="Tell us how we can help you..."
                         required
                       />
                     </div>
 
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-gold hover:bg-gold/90" 
+                    <Button
+                      type="submit"
+                      className="w-full bg-gold hover:bg-gold/90"
                       size="lg"
                       disabled={isSubmitting}
                     >
@@ -274,9 +306,12 @@ export default function Contact() {
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-serif font-bold mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-3xl font-serif font-bold mb-4">
+              Frequently Asked Questions
+            </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Find quick answers to common questions about our products and services.
+              Find quick answers to common questions about our products and
+              services.
             </p>
           </div>
 
@@ -284,20 +319,24 @@ export default function Contact() {
             {[
               {
                 question: "What is your return policy?",
-                answer: "We offer a 7-day return policy for all unworn items with original tags. Custom-made items are not eligible for returns."
+                answer:
+                  "We offer a 7-day return policy for all unworn items with original tags. Custom-made items are not eligible for returns.",
               },
               {
                 question: "Do you offer custom sizing?",
-                answer: "Yes, we provide custom sizing for all our products. Additional charges may apply for extensive alterations."
+                answer:
+                  "Yes, we provide custom sizing for all our products. Additional charges may apply for extensive alterations.",
               },
               {
                 question: "How long does shipping take?",
-                answer: "Standard shipping takes 3-5 business days within India. Express shipping is available for next-day delivery in major cities."
+                answer:
+                  "Standard shipping takes 3-5 business days within India. Express shipping is available for next-day delivery in major cities.",
               },
               {
                 question: "Do you ship internationally?",
-                answer: "Yes, we ship worldwide. International shipping takes 7-14 business days depending on the destination."
-              }
+                answer:
+                  "Yes, we ship worldwide. International shipping takes 7-14 business days depending on the destination.",
+              },
             ].map((faq, index) => (
               <Card key={index}>
                 <CardContent className="p-6">

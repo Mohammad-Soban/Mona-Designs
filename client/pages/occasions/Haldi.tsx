@@ -18,17 +18,22 @@ const sortOptions = [
   { value: "rating", label: "Highest Rated" },
 ];
 
-const categories = ["All", "Sherwanis", "Kurtas", "Suits", "Lehengas"];
+const categories = ["All", "Kurtas", "Sherwanis", "Suits", "Lehengas"];
 
-export default function Collections() {
+export default function Haldi() {
   const [sortBy, setSortBy] = useState("featured");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // Filter and sort products
+  // Filter products suitable for Haldi (bright colors, traditional styles)
+  const haldiProducts = useMemo(() => {
+    const categoryProducts = getProductsByCategory(selectedCategory);
+    // For demo, return all products. In real app, filter by occasion tags
+    return categoryProducts;
+  }, [selectedCategory]);
+
   const filteredAndSortedProducts = useMemo(() => {
-    const filtered = getProductsByCategory(selectedCategory);
-    return sortProducts(filtered, sortBy);
-  }, [selectedCategory, sortBy]);
+    return sortProducts(haldiProducts, sortBy);
+  }, [haldiProducts, sortBy]);
 
   const handleSortChange = (newSortBy: string) => {
     setSortBy(newSortBy);
@@ -41,16 +46,16 @@ export default function Collections() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-64 bg-gradient-to-r from-gold/90 to-amber-600/90 flex items-center mt-20">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-yellow-600/20" />
+      <section className="relative h-64 bg-gradient-to-r from-orange-500/90 to-amber-600/90 flex items-center mt-20">
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-600/20 to-red-500/20" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
-              All Collections
+              Haldi Collection
             </h1>
-            <p className="text-amber-100 text-lg">
-              Discover our complete range of premium ethnic wear for every
-              celebration. From traditional kurtas to designer lehengas.
+            <p className="text-orange-100 text-lg">
+              Embrace the vibrant spirit of Haldi ceremonies with our collection
+              of bright yellows, warm oranges, and festive traditional wear.
             </p>
           </div>
         </div>
@@ -74,7 +79,7 @@ export default function Collections() {
                 {category}
                 <Badge variant="secondary" className="ml-2 text-xs">
                   {category === "All"
-                    ? allProducts.length
+                    ? haldiProducts.length
                     : getProductsByCategory(category).length}
                 </Badge>
               </button>
@@ -84,7 +89,7 @@ export default function Collections() {
       </section>
 
       {/* Sort Bar */}
-      <section className="sticky top-16 z-40 bg-background/95 backdrop-blur border-b">
+      <section className="sticky top-20 z-40 bg-background/95 backdrop-blur border-b">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-4">
