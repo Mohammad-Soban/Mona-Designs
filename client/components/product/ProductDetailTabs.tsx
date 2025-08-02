@@ -116,10 +116,38 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
     return distribution;
   };
 
+  const tabOptions = [
+    { value: "description", label: "Description" },
+    { value: "specifications", label: "Specifications" },
+    { value: "reviews", label: `Reviews (${product.reviews})` },
+    { value: "care", label: "Size & Care" }
+  ];
+
+  const getCurrentTabLabel = () => {
+    return tabOptions.find(tab => tab.value === activeTab)?.label || "Select Tab";
+  };
+
   return (
     <div className="mt-16">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 h-12 bg-muted/30">
+        {/* Mobile Dropdown */}
+        <div className="md:hidden mb-6">
+          <Select value={activeTab} onValueChange={setActiveTab}>
+            <SelectTrigger className="w-full h-12">
+              <SelectValue>{getCurrentTabLabel()}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {tabOptions.map((tab) => (
+                <SelectItem key={tab.value} value={tab.value}>
+                  {tab.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Desktop Tabs */}
+        <TabsList className="hidden md:grid w-full grid-cols-4 h-12 bg-muted/30">
           <TabsTrigger value="description" className="text-sm font-medium">
             Description
           </TabsTrigger>
