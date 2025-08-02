@@ -51,26 +51,26 @@ export default function NewArrivals() {
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="flex items-center space-x-2 mb-4">
-              <TrendingUp className="h-6 w-6 text-emerald-200" />
-              <Badge className="bg-emerald-500/20 text-emerald-100 border-emerald-400/30">
+              <TrendingUp className="h-4 w-4 sm:h-6 sm:w-6 text-emerald-200" />
+              <Badge className="bg-emerald-500/20 text-emerald-100 border-emerald-400/30 text-xs sm:text-sm">
                 Fresh Arrivals
               </Badge>
             </div>
-            <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif font-bold text-white mb-4 sm:mb-6 leading-tight">
               New Arrivals
             </h1>
-            <p className="text-emerald-100 text-xl mb-8">
-              Discover our latest collection of premium ethnic wear. From contemporary 
+            <p className="text-emerald-100 text-base sm:text-lg md:text-xl mb-6 sm:mb-8 leading-relaxed">
+              Discover our latest collection of premium ethnic wear. From contemporary
               designs to traditional masterpieces, explore what's trending now.
             </p>
-            <div className="flex items-center space-x-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-6">
               <div className="flex items-center space-x-2 text-emerald-200">
-                <Clock className="h-5 w-5" />
-                <span className="text-sm">Updated Weekly</span>
+                <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="text-xs sm:text-sm">Updated Weekly</span>
               </div>
               <div className="flex items-center space-x-2 text-emerald-200">
-                <Star className="h-5 w-5" />
-                <span className="text-sm">Premium Quality</span>
+                <Star className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="text-xs sm:text-sm">Premium Quality</span>
               </div>
             </div>
           </div>
