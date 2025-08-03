@@ -38,6 +38,7 @@ const navigation = [
       { name: "Reception", href: "/collections/reception" },
       { name: "Mehendi", href: "/collections/mehendi" },
       { name: "Sangeet", href: "/collections/sangeet" },
+      { name: "Festivals", href: "/collections/festivals" },
       { name: "General", href: "/collections/general" },
     ],
   },
