@@ -487,7 +487,8 @@ export default function Checkout() {
                 </div>
 
                 <Button
-                  onClick={handleSubmitOrder}
+                  type="submit"
+                  form="checkout-form"
                   className="w-full bg-gold hover:bg-gold/90"
                   size="lg"
                   disabled={isProcessing}
