@@ -58,6 +58,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const login = async (username: string, password: string): Promise<{ success: boolean; message: string; user?: User }> => {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+
+      // Check for test credentials
+      if (username === "test" && password === "test") {
+        const user: User = {
+          id: "test_admin_user",
+          phone: "+91 98765 43210",
+          email: "test@monadesigners.com",
+          username: "test",
+          name: "Test Admin"
+        };
+
+        // Store user in localStorage
+        localStorage.setItem("mona-user", JSON.stringify(user));
+
+        setState({
+          user,
+          isLoading: false,
+          isAuthenticated: true,
+        });
+
+        return {
+          success: true,
+          message: "Login successful!",
+          user
+        };
+      } else {
+        return {
+          success: false,
+          message: "Invalid username or password. Use 'test' for both username and password."
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: "Login failed. Please try again."
+      };
+    }
+  };
+
   const sendOTP = async (phone: string): Promise<{ success: boolean; message: string }> => {
     // Simulate API call to send OTP
     try {
