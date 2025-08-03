@@ -49,15 +49,17 @@ export default function Checkout() {
 
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Close cart sidebar when component mounts
+  useEffect(() => {
+    closeCart();
+  }, []); // Only run once on mount
+
   // Redirect if cart is empty
   useEffect(() => {
     if (cartState.items.length === 0) {
       navigate("/");
-      return;
     }
-    // Close cart sidebar when on checkout
-    closeCart();
-  }, [cartState.items.length, navigate, closeCart]);
+  }, [cartState.items.length, navigate]);
 
   // Load Razorpay script
   useEffect(() => {
