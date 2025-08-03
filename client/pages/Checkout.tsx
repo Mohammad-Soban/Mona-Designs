@@ -44,7 +44,7 @@ export default function Checkout() {
     city: "",
     state: "",
     pincode: "",
-    paymentMethod: "razorpay"
+    paymentMethod: "razorpay",
   });
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -69,7 +69,9 @@ export default function Checkout() {
     }
 
     // Check if script is already being loaded
-    const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+    const existingScript = document.querySelector(
+      'script[src="https://checkout.razorpay.com/v1/checkout.js"]',
+    );
     if (existingScript) {
       return;
     }
@@ -87,7 +89,9 @@ export default function Checkout() {
 
     return () => {
       // Only remove if the script exists
-      const scriptElement = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+      const scriptElement = document.querySelector(
+        'script[src="https://checkout.razorpay.com/v1/checkout.js"]',
+      );
       if (scriptElement && scriptElement.parentNode) {
         scriptElement.parentNode.removeChild(scriptElement);
       }
@@ -95,29 +99,38 @@ export default function Checkout() {
   }, []);
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
       maximumFractionDigits: 0,
     }).format(price);
   };
 
   const calculateSubtotal = () => getCartTotal();
-  const calculateShipping = () => calculateSubtotal() >= 2999 ? 0 : 99;
+  const calculateShipping = () => (calculateSubtotal() >= 2999 ? 0 : 99);
   const calculateTotal = () => calculateSubtotal() + calculateShipping();
 
   const handleInputChange = (field: keyof OrderData, value: string) => {
-    setOrderData(prev => ({ ...prev, [field]: value }));
+    setOrderData((prev) => ({ ...prev, [field]: value }));
   };
 
   const validateForm = () => {
-    const required = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'pincode'];
+    const required = [
+      "firstName",
+      "lastName",
+      "email",
+      "phone",
+      "address",
+      "city",
+      "state",
+      "pincode",
+    ];
     for (const field of required) {
       if (!orderData[field as keyof OrderData]) {
         toast({
           title: "Missing Information",
-          description: `Please fill in the ${field.replace(/([A-Z])/g, ' $1').toLowerCase()} field.`,
-          variant: "destructive"
+          description: `Please fill in the ${field.replace(/([A-Z])/g, " $1").toLowerCase()} field.`,
+          variant: "destructive",
         });
         return false;
       }
@@ -129,7 +142,7 @@ export default function Checkout() {
       toast({
         title: "Invalid Email",
         description: "Please enter a valid email address.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return false;
     }
@@ -139,7 +152,7 @@ export default function Checkout() {
       toast({
         title: "Invalid Phone",
         description: "Please enter a valid phone number.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return false;
     }
@@ -152,7 +165,7 @@ export default function Checkout() {
       toast({
         title: "Payment Error",
         description: "Payment system is not available. Please try again later.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -169,7 +182,7 @@ export default function Checkout() {
       handler: function (response: any) {
         // Payment successful
         console.log("Payment successful:", response);
-        
+
         toast({
           title: "Payment Successful!",
           description: `Payment ID: ${response.razorpay_payment_id}`,
@@ -191,20 +204,22 @@ export default function Checkout() {
         color: "#F59E0B", // Gold color
       },
       modal: {
-        ondismiss: function() {
+        ondismiss: function () {
           setIsProcessing(false);
-        }
-      }
+        },
+      },
     };
 
     const rzp = new window.Razorpay(options);
-    
-    rzp.on('payment.failed', function (response: any) {
+
+    rzp.on("payment.failed", function (response: any) {
       console.error("Payment failed:", response.error);
       toast({
         title: "Payment Failed",
-        description: response.error.description || "Payment could not be processed. Please try again.",
-        variant: "destructive"
+        description:
+          response.error.description ||
+          "Payment could not be processed. Please try again.",
+        variant: "destructive",
       });
       setIsProcessing(false);
     });
@@ -249,11 +264,7 @@ export default function Checkout() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate(-1)}
-            className="mr-4"
-          >
+          <Button variant="ghost" onClick={() => navigate(-1)} className="mr-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
@@ -263,7 +274,11 @@ export default function Checkout() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Order Form */}
           <div className="lg:col-span-2">
-            <form id="checkout-form" onSubmit={handleSubmitOrder} className="space-y-6">
+            <form
+              id="checkout-form"
+              onSubmit={handleSubmitOrder}
+              className="space-y-6"
+            >
               {/* Contact Information */}
               <Card>
                 <CardHeader>
@@ -280,7 +295,9 @@ export default function Checkout() {
                         id="firstName"
                         type="text"
                         value={orderData.firstName}
-                        onChange={(e) => handleInputChange("firstName", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("firstName", e.target.value)
+                        }
                         className="w-full mt-2 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                         required
                       />
@@ -291,7 +308,9 @@ export default function Checkout() {
                         id="lastName"
                         type="text"
                         value={orderData.lastName}
-                        onChange={(e) => handleInputChange("lastName", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("lastName", e.target.value)
+                        }
                         className="w-full mt-2 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                         required
                       />
@@ -303,7 +322,9 @@ export default function Checkout() {
                       id="email"
                       type="email"
                       value={orderData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("email", e.target.value)
+                      }
                       className="w-full mt-2 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                       required
                     />
@@ -314,7 +335,9 @@ export default function Checkout() {
                       id="phone"
                       type="tel"
                       value={orderData.phone}
-                      onChange={(e) => handleInputChange("phone", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("phone", e.target.value)
+                      }
                       className="w-full mt-2 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                       required
                     />
@@ -337,7 +360,9 @@ export default function Checkout() {
                       id="address"
                       type="text"
                       value={orderData.address}
-                      onChange={(e) => handleInputChange("address", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("address", e.target.value)
+                      }
                       className="w-full mt-2 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                       placeholder="Street address, apartment, etc."
                       required
@@ -350,7 +375,9 @@ export default function Checkout() {
                         id="city"
                         type="text"
                         value={orderData.city}
-                        onChange={(e) => handleInputChange("city", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("city", e.target.value)
+                        }
                         className="w-full mt-2 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                         required
                       />
@@ -361,7 +388,9 @@ export default function Checkout() {
                         id="state"
                         type="text"
                         value={orderData.state}
-                        onChange={(e) => handleInputChange("state", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("state", e.target.value)
+                        }
                         className="w-full mt-2 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                         required
                       />
@@ -373,7 +402,9 @@ export default function Checkout() {
                       id="pincode"
                       type="text"
                       value={orderData.pincode}
-                      onChange={(e) => handleInputChange("pincode", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("pincode", e.target.value)
+                      }
                       className="w-full mt-2 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
                       required
                     />
@@ -398,15 +429,24 @@ export default function Checkout() {
                         name="paymentMethod"
                         value="razorpay"
                         checked={orderData.paymentMethod === "razorpay"}
-                        onChange={(e) => handleInputChange("paymentMethod", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("paymentMethod", e.target.value)
+                        }
                         className="text-gold"
                       />
-                      <Label htmlFor="razorpay" className="flex-1 cursor-pointer">
+                      <Label
+                        htmlFor="razorpay"
+                        className="flex-1 cursor-pointer"
+                      >
                         <div className="flex items-center justify-between">
-                          <span className="font-medium">Online Payment (Recommended)</span>
+                          <span className="font-medium">
+                            Online Payment (Recommended)
+                          </span>
                           <div className="flex items-center space-x-1">
                             <Shield className="h-4 w-4 text-green-600" />
-                            <span className="text-xs text-green-600">Secure</span>
+                            <span className="text-xs text-green-600">
+                              Secure
+                            </span>
                           </div>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -430,7 +470,10 @@ export default function Checkout() {
                 {/* Cart Items */}
                 <div className="space-y-3 max-h-60 overflow-y-auto">
                   {cartState.items.map((item, index) => (
-                    <div key={`${item.id}-${item.size}-${index}`} className="flex space-x-3">
+                    <div
+                      key={`${item.id}-${item.size}-${index}`}
+                      className="flex space-x-3"
+                    >
                       <div className="w-16 h-16 rounded-md overflow-hidden bg-muted">
                         <img
                           src={item.image}
@@ -493,7 +536,9 @@ export default function Checkout() {
                   size="lg"
                   disabled={isProcessing}
                 >
-                  {isProcessing ? "Processing..." : `Pay ${formatPrice(calculateTotal())}`}
+                  {isProcessing
+                    ? "Processing..."
+                    : `Pay ${formatPrice(calculateTotal())}`}
                 </Button>
 
                 <p className="text-xs text-muted-foreground text-center">

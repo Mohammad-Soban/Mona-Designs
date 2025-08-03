@@ -316,8 +316,6 @@ export default function HeritageWork() {
                 <p className="text-muted-foreground">Years of Experience</p>
               </div>
             </div>
-
-
           </div>
         </div>
       </section>

@@ -6,7 +6,12 @@ interface ScrollToTopLinkProps extends LinkProps {
   className?: string;
 }
 
-export function ScrollToTopLink({ children, to, className, ...props }: ScrollToTopLinkProps) {
+export function ScrollToTopLink({
+  children,
+  to,
+  className,
+  ...props
+}: ScrollToTopLinkProps) {
   const navigate = useNavigate();
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -20,18 +25,13 @@ export function ScrollToTopLink({ children, to, className, ...props }: ScrollToT
       window.scrollTo({
         top: 0,
         left: 0,
-        behavior: "smooth"
+        behavior: "smooth",
       });
     }, 100);
   };
 
   return (
-    <Link 
-      to={to} 
-      className={className} 
-      onClick={handleClick}
-      {...props}
-    >
+    <Link to={to} className={className} onClick={handleClick} {...props}>
       {children}
     </Link>
   );
