@@ -8,7 +8,6 @@ import {
   ArrowRight,
   Star,
   Heart,
-  ShoppingCart,
   Truck,
   Shield,
   RotateCcw,
@@ -167,20 +166,7 @@ export default function Index() {
                         <Heart className="h-4 w-4" />
                       </Button>
                     </div>
-                    <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <Button
-                        size="sm"
-                        className="bg-gold hover:bg-gold/90"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          // Add to cart logic here
-                        }}
-                      >
-                        <ShoppingCart className="h-4 w-4 mr-1" />
-                        Add
-                      </Button>
-                    </div>
+
                   </div>
                   <CardContent className="p-4">
                     <h3 className="font-semibold mb-1">{product.name}</h3>
