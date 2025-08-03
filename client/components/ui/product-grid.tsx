@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Star, ShoppingCart } from "lucide-react";
+import { Heart, Star } from "lucide-react";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { cn } from "@/lib/utils";
 
@@ -91,12 +91,7 @@ export function ProductGrid({ products, className }: ProductGridProps) {
                 </Button>
               </div>
               
-              <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <Button size="sm" className="bg-gold hover:bg-gold/90">
-                  <ShoppingCart className="h-4 w-4 mr-1" />
-                  Add
-                </Button>
-              </div>
+
 
               {/* Quick view overlay */}
               <Link 
