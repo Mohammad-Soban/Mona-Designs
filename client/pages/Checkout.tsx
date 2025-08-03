@@ -212,9 +212,11 @@ export default function Checkout() {
     rzp.open();
   };
 
-  const handleSubmitOrder = (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmitOrder = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+
     if (!validateForm()) {
       return;
     }
