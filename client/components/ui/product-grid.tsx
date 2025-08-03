@@ -60,8 +60,9 @@ export function ProductGrid({ products, className, showPagination = false, items
   };
 
   return (
-    <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6", className)}>
-      {products.map((product) => {
+    <div className="space-y-6">
+      <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6", className)}>
+        {displayProducts.map((product) => {
         const isWishlisted = isInWishlist(product.id);
         return (
           <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden">
@@ -155,7 +156,21 @@ export function ProductGrid({ products, className, showPagination = false, items
             </CardContent>
           </Card>
         );
-      })}
+        })}
+      </div>
+
+      {showPagination && (
+        <Pagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          onPageChange={pagination.goToPage}
+          hasNext={pagination.hasNext}
+          hasPrevious={pagination.hasPrevious}
+          startIndex={pagination.startIndex}
+          endIndex={pagination.endIndex}
+          totalItems={pagination.totalItems}
+        />
+      )}
     </div>
   );
 }
