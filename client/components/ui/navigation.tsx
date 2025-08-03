@@ -52,9 +52,9 @@ const navigation = [
       { name: "Lehengas", href: "/lehengas" },
     ],
   },
-  { name: "Contact Us", href: "/contact" },
   { name: "Accessories", href: "/accessories" },
   { name: "Heritage Work", href: "/heritage-work" },
+  { name: "Contact Us", href: "/contact" },
 ];
 
 export function Navigation() {
