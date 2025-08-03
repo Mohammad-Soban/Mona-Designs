@@ -135,7 +135,14 @@ export function CartSidebar() {
               </div>
               
               <div className="space-y-2">
-                <Button className="w-full bg-gold hover:bg-gold/90" size="lg">
+                <Button
+                  className="w-full bg-gold hover:bg-gold/90"
+                  size="lg"
+                  onClick={() => {
+                    closeCart();
+                    navigate("/checkout");
+                  }}
+                >
                   Proceed to Checkout
                 </Button>
                 <Button variant="outline" className="w-full" onClick={closeCart}>
