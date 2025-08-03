@@ -317,11 +317,7 @@ export default function HeritageWork() {
               </div>
             </div>
 
-            <Link to="/login">
-              <Button size="lg" className="bg-gold hover:bg-gold/90">
-                Support Our Artisans
-              </Button>
-            </Link>
+
           </div>
         </div>
       </section>
