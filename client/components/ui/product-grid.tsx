@@ -25,6 +25,8 @@ interface Product {
 interface ProductGridProps {
   products: Product[];
   className?: string;
+  showPagination?: boolean;
+  itemsPerPage?: number;
 }
 
 export function ProductGrid({ products, className }: ProductGridProps) {
