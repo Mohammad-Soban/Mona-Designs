@@ -249,6 +249,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = {
     state,
+    login,
     sendOTP,
     verifyOTP,
     registerUser,
