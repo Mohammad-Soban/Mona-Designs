@@ -16,6 +16,7 @@ interface AuthState {
 
 interface AuthContextType {
   state: AuthState;
+  login: (username: string, password: string) => Promise<{ success: boolean; message: string; user?: User }>;
   sendOTP: (phone: string) => Promise<{ success: boolean; message: string }>;
   verifyOTP: (phone: string, otp: string) => Promise<{ success: boolean; message: string; user?: User }>;
   registerUser: (userData: { email: string; username: string; password: string; mobile: string }) => Promise<{ success: boolean; message: string }>;
