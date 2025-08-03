@@ -99,6 +99,10 @@ export default function App() {
                           element={<Sangeet />}
                         />
                         <Route
+                          path="/collections/festivals"
+                          element={<Festivals />}
+                        />
+                        <Route
                           path="/collections/general"
                           element={<General />}
                         />
