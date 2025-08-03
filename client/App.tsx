@@ -39,6 +39,7 @@ import Reception from "./pages/occasions/Reception";
 import Mehendi from "./pages/occasions/Mehendi";
 import Sangeet from "./pages/occasions/Sangeet";
 import General from "./pages/occasions/General";
+import Festivals from "./pages/occasions/Festivals";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
