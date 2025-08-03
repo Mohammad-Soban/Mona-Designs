@@ -71,6 +71,53 @@ const nonReturnableItems = [
 ];
 
 export default function Returns() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    orderNumber: "",
+    email: "",
+    phone: "",
+    reason: "",
+    itemDescription: "",
+    additionalNotes: ""
+  });
+  const { toast } = useToast();
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmitReturn = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate required fields
+    if (!formData.orderNumber || !formData.email || !formData.phone || !formData.reason) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Close dialog and show success toast
+    setIsDialogOpen(false);
+
+    toast({
+      title: "Return Request Submitted",
+      description: "Your return request has been raised. We will contact you within the next 48 hours.",
+    });
+
+    // Reset form
+    setFormData({
+      orderNumber: "",
+      email: "",
+      phone: "",
+      reason: "",
+      itemDescription: "",
+      additionalNotes: ""
+    });
+  };
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
