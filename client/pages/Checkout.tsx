@@ -63,13 +63,34 @@ export default function Checkout() {
 
   // Load Razorpay script
   useEffect(() => {
+    // Check if script is already loaded
+    if (window.Razorpay) {
+      return;
+    }
+
+    // Check if script is already being loaded
+    const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+    if (existingScript) {
+      return;
+    }
+
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
+    script.onload = () => {
+      console.log("Razorpay script loaded successfully");
+    };
+    script.onerror = () => {
+      console.error("Failed to load Razorpay script");
+    };
     document.body.appendChild(script);
 
     return () => {
-      document.body.removeChild(script);
+      // Only remove if the script exists
+      const scriptElement = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+      if (scriptElement && scriptElement.parentNode) {
+        scriptElement.parentNode.removeChild(scriptElement);
+      }
     };
   }, []);
 
