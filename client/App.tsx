@@ -116,6 +116,7 @@ export default function App() {
                           path="/cart"
                           element={<PlaceholderPage title="Shopping Cart" />}
                         />
+                        <Route path="/checkout" element={<Checkout />} />
                         <Route path="/wishlist" element={<Wishlist />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
