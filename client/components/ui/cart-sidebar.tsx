@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 export function CartSidebar() {
   const { state, removeItem, updateQuantity, closeCart, getCartTotal, getCartItemsCount } = useCart();
+  const navigate = useNavigate();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
