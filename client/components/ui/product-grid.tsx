@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, Star } from "lucide-react";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { cn } from "@/lib/utils";
+import { usePagination } from "@/hooks/use-pagination";
+import { Pagination } from "@/components/ui/pagination";
 
 interface Product {
   id: number;
