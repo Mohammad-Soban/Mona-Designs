@@ -210,12 +210,20 @@ export default function SizeGuide() {
                   <span className="text-foreground font-medium">Call: +91 98765 43210</span>
                 </div>
               </a>
-              <a href="mailto:hello@monadesigners.com" className="inline-flex">
+              <button
+                onClick={() => {
+                  const message = "Hi, I need help with sizing for your ethnic wear products";
+                  const phoneNumber = "917435898915"; // +91 74358 98915
+                  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+                  window.open(whatsappUrl, "_blank");
+                }}
+                className="inline-flex"
+              >
                 <div className="bg-gold/10 border border-gold/20 rounded-lg px-6 py-4 flex items-center space-x-3 hover:bg-gold/20 transition-all duration-300">
-                  <Info className="h-5 w-5 text-gold" />
-                  <span className="text-foreground font-medium">Email Support</span>
+                  <MessageCircle className="h-5 w-5 text-gold" />
+                  <span className="text-foreground font-medium">WhatsApp Support</span>
                 </div>
-              </a>
+              </button>
             </div>
           </div>
         </div>
