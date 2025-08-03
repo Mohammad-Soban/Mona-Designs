@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom"
 import { Instagram, Twitter, Linkedin, Mail, Phone } from "lucide-react"
+import { ScrollToTopLink } from "./scroll-to-top-link"
 
 export function Footer() {
   return (
