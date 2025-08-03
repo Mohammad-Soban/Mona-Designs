@@ -11,16 +11,18 @@ export function ScrollToTopLink({ children, to, className, ...props }: ScrollToT
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    
+
     // Navigate to the route
     navigate(to);
-    
-    // Scroll to top
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "smooth"
-    });
+
+    // Scroll to top after a small delay to ensure navigation completes
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "smooth"
+      });
+    }, 100);
   };
 
   return (
