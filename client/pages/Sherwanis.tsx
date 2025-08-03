@@ -87,14 +87,7 @@ export default function Sherwanis() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {sortedProducts.length > 0 ? (
             <>
-              <ProductGrid products={sortedProducts} />
-
-              {/* Load More */}
-              <div className="text-center mt-12">
-                <button className="inline-flex items-center px-6 py-3 border border-border rounded-md text-sm font-medium text-foreground bg-background hover:bg-muted transition-colors">
-                  Load More Sherwanis
-                </button>
-              </div>
+              <ProductGrid products={sortedProducts} showPagination={true} itemsPerPage={12} />
             </>
           ) : (
             <div className="text-center py-16">
