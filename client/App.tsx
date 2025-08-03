@@ -40,6 +40,7 @@ import Mehendi from "./pages/occasions/Mehendi";
 import Sangeet from "./pages/occasions/Sangeet";
 import General from "./pages/occasions/General";
 import Festivals from "./pages/occasions/Festivals";
+import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
