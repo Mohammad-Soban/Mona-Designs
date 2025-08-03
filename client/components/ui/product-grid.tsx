@@ -29,8 +29,15 @@ interface ProductGridProps {
   itemsPerPage?: number;
 }
 
-export function ProductGrid({ products, className }: ProductGridProps) {
+export function ProductGrid({ products, className, showPagination = false, itemsPerPage = 12 }: ProductGridProps) {
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
+
+  const pagination = usePagination({
+    data: products,
+    itemsPerPage: itemsPerPage
+  });
+
+  const displayProducts = showPagination ? pagination.paginatedData : products;
 
   const handleWishlistToggle = (e: React.MouseEvent, product: Product) => {
     e.preventDefault(); // Prevent navigation to product page
