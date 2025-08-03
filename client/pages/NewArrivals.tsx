@@ -180,18 +180,7 @@ export default function NewArrivals() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {filteredAndSortedProducts.length > 0 ? (
             <>
-              <ProductGrid products={filteredAndSortedProducts} />
-
-              {/* Load More */}
-              <div className="text-center mt-12">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white"
-                >
-                  Load More New Arrivals
-                </Button>
-              </div>
+              <ProductGrid products={filteredAndSortedProducts} showPagination={true} itemsPerPage={12} />
             </>
           ) : (
             <div className="text-center py-16">
