@@ -99,18 +99,18 @@ export default function Returns() {
             <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
               {returnSteps.map((step, index) => (
                 <div key={step.step} className="relative">
-                  <Card className="text-center hover:shadow-lg transition-all duration-300 border-gold/20">
-                    <CardHeader className="pb-3">
+                  <Card className="text-center hover:shadow-lg transition-all duration-300 border-gold/20 h-full min-h-[200px] flex flex-col">
+                    <CardHeader className="pb-3 flex-shrink-0">
                       <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gold/20 flex items-center justify-center text-gold">
                         {step.icon}
                       </div>
                       <Badge variant="outline" className="mx-auto mb-2">
                         Step {step.step}
                       </Badge>
-                      <CardTitle className="text-sm">{step.title}</CardTitle>
+                      <CardTitle className="text-sm h-10 flex items-center justify-center">{step.title}</CardTitle>
                     </CardHeader>
-                    <CardContent className="pt-0">
-                      <p className="text-xs text-muted-foreground">{step.description}</p>
+                    <CardContent className="pt-0 flex-1 flex items-center">
+                      <p className="text-xs text-muted-foreground text-center">{step.description}</p>
                     </CardContent>
                   </Card>
                   
