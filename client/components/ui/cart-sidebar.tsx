@@ -2,11 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/contexts/CartContext";
+import { useNavigate } from "react-router-dom";
 import { X, Plus, Minus, ShoppingBag, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function CartSidebar() {
   const { state, removeItem, updateQuantity, closeCart, getCartTotal, getCartItemsCount } = useCart();
+  const navigate = useNavigate();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -133,7 +135,14 @@ export function CartSidebar() {
               </div>
               
               <div className="space-y-2">
-                <Button className="w-full bg-gold hover:bg-gold/90" size="lg">
+                <Button
+                  className="w-full bg-gold hover:bg-gold/90"
+                  size="lg"
+                  onClick={() => {
+                    closeCart();
+                    navigate("/checkout");
+                  }}
+                >
                   Proceed to Checkout
                 </Button>
                 <Button variant="outline" className="w-full" onClick={closeCart}>

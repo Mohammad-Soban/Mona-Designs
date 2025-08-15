@@ -16,6 +16,7 @@ interface AuthState {
 
 interface AuthContextType {
   state: AuthState;
+  login: (username: string, password: string) => Promise<{ success: boolean; message: string; user?: User }>;
   sendOTP: (phone: string) => Promise<{ success: boolean; message: string }>;
   verifyOTP: (phone: string, otp: string) => Promise<{ success: boolean; message: string; user?: User }>;
   registerUser: (userData: { email: string; username: string; password: string; mobile: string }) => Promise<{ success: boolean; message: string }>;
@@ -56,6 +57,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setState(prev => ({ ...prev, isLoading: false }));
     }
   }, []);
+
+  const login = async (username: string, password: string): Promise<{ success: boolean; message: string; user?: User }> => {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+
+      // Check for test credentials
+      if (username === "test" && password === "test") {
+        const user: User = {
+          id: "test_admin_user",
+          phone: "+91 98765 43210",
+          email: "test@monadesigners.com",
+          username: "test",
+          name: "Test Admin"
+        };
+
+        // Store user in localStorage
+        localStorage.setItem("mona-user", JSON.stringify(user));
+
+        setState({
+          user,
+          isLoading: false,
+          isAuthenticated: true,
+        });
+
+        return {
+          success: true,
+          message: "Login successful!",
+          user
+        };
+      } else {
+        return {
+          success: false,
+          message: "Invalid username or password. Use 'test' for both username and password."
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: "Login failed. Please try again."
+      };
+    }
+  };
 
   const sendOTP = async (phone: string): Promise<{ success: boolean; message: string }> => {
     // Simulate API call to send OTP
@@ -206,6 +249,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = {
     state,
+    login,
     sendOTP,
     verifyOTP,
     registerUser,

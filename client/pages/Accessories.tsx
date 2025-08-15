@@ -8,7 +8,7 @@ import {
   Gem,
   Shield,
   Star,
-  ShoppingCart,
+
   Heart,
 } from "lucide-react";
 
@@ -171,10 +171,7 @@ export default function Accessories() {
                   <p className="text-gold font-bold text-lg mb-3">
                     {product.price}
                   </p>
-                  <Button className="w-full bg-gold hover:bg-gold/90">
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Add to Cart
-                  </Button>
+
                 </CardContent>
               </Card>
             ))}

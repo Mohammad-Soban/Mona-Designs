@@ -18,20 +18,22 @@ const sortOptions = [
   { value: "rating", label: "Highest Rated" },
 ];
 
-const categories = ["All", "Kurtas", "Lehengas", "Suits", "Sherwanis"];
+const categories = ["All", "Kurtas", "Sherwanis", "Suits", "Lehengas"];
 
-export default function Mehendi() {
+export default function Festivals() {
   const [sortBy, setSortBy] = useState("featured");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const mehendiProducts = useMemo(() => {
+  // Filter products suitable for Festivals (colorful, traditional styles)
+  const festivalProducts = useMemo(() => {
     const categoryProducts = getProductsByCategory(selectedCategory);
+    // For demo, return all products. In real app, filter by occasion tags
     return categoryProducts;
   }, [selectedCategory]);
 
   const filteredAndSortedProducts = useMemo(() => {
-    return sortProducts(mehendiProducts, sortBy);
-  }, [mehendiProducts, sortBy]);
+    return sortProducts(festivalProducts, sortBy);
+  }, [festivalProducts, sortBy]);
 
   const handleSortChange = (newSortBy: string) => {
     setSortBy(newSortBy);
@@ -44,17 +46,16 @@ export default function Mehendi() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-64 bg-gradient-to-r from-green-500/90 to-emerald-600/90 flex items-center mt-20">
-        <div className="absolute inset-0 bg-gradient-to-br from-green-600/20 to-teal-600/20" />
+      <section className="relative h-64 bg-gradient-to-r from-purple-600/90 to-pink-600/90 flex items-center mt-20">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
-              Mehendi Collection
+              Festivals Collection
             </h1>
-            <p className="text-green-100 text-lg">
-              Celebrate the art of henna with our vibrant mehendi collection
-              featuring comfortable kurtas, flowing lehengas, and festive
-              traditional wear.
+            <p className="text-purple-100 text-lg">
+              Celebrate every festival in style with our vibrant collection
+              of traditional wear perfect for Diwali, Holi, Navratri, and more.
             </p>
           </div>
         </div>
@@ -78,7 +79,7 @@ export default function Mehendi() {
                 {category}
                 <Badge variant="secondary" className="ml-2 text-xs">
                   {category === "All"
-                    ? mehendiProducts.length
+                    ? festivalProducts.length
                     : getProductsByCategory(category).length}
                 </Badge>
               </button>
@@ -105,6 +106,7 @@ export default function Mehendi() {
             </div>
 
             <div className="flex items-center space-x-4">
+              {/* Sort Dropdown */}
               <div className="relative">
                 <select
                   value={sortBy}

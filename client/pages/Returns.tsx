@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SectionWrapper } from "@/components/ui/section-wrapper";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import { 
   RotateCcw, 
   Clock, 
@@ -67,6 +71,53 @@ const nonReturnableItems = [
 ];
 
 export default function Returns() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    orderNumber: "",
+    email: "",
+    phone: "",
+    reason: "",
+    itemDescription: "",
+    additionalNotes: ""
+  });
+  const { toast } = useToast();
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmitReturn = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate required fields
+    if (!formData.orderNumber || !formData.email || !formData.phone || !formData.reason) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Close dialog and show success toast
+    setIsDialogOpen(false);
+
+    toast({
+      title: "Return Request Submitted",
+      description: "Your return request has been raised. We will contact you within the next 48 hours.",
+    });
+
+    // Reset form
+    setFormData({
+      orderNumber: "",
+      email: "",
+      phone: "",
+      reason: "",
+      itemDescription: "",
+      additionalNotes: ""
+    });
+  };
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -99,18 +150,18 @@ export default function Returns() {
             <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
               {returnSteps.map((step, index) => (
                 <div key={step.step} className="relative">
-                  <Card className="text-center hover:shadow-lg transition-all duration-300 border-gold/20">
-                    <CardHeader className="pb-3">
+                  <Card className="text-center hover:shadow-lg transition-all duration-300 border-gold/20 h-full min-h-[200px] flex flex-col">
+                    <CardHeader className="pb-3 flex-shrink-0">
                       <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gold/20 flex items-center justify-center text-gold">
                         {step.icon}
                       </div>
                       <Badge variant="outline" className="mx-auto mb-2">
                         Step {step.step}
                       </Badge>
-                      <CardTitle className="text-sm">{step.title}</CardTitle>
+                      <CardTitle className="text-sm h-10 flex items-center justify-center">{step.title}</CardTitle>
                     </CardHeader>
-                    <CardContent className="pt-0">
-                      <p className="text-xs text-muted-foreground">{step.description}</p>
+                    <CardContent className="pt-0 flex-1 flex items-center">
+                      <p className="text-xs text-muted-foreground text-center">{step.description}</p>
                     </CardContent>
                   </Card>
                   
@@ -268,9 +319,118 @@ export default function Returns() {
               </a>
             </div>
 
-            <Button size="lg" className="bg-white text-gold hover:bg-white/90 border-0 shadow-xl transition-all duration-300 hover:scale-105 px-8 py-4 text-lg font-semibold">
-              Start Return Process
-            </Button>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="lg" className="bg-white text-gold hover:bg-white/90 border-0 shadow-xl transition-all duration-300 hover:scale-105 px-8 py-4 text-lg font-semibold">
+                  Start Return Process
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Return Request Form</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmitReturn} className="space-y-4">
+                  <div>
+                    <Label htmlFor="orderNumber">Order Number *</Label>
+                    <input
+                      id="orderNumber"
+                      type="text"
+                      value={formData.orderNumber}
+                      onChange={(e) => handleInputChange("orderNumber", e.target.value)}
+                      className="w-full mt-2 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
+                      placeholder="Enter your order number"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="email">Email Address *</Label>
+                    <input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      className="w-full mt-2 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
+                      placeholder="Enter your email"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="phone">Phone Number *</Label>
+                    <input
+                      id="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => handleInputChange("phone", e.target.value)}
+                      className="w-full mt-2 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
+                      placeholder="Enter your phone number"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="reason">Reason for Return *</Label>
+                    <select
+                      id="reason"
+                      value={formData.reason}
+                      onChange={(e) => handleInputChange("reason", e.target.value)}
+                      className="w-full mt-2 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
+                      required
+                    >
+                      <option value="">Select a reason</option>
+                      <option value="defective">Item is defective</option>
+                      <option value="wrong-size">Wrong size</option>
+                      <option value="wrong-item">Wrong item received</option>
+                      <option value="damaged">Item arrived damaged</option>
+                      <option value="not-as-described">Not as described</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="itemDescription">Item Description</Label>
+                    <input
+                      id="itemDescription"
+                      type="text"
+                      value={formData.itemDescription}
+                      onChange={(e) => handleInputChange("itemDescription", e.target.value)}
+                      className="w-full mt-2 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold text-black"
+                      placeholder="Describe the item you want to return"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="additionalNotes">Additional Notes</Label>
+                    <textarea
+                      id="additionalNotes"
+                      value={formData.additionalNotes}
+                      onChange={(e) => handleInputChange("additionalNotes", e.target.value)}
+                      rows={3}
+                      className="w-full mt-2 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold resize-none text-black"
+                      placeholder="Any additional information..."
+                    />
+                  </div>
+
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsDialogOpen(false)}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="flex-1 bg-gold hover:bg-gold/90"
+                    >
+                      Submit Request
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </SectionWrapper>

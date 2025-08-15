@@ -2,9 +2,11 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Star, ShoppingCart } from "lucide-react";
+import { Heart, Star } from "lucide-react";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { cn } from "@/lib/utils";
+import { usePagination } from "@/hooks/use-pagination";
+import { Pagination } from "@/components/ui/pagination";
 
 interface Product {
   id: number;
@@ -23,10 +25,19 @@ interface Product {
 interface ProductGridProps {
   products: Product[];
   className?: string;
+  showPagination?: boolean;
+  itemsPerPage?: number;
 }
 
-export function ProductGrid({ products, className }: ProductGridProps) {
+export function ProductGrid({ products, className, showPagination = false, itemsPerPage = 12 }: ProductGridProps) {
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
+
+  const pagination = usePagination({
+    data: products,
+    itemsPerPage: itemsPerPage
+  });
+
+  const displayProducts = showPagination ? pagination.paginatedData : products;
 
   const handleWishlistToggle = (e: React.MouseEvent, product: Product) => {
     e.preventDefault(); // Prevent navigation to product page
@@ -49,8 +60,9 @@ export function ProductGrid({ products, className }: ProductGridProps) {
   };
 
   return (
-    <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6", className)}>
-      {products.map((product) => {
+    <div className="space-y-6">
+      <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6", className)}>
+        {displayProducts.map((product) => {
         const isWishlisted = isInWishlist(product.id);
         return (
           <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden">
@@ -91,12 +103,7 @@ export function ProductGrid({ products, className }: ProductGridProps) {
                 </Button>
               </div>
               
-              <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <Button size="sm" className="bg-gold hover:bg-gold/90">
-                  <ShoppingCart className="h-4 w-4 mr-1" />
-                  Add
-                </Button>
-              </div>
+
 
               {/* Quick view overlay */}
               <Link 
@@ -149,7 +156,21 @@ export function ProductGrid({ products, className }: ProductGridProps) {
             </CardContent>
           </Card>
         );
-      })}
+        })}
+      </div>
+
+      {showPagination && (
+        <Pagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          onPageChange={pagination.goToPage}
+          hasNext={pagination.hasNext}
+          hasPrevious={pagination.hasPrevious}
+          startIndex={pagination.startIndex}
+          endIndex={pagination.endIndex}
+          totalItems={pagination.totalItems}
+        />
+      )}
     </div>
   );
 }

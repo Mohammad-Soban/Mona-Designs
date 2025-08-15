@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductGrid } from "@/components/ui/product-grid";
@@ -315,10 +316,6 @@ export default function HeritageWork() {
                 <p className="text-muted-foreground">Years of Experience</p>
               </div>
             </div>
-
-            <Button size="lg" className="bg-gold hover:bg-gold/90">
-              Support Our Artisans
-            </Button>
           </div>
         </div>
       </section>
