@@ -1,0 +1,223 @@
+Backend Plan for Mona-Designs (MERN + Razorpay)
+
+Goal
+- Deliver a complete, cost-efficient backend for the existing React frontend in this repo.
+- Use MongoDB (Atlas free tier), Express + TypeScript, and integrate Razorpay for payments.
+- Admin can create/modify products and select which images display on which pages.
+
+High-level architecture
+- Frontend: existing React app in `client/` will call a REST API at `/api/*`.
+- Backend: Express + TypeScript server in `server/` exposing REST routes for auth, products, cart, orders, payments and admin management.
+- DB: MongoDB (Atlas free tier) for persistent data.
+- Storage: Cloudinary free tier for images (or allow direct image URL usage to keep costs zero).
+- Payments: Razorpay using server-side order creation + signature verification; optional webhooks for asynchronous events.
+
+Contract (tiny)
+- Inputs: HTTP JSON bodies, multipart file uploads for images, auth via Bearer JWT.
+- Outputs: JSON responses (data + errors), HTTP status codes.
+- Error modes: validation errors (400), auth errors (401/403), server errors (500), payment verification failures (422).
+- Success: Clean JSON payloads with created/updated resource and stable IDs.
+
+Database collections & fields
+1) users
+- _id: ObjectId
+- name: string
+- email: string (unique, indexed)
+- passwordHash: string
+- role: string enum ['user','admin'] (default 'user')
+- createdAt: Date
+- updatedAt: Date
+- profileImage?: { url, public_id }
+- address?: [{ label, line1, city, state, postalCode, country }]
+
+Indexes: email unique, createdAt TTL not needed.
+
+2) products
+- _id: ObjectId
+- title: string
+- slug: string (unique, index) e.g., 'classic-sherwani'
+- description: string (HTML or markdown)
+- price: number (in smallest currency unit, e.g., INR paise or cents)
+- currency: string (default 'INR')
+- sku?: string
+- stock: number
+- categories: [string]
+- tags: [string]
+- sizes?: [{ label, qty }] or simple size array
+- colors?: [{ label, hex }]
+- images: [{ url, public_id, alt, role, position }]
+  - role: 'hero'|'gallery'|'thumbnail'|'category' (used by frontend to display on specific pages)
+  - position: integer
+- attributes: object (custom attributes)
+- isActive: boolean
+- featured: boolean (for home/collections)
+- metadata: object
+- createdBy: ObjectId (admin)
+- createdAt/updatedAt
+
+Indexes: slug unique, featured index for fast queries, text index on title/description for search.
+
+3) carts (optional: session-based or user persistent)
+- _id: ObjectId
+- userId: ObjectId (nullable for guest carts)
+- items: [{ productId, title, price, qty, options }]
+- updatedAt
+
+4) orders
+- _id: ObjectId
+- userId: ObjectId
+- items: [{ productId, title, price, qty, options }]
+- shippingAddress: object
+- billingAddress: object
+- subtotal: number
+- shipping: number
+- tax: number
+- total: number
+- currency: string
+- status: enum['pending','created','paid','failed','shipped','delivered','cancelled','refunded']
+- payment: {
+    provider: 'razorpay',
+    orderId: string (razorpay order id),
+    paymentId?: string (razorpay payment id),
+    signature?: string,
+    method?: string,
+    captured: boolean
+  }
+- receiptId: string (internal receipt reference)
+- createdAt/updatedAt
+
+5) payments (optional separate collection)
+- _id
+- orderId: ObjectId
+- providerPaymentId
+- providerOrderId
+- amount
+- currency
+- status
+- rawPayload (store webhook body if any)
+- createdAt
+
+6) audit_logs (optional)
+- user, action, meta, timestamp
+
+Image metadata notes
+- Allow admin to upload multiple images per product. On upload, admin assigns role(s) to each image (hero, gallery, thumbnail). The frontend will select images by role when rendering specific pages.
+- Store both `url` and `public_id` (Cloudinary) for deletion.
+
+API endpoints (recommended)
+- Auth
+  - POST /api/auth/register { name, email, password } -> 201 user + token
+  - POST /api/auth/login { email, password } -> 200 { token }
+  - POST /api/auth/refresh -> (optional) refresh token flow
+  - GET /api/auth/me -> user profile (auth)
+
+- Admin user management
+  - GET /api/admin/users
+  - PATCH /api/admin/users/:id
+  - DELETE /api/admin/users/:id
+
+- Products
+  - GET /api/products?search=&category=&page=&limit= -> list (public)
+  - GET /api/products/:slug -> product detail
+  - GET /api/products/id/:id -> alternate
+
+- Admin Products (admin role required)
+  - POST /api/admin/products -> create (multipart+json)
+  - PATCH /api/admin/products/:id -> update
+  - DELETE /api/admin/products/:id
+  - POST /api/admin/products/:id/images -> upload image (multer -> cloudinary) and assign role
+  - DELETE /api/admin/products/:id/images/:imageId -> remove
+
+- Cart
+  - GET /api/cart (auth) or client stores local cart
+  - POST /api/cart (auth) add/item
+  - PATCH /api/cart/item/:itemId
+  - DELETE /api/cart/item/:itemId
+
+- Orders
+  - POST /api/orders -> create order (calculates totals, creates razorpay order if payment required)
+  - GET /api/orders/:id -> get order
+  - GET /api/orders -> user orders
+  - PATCH /api/orders/:id (admin updates status)
+
+- Payments (Razorpay flow)
+  - POST /api/payments/razorpay/create-order { orderId, amount } -> creates Razorpay order, returns { razorpayOrderId, amount, currency }
+  - POST /api/payments/razorpay/verify -> verify signature from client after checkout; marks order paid
+  - POST /api/payments/razorpay/webhook -> (optional) verify webhook signature and update order/payment status
+
+- Uploads (optional)
+  - POST /api/uploads (admin) -> direct cloudinary upload support with signed uploads if you want more control
+
+Security & middleware
+- Use helmet, cors (allow front-end origin), rate-limiter (express-rate-limit) on auth endpoints.
+- Use bcrypt (bcryptjs) with cost factor 10+ for passwords.
+- Use JWT (HS256) with a strong secret; token expiry 1h or short-lived and refresh token if needed.
+- Validate bodies with Zod or express-validator.
+- Sanitize user input for search to avoid ReDoS.
+
+Razorpay integration (detailed)
+- Create order on server: call Razorpay Orders API with amount (in paise), currency, receipt id (internal order id), and capture:1 (auto-capture) or 0 (manual).
+- Return { key_id, order_id, amount } to client. On client, open Razorpay Checkout with these params along with prefill info.
+- On successful payment, the checkout returns razorpay_payment_id, razorpay_order_id, and razorpay_signature to client. Client sends these to /api/payments/razorpay/verify.
+- Server verifies signature: compute HMAC_SHA256(razorpay_order_id + '|' + razorpay_payment_id, RAZORPAY_KEY_SECRET) and compare with razorpay_signature.
+- If valid, mark order status 'paid' and store payment details.
+- Optionally implement webhook to capture asynchronous failures/refunds. Verify webhook signature with X-Razorpay-Signature and webhook secret.
+
+Zero/low-cost recommendations
+- MongoDB Atlas free tier cluster (M0). Use a small cluster and whitelist your IP or use VPC peering if needed.
+- Cloudinary free plan for images (has bandwidth & storage limits). Alternatively, allow admin to paste external image URLs to avoid storage costs entirely.
+- Host server on Railway/Render/Vercel serverless functions (free tiers). For Express, Railway or Render's free instance is straightforward. If you want full zero-cost, use Railway's free tier with limited uptime, or use Fly.io free allowance.
+- Use Netlify/Vercel for frontend (already uses Netlify config in repo). Keep backend on Render/Railway.
+
+Step-by-step execution plan (developer tasks)
+1. Map frontend API usage (2-4 hours)
+   - Inspect `client/pages` and `client/components` to identify exact JSON shapes expected by frontend and adjust endpoint names accordingly.
+
+2. Scaffold backend project (30-60 minutes)
+   - Create `server/` folder (if not present or extend existing) with TypeScript setup.
+   - Initialize package.json, install dependencies (list in requirements file).
+   - Create `src/server.ts` or `index.ts` to boot Express, load .env.
+
+3. Implement core infra (1-2 hours)
+   - Add middleware: helmet, cors, morgan, express.json(), error handler.
+   - Connect to MongoDB via mongoose.
+
+4. Implement auth (2-4 hours)
+   - User model, register/login routes, password hashing, JWT token generation, `authMiddleware` to protect routes.
+   - Create an initial admin seeding script or environment vars for initial admin credentials.
+
+5. Implement product model & admin CRUD (3-5 hours)
+   - Product schema per above, image upload endpoints using multer and cloudinary. Implement role assignment for images.
+   - Populate sample products via admin UI.
+
+6. Cart & Orders (2-4 hours)
+   - Implement cart persistence (optional: client-only cart with server checkout endpoint).
+   - Order creation: calculate subtotal, taxes, shipping, create order doc with status 'created'.
+
+7. Razorpay integration (2-4 hours)
+   - Add endpoints to create Razorpay order, verify payments, and optional webhook handling.
+   - Test flow with Razorpay test keys.
+
+8. Tests & validation (2-4 hours)
+   - Add simple Vitest tests for auth, product CRUD, payment verification routine.
+
+9. Deployment & environment (1-2 hours)
+   - Set up MongoDB Atlas, Cloudinary, Razorpay test account.
+   - Deploy backend to Railway/Render; configure environment variables.
+
+10. QA & Handover (1-2 hours)
+   - Smoke test end-to-end: register/login, admin create product & images, add to cart, checkout using Razorpay test checkout, verify signature, confirm order.
+
+Operational notes & edge-cases
+- Guest checkouts: allow creating orders for guests with email & create user optionally.
+- Idempotency: use receiptId and idempotency for order creation to avoid duplicate charges.
+- Refunds: support querying Razorpay payment and initiating refunds via Razorpay API (admin-only).
+- Currency conversion: keep amounts in smallest currency unit and document assumptions.
+
+Monitoring & logs
+- Log minimal payment events and errors to console; in production use a log aggregator.
+
+Next steps (after plan)
+- I will add the requirements file with exact env variables and package list. Then map the frontend to endpoints (I'll scan `client/` to confirm shapes) and propose minimal server scaffolding files if you want me to implement them.
+
+

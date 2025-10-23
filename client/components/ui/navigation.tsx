@@ -38,7 +38,6 @@ const navigation = [
       { name: "Reception", href: "/collections/reception" },
       { name: "Mehendi", href: "/collections/mehendi" },
       { name: "Sangeet", href: "/collections/sangeet" },
-      { name: "Festivals", href: "/collections/festivals" },
       { name: "General", href: "/collections/general" },
     ],
   },
@@ -52,9 +51,9 @@ const navigation = [
       { name: "Lehengas", href: "/lehengas" },
     ],
   },
+  { name: "Contact Us", href: "/contact" },
   { name: "Accessories", href: "/accessories" },
   { name: "Heritage Work", href: "/heritage-work" },
-  { name: "Contact Us", href: "/contact" },
 ];
 
 export function Navigation() {

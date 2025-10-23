@@ -160,7 +160,7 @@ export default function Checkout() {
     return true;
   };
 
-  const handleRazorpayPayment = () => {
+  const handleRazorpayPayment = async () => {
     if (!window.Razorpay) {
       toast({
         title: "Payment Error",
@@ -170,61 +170,183 @@ export default function Checkout() {
       return;
     }
 
-    const amount = calculateTotal() * 100; // Razorpay expects amount in paise
+    try {
+      // 1. Create order on server
+      const token = localStorage.getItem("token");
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const options = {
-      key: "rzp_test_1234567890", // Replace with your actual Razorpay key
-      amount: amount,
-      currency: "INR",
-      name: "Mona Designers",
-      description: "Payment for ethnic wear order",
-      image: "/static/images/logo.webp",
-      handler: function (response: any) {
-        // Payment successful
-        console.log("Payment successful:", response);
+      const orderResponse = await fetch("/api/payments/razorpay/create-order", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          amount: calculateTotal(), // Server will convert to paise
+          currency: "INR",
+          receipt: `order_${Date.now()}`,
+          notes: {
+            address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.pincode}`,
+          }
+        }),
+      });
+
+      if (!orderResponse.ok) {
+        // Try to parse returned body for debug
+        let errBody: any = null;
+        try {
+          errBody = await orderResponse.json();
+        } catch (e) {
+          errBody = await orderResponse.text();
+        }
+        console.error('Create order failed', orderResponse.status, errBody);
+        setIsProcessing(false);
+        throw new Error(`Failed to create order: ${orderResponse.status} - ${JSON.stringify(errBody)}`);
+      }
+
+      const razorpayOrder = await orderResponse.json();
+
+      // 2. Initialize Razorpay payment
+      console.log('Initializing Razorpay with order:', {
+        orderId: razorpayOrder.id,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        keyId: razorpayOrder.key_id
+      });
+
+      const options = {
+        key: razorpayOrder.key_id, // Key from server
+        amount: razorpayOrder.amount, // Already in paise from server
+        currency: razorpayOrder.currency,
+        name: "Mona Designers",
+        description: "Payment for ethnic wear order",
+        order_id: razorpayOrder.id,
+        image: "https://mona-designs.netlify.app/static/images/logo.webp",
+        handler: async function (response: any) {
+          try {
+            // 3. Verify payment on server
+            // Verify payment on server (send Authorization only if token exists)
+            const vtoken = localStorage.getItem("token");
+            const vheaders: Record<string, string> = { "Content-Type": "application/json" };
+            if (vtoken) vheaders["Authorization"] = `Bearer ${vtoken}`;
+
+            const verifyResponse = await fetch("/api/payments/razorpay/verify", {
+              method: "POST",
+              headers: vheaders,
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            if (!verifyResponse.ok) {
+              let errBody: any = null;
+              try {
+                errBody = await verifyResponse.json();
+              } catch (e) {
+                errBody = await verifyResponse.text();
+              }
+              console.error('Verify payment failed', verifyResponse.status, errBody);
+              throw new Error(`Payment verification failed: ${verifyResponse.status} - ${JSON.stringify(errBody)}`);
+            }
+
+            const verificationResult = await verifyResponse.json();
+
+            toast({
+              title: "Payment Successful!",
+              description: `Order ID: ${verificationResult.orderId}`,
+            });
+
+            // Clear cart and redirect
+            clearCart();
+            setIsProcessing(false);
+            navigate("/", { replace: true });
+          } catch (error) {
+            console.error("Payment verification error:", error);
+            toast({
+              title: "Payment Verification Failed",
+              description: "Please contact support with your order ID",
+              variant: "destructive",
+            });
+            setIsProcessing(false);
+          }
+        },
+        prefill: {
+          name: `${orderData.firstName} ${orderData.lastName}`,
+          email: orderData.email,
+          contact: orderData.phone,
+        },
+        notes: {
+          address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.pincode}`,
+        },
+        theme: {
+          color: "#F59E0B", // Gold color
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+          },
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+
+      rzp.on("payment.failed", function (response: any) {
+        console.log("Full payment failure response:", response);
+        console.error("Payment failed with error:", response.error);
+        console.log("Error code:", response.error.code);
+        console.log("Error description:", response.error.description);
+        console.log("Error source:", response.error.source);
+        console.log("Error step:", response.error.step);
+        console.log("Error reason:", response.error.reason);
 
         toast({
-          title: "Payment Successful!",
-          description: `Payment ID: ${response.razorpay_payment_id}`,
+          title: "Payment Failed",
+          description: response.error.description || "Payment could not be processed. Please try again.",
+          variant: "destructive",
         });
+        setIsProcessing(false);
 
-        // Clear cart and redirect
-        clearCart();
-        navigate("/", { replace: true });
-      },
-      prefill: {
-        name: `${orderData.firstName} ${orderData.lastName}`,
-        email: orderData.email,
-        contact: orderData.phone,
-      },
-      notes: {
-        address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.pincode}`,
-      },
-      theme: {
-        color: "#F59E0B", // Gold color
-      },
-      modal: {
-        ondismiss: function () {
-          setIsProcessing(false);
-        },
-      },
-    };
+        // Send detailed failure payload to server for debugging
+        try {
+          fetch('/api/debug/log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'razorpay_payment_failed',
+              error: {
+                code: response.error.code,
+                description: response.error.description,
+                source: response.error.source,
+                step: response.error.step,
+                reason: response.error.reason
+              },
+              orderDetails: {
+                amount: calculateTotal(),
+                receipt: `order_${Date.now()}`,
+                currency: 'INR'
+              },
+              metadata: {
+                userAgent: window.navigator.userAgent,
+                timestamp: new Date().toISOString()
+              }
+            }),
+          }).catch((e) => console.warn('Failed to send debug log:', e));
+        } catch (e) {
+          console.warn('Debug log error:', e);
+        }
+      });
 
-    const rzp = new window.Razorpay(options);
-
-    rzp.on("payment.failed", function (response: any) {
-      console.error("Payment failed:", response.error);
+      rzp.open();
+    } catch (error) {
+      console.error("Payment error:", error);
       toast({
-        title: "Payment Failed",
-        description:
-          response.error.description ||
-          "Payment could not be processed. Please try again.",
+        title: "Payment Error",
+        description: "Could not process payment. Please try again.",
         variant: "destructive",
       });
       setIsProcessing(false);
-    });
-
-    rzp.open();
+      return;
+    }
   };
 
   const handleSubmitOrder = (e?: React.FormEvent) => {
@@ -544,6 +666,17 @@ export default function Checkout() {
                 <p className="text-xs text-muted-foreground text-center">
                   Your payment information is secure and encrypted
                 </p>
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+                    <p className="text-xs font-medium mb-2">🔧 Test Card Details (Development Only):</p>
+                    <div className="text-xs space-y-1 text-muted-foreground">
+                      <p>Card: 5267 3181 8797 5449</p>
+                      <p>Expiry: Any future date</p>
+                      <p>CVV: Any 3 digits</p>
+                      <p>OTP: 1111</p>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
