@@ -1,4 +1,5 @@
-import { createContext, useContext, useReducer, ReactNode } from "react";
+import { createContext, useContext, useReducer, ReactNode, useEffect } from "react";
+import { useAuth } from "./AuthContext";
 
 export interface CartItem {
   id: number;
@@ -96,25 +97,158 @@ export function CartProvider({ children }: { children: ReactNode }) {
     items: [],
     isOpen: false,
   });
+  const { state: authState } = useAuth();
 
-  const addItem = (item: CartItem) => {
+  // Load cart from database when user logs in
+  useEffect(() => {
+    if (authState.user) {
+      loadCartFromDatabase();
+    } else {
+      // Clear cart when user logs out
+      dispatch({ type: "CLEAR_CART" });
+    }
+  }, [authState.user]);
+
+  const loadCartFromDatabase = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch("/api/orders/cart", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.cart.items.length > 0) {
+          // Convert database cart items to frontend format
+          const dbItems = data.cart.items.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            image: item.image,
+            size: item.size,
+            color: item.color,
+            quantity: item.quantity,
+            category: item.category,
+          }));
+          
+          // Replace local cart with database cart
+          dispatch({ type: "CLEAR_CART" });
+          dbItems.forEach((item: CartItem) => {
+            dispatch({ type: "ADD_ITEM", payload: item });
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load cart from database:", error);
+    }
+  };
+
+  const addItem = async (item: CartItem) => {
     dispatch({ type: "ADD_ITEM", payload: item });
+    
+    // Sync with database if user is logged in
+    if (authState.user) {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        await fetch("/api/orders/cart", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            productId: item.id.toString(),
+            qty: item.quantity,
+            size: item.size,
+            color: item.color,
+          }),
+        });
+      } catch (error) {
+        console.error("Failed to sync cart with database:", error);
+      }
+    }
   };
 
-  const removeItem = (id: number, size: string) => {
+  const removeItem = async (id: number, size: string) => {
     dispatch({ type: "REMOVE_ITEM", payload: { id, size } });
+    
+    // Sync with database if user is logged in
+    if (authState.user) {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        // Find the cart item ID from database
+        const cartItem = state.items.find(item => item.id === id && item.size === size);
+        if (cartItem) {
+          await fetch(`/api/orders/cart/item/${cartItem.id}`, {
+            method: "DELETE",
+            headers: {
+              "Authorization": `Bearer ${token}`,
+            },
+          });
+        }
+      } catch (error) {
+        console.error("Failed to sync cart removal with database:", error);
+      }
+    }
   };
 
-  const updateQuantity = (id: number, size: string, quantity: number) => {
+  const updateQuantity = async (id: number, size: string, quantity: number) => {
     if (quantity <= 0) {
       removeItem(id, size);
     } else {
       dispatch({ type: "UPDATE_QUANTITY", payload: { id, size, quantity } });
+      
+      // Sync with database if user is logged in
+      if (authState.user) {
+        try {
+          const token = localStorage.getItem("token");
+          if (!token) return;
+
+          const cartItem = state.items.find(item => item.id === id && item.size === size);
+          if (cartItem) {
+            await fetch(`/api/orders/cart/item/${cartItem.id}`, {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+              },
+              body: JSON.stringify({ qty: quantity }),
+            });
+          }
+        } catch (error) {
+          console.error("Failed to sync cart update with database:", error);
+        }
+      }
     }
   };
 
-  const clearCart = () => {
+  const clearCart = async () => {
     dispatch({ type: "CLEAR_CART" });
+    
+    // Sync with database if user is logged in
+    if (authState.user) {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        await fetch("/api/orders/cart", {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+      } catch (error) {
+        console.error("Failed to sync cart clear with database:", error);
+      }
+    }
   };
 
   const toggleCart = () => {

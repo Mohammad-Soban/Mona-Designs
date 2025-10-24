@@ -30,7 +30,7 @@ export interface IPaymentDetails {
 
 export interface IOrder extends Document {
   _id: string;
-  userId: mongoose.Types.ObjectId;
+  userId?: mongoose.Types.ObjectId; // Make optional for guest checkout
   items: IOrderItem[];
   shippingAddress: IAddress;
   billingAddress: IAddress;
@@ -50,7 +50,7 @@ const orderSchema = new Schema<IOrder>({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
+    required: false, // Allow null for guest checkout
   },
   items: [{
     productId: {

@@ -157,6 +157,16 @@ export default function Checkout() {
       return false;
     }
 
+    // Ensure payment method is Razorpay
+    if (orderData.paymentMethod !== "razorpay") {
+      toast({
+        title: "Payment Required",
+        description: "You must complete the payment process. No other payment methods are available.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     return true;
   };
 
@@ -185,8 +195,60 @@ export default function Checkout() {
           receipt: `order_${Date.now()}`,
           notes: {
             address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.pincode}`,
+          },
+          orderData: {
+            ...(authState.user?._id && { userId: authState.user._id }),
+            items: cartState.items.map(item => ({
+              productId: item.id.toString(),
+              title: item.name,
+              price: parseInt(item.price.replace(/[₹,]/g, '')),
+              qty: item.quantity,
+              size: item.size,
+              color: item.color,
+              options: item.options,
+            })),
+            shippingAddress: {
+              address: orderData.address,
+              city: orderData.city,
+              state: orderData.state,
+              pincode: orderData.pincode,
+            },
+            billingAddress: {
+              address: orderData.address,
+              city: orderData.city,
+              state: orderData.state,
+              pincode: orderData.pincode,
+            },
           }
         }),
+      });
+
+      console.log('Sending order data:', {
+        amount: calculateTotal(),
+        orderData: {
+          ...(authState.user?._id && { userId: authState.user._id }),
+          items: cartState.items.map(item => ({
+            productId: item.id.toString(),
+            title: item.name,
+            price: parseInt(item.price.replace(/[₹,]/g, '')),
+            qty: item.quantity,
+            size: item.size,
+            color: item.color,
+            options: item.options,
+          })),
+          shippingAddress: {
+            address: orderData.address,
+            city: orderData.city,
+            state: orderData.state,
+            pincode: orderData.pincode,
+          },
+          billingAddress: {
+            address: orderData.address,
+            city: orderData.city,
+            state: orderData.state,
+            pincode: orderData.pincode,
+          },
+        }
       });
 
       if (!orderResponse.ok) {
@@ -219,7 +281,7 @@ export default function Checkout() {
         name: "Mona Designers",
         description: "Payment for ethnic wear order",
         order_id: razorpayOrder.id,
-        image: "https://mona-designs.netlify.app/static/images/logo.webp",
+        image: "", // Remove logo to avoid CORS issues
         handler: async function (response: any) {
           try {
             // 3. Verify payment on server
@@ -251,10 +313,27 @@ export default function Checkout() {
 
             const verificationResult = await verifyResponse.json();
 
+            console.log('Payment verification successful:', verificationResult);
+
             toast({
-              title: "Payment Successful!",
-              description: `Order ID: ${verificationResult.orderId}`,
+              title: "Payment Successful! 🎉",
+              description: `Order ID: ${verificationResult.orderId || 'N/A'}`,
             });
+
+            // Clear cart from database if user is logged in
+            if (authState.user) {
+              try {
+                await fetch("/api/orders/cart", {
+                  method: "DELETE",
+                  headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                  },
+                });
+                console.log('Cart cleared from database');
+              } catch (error) {
+                console.warn("Failed to clear cart from database:", error);
+              }
+            }
 
             // Clear cart and redirect
             clearCart();
@@ -290,7 +369,7 @@ export default function Checkout() {
 
       const rzp = new window.Razorpay(options);
 
-      rzp.on("payment.failed", function (response: any) {
+        rzp.on("payment.failed", function (response: any) {
         console.log("Full payment failure response:", response);
         console.error("Payment failed with error:", response.error);
         console.log("Error code:", response.error.code);
@@ -299,9 +378,16 @@ export default function Checkout() {
         console.log("Error step:", response.error.step);
         console.log("Error reason:", response.error.reason);
 
+        // Handle specific error cases
+        let errorMessage = response.error.description || "Payment could not be processed. Please try again.";
+        
+        if (response.error.reason === "international_transaction_not_allowed") {
+          errorMessage = "Please use Indian test cards: 4111 1111 1111 1111 or 5555 5555 5555 4444";
+        }
+
         toast({
           title: "Payment Failed",
-          description: response.error.description || "Payment could not be processed. Please try again.",
+          description: errorMessage,
           variant: "destructive",
         });
         setIsProcessing(false);
@@ -360,21 +446,8 @@ export default function Checkout() {
 
     setIsProcessing(true);
 
-    // Simulate order creation API call
-    setTimeout(() => {
-      if (orderData.paymentMethod === "razorpay") {
-        handleRazorpayPayment();
-      } else {
-        // Handle other payment methods (COD, etc.)
-        toast({
-          title: "Order Placed",
-          description: "Your order has been placed successfully!",
-        });
-        clearCart();
-        navigate("/", { replace: true });
-        setIsProcessing(false);
-      }
-    }, 1000);
+    // Always use Razorpay payment - no other options
+    handleRazorpayPayment();
   };
 
   if (cartState.items.length === 0) {
@@ -555,6 +628,7 @@ export default function Checkout() {
                           handleInputChange("paymentMethod", e.target.value)
                         }
                         className="text-gold"
+                        disabled={true}
                       />
                       <Label
                         htmlFor="razorpay"
@@ -562,7 +636,7 @@ export default function Checkout() {
                       >
                         <div className="flex items-center justify-between">
                           <span className="font-medium">
-                            Online Payment (Recommended)
+                            Online Payment (Required)
                           </span>
                           <div className="flex items-center space-x-1">
                             <Shield className="h-4 w-4 text-green-600" />
@@ -574,6 +648,11 @@ export default function Checkout() {
                         <p className="text-sm text-muted-foreground mt-1">
                           Pay securely with UPI, Cards, NetBanking & Wallets
                         </p>
+                        {process.env.NODE_ENV === 'development' && (
+                          <p className="text-xs text-yellow-600 mt-1 font-medium">
+                            ⚠️ Payment is mandatory - Use test cards provided below
+                          </p>
+                        )}
                       </Label>
                     </div>
                   </div>
@@ -667,13 +746,44 @@ export default function Checkout() {
                   Your payment information is secure and encrypted
                 </p>
                 {process.env.NODE_ENV === 'development' && (
-                  <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-                    <p className="text-xs font-medium mb-2">🔧 Test Card Details (Development Only):</p>
-                    <div className="text-xs space-y-1 text-muted-foreground">
-                      <p>Card: 5267 3181 8797 5449</p>
-                      <p>Expiry: Any future date</p>
-                      <p>CVV: Any 3 digits</p>
-                      <p>OTP: 1111</p>
+                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="flex items-center mb-3">
+                      <div className="text-yellow-600 mr-2">⚠️</div>
+                      <p className="text-sm font-semibold text-yellow-800">Development Mode - Payment Required</p>
+                    </div>
+                    <p className="text-xs text-yellow-700 mb-3">
+                      You must complete the payment process using the test cards below. No skipping allowed!
+                    </p>
+                    <div className="space-y-3">
+                      <div className="p-3 bg-green-50 border border-green-200 rounded">
+                        <p className="text-sm font-semibold text-green-800 mb-2">✅ INDIAN TEST CARDS (Use These):</p>
+                        <div className="text-sm space-y-1 text-green-700">
+                          <p><strong>Visa:</strong> 4111 1111 1111 1111</p>
+                          <p><strong>Mastercard:</strong> 5555 5555 5555 4444</p>
+                          <p><strong>Expiry:</strong> 12/25 (or any future date)</p>
+                          <p><strong>CVV:</strong> 123 (or any 3 digits)</p>
+                          <p><strong>OTP:</strong> 1111</p>
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 bg-blue-50 border border-blue-200 rounded">
+                        <p className="text-sm font-semibold text-blue-800 mb-2">💳 More Indian Test Cards:</p>
+                        <div className="text-sm space-y-1 text-blue-700">
+                          <p>• <strong>Visa:</strong> 4000 0000 0000 0002</p>
+                          <p>• <strong>RuPay:</strong> 6073 0000 0000 0000</p>
+                          <p>• <strong>UPI:</strong> Use UPI option instead</p>
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-purple-50 border border-purple-200 rounded">
+                        <p className="text-sm font-semibold text-purple-800 mb-2">📱 UPI Payment (Recommended):</p>
+                        <div className="text-sm space-y-1 text-purple-700">
+                          <p>• Select <strong>UPI</strong> option in Razorpay</p>
+                          <p>• Use any UPI ID: <strong>test@paytm</strong></p>
+                          <p>• Or use: <strong>test@upi</strong></p>
+                          <p>• This works better than cards for testing</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}

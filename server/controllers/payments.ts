@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
+import mongoose from 'mongoose';
 import { Order } from '../models/Order';
 import { Payment } from '../models/Payment';
 import { Product } from '../models/Product';
@@ -12,6 +13,30 @@ const createRazorpayOrderSchema = z.object({
     currency: z.string().optional().default('INR'),
     receipt: z.string().optional(),
     notes: z.any().optional(),
+    orderData: z.object({
+      userId: z.string().optional(),
+      items: z.array(z.object({
+        productId: z.string(),
+        title: z.string(),
+        price: z.number(),
+        qty: z.number().min(1),
+        size: z.string().optional(),
+        color: z.string().optional(),
+        options: z.any().optional(),
+      })).optional(),
+      shippingAddress: z.object({
+        address: z.string(),
+        city: z.string(),
+        state: z.string(),
+        pincode: z.string(),
+      }).optional(),
+      billingAddress: z.object({
+        address: z.string(),
+        city: z.string(),
+        state: z.string(),
+        pincode: z.string(),
+      }).optional(),
+    }).optional(),
   }),
 });
 
@@ -26,7 +51,7 @@ const verifyPaymentSchema = z.object({
 // Create Razorpay order (supports guest checkout)
 export const createRazorpayOrder = async (req: Request, res: Response) => {
   try {
-    const { amount, currency = 'INR', receipt, notes } = req.body;
+    const { amount, currency = 'INR', receipt, notes, orderData } = req.body;
 
     console.log('Creating Razorpay order:', {
       amount,
@@ -36,6 +61,10 @@ export const createRazorpayOrder = async (req: Request, res: Response) => {
       amountInPaise: amount * 100,
       key_id: process.env.RAZORPAY_KEY_ID?.substring(0, 10) + '...',
       has_key_secret: !!process.env.RAZORPAY_KEY_SECRET,
+      hasOrderData: !!orderData,
+      orderDataKeys: orderData ? Object.keys(orderData) : null,
+      userId: orderData?.userId,
+      itemsCount: orderData?.items?.length,
     });
 
     // Validate Razorpay configuration
@@ -76,6 +105,83 @@ export const createRazorpayOrder = async (req: Request, res: Response) => {
       });
     }
 
+    // If orderData is provided, create order in database
+    let dbOrder = null;
+    if (orderData && orderData.items && orderData.items.length > 0) {
+      try {
+        console.log('Creating order in database with items:', orderData.items.length);
+        
+        // Calculate totals
+        const subtotal = orderData.items.reduce((total: number, item: any) => total + (item.price * item.qty), 0);
+        const shipping = subtotal >= 2999 ? 0 : 99;
+        const tax = Math.round(subtotal * 0.18); // 18% GST
+        const total = subtotal + shipping + tax;
+        
+        console.log('Order totals:', { subtotal, shipping, tax, total });
+
+        // Generate receipt ID
+        const generateReceiptId = (): string => {
+          return `MONA-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        };
+
+        // Create order in database
+        dbOrder = new Order({
+          userId: orderData.userId || null, // Allow null for guest checkout
+          items: orderData.items.map((item: any) => ({
+            productId: new mongoose.Types.ObjectId(), // Create a new ObjectId for testing
+            title: item.title,
+            price: item.price,
+            qty: item.qty,
+            size: item.size,
+            color: item.color,
+            options: item.options,
+          })),
+          shippingAddress: {
+            label: 'Home',
+            line1: orderData.shippingAddress?.address || '',
+            city: orderData.shippingAddress?.city || '',
+            state: orderData.shippingAddress?.state || '',
+            postalCode: orderData.shippingAddress?.pincode || '',
+            country: 'India',
+          },
+          billingAddress: {
+            label: 'Home',
+            line1: orderData.billingAddress?.address || orderData.shippingAddress?.address || '',
+            city: orderData.billingAddress?.city || orderData.shippingAddress?.city || '',
+            state: orderData.billingAddress?.state || orderData.shippingAddress?.state || '',
+            postalCode: orderData.billingAddress?.pincode || orderData.shippingAddress?.pincode || '',
+            country: 'India',
+          },
+          subtotal,
+          shipping,
+          tax,
+          total,
+          currency: 'INR',
+          status: 'created',
+          payment: {
+            provider: 'razorpay',
+            orderId: razorpayOrder.id,
+            captured: false,
+          },
+          receiptId: generateReceiptId(),
+        });
+
+        await dbOrder.save();
+        console.log('Order created in database:', dbOrder._id);
+
+        // Update product stock
+        for (const item of orderData.items) {
+          await Product.findByIdAndUpdate(
+            item.productId,
+            { $inc: { stock: -item.qty } }
+          );
+        }
+      } catch (dbError) {
+        console.error('Failed to create order in database:', dbError);
+        // Continue with payment even if DB order creation fails
+      }
+    }
+
     // Return the razorpay order payload needed by client
     return res.json({
       success: true,
@@ -83,6 +189,7 @@ export const createRazorpayOrder = async (req: Request, res: Response) => {
       amount: razorpayOrder.amount,
       currency: razorpayOrder.currency,
       key_id: process.env.RAZORPAY_KEY_ID,
+      orderId: dbOrder?._id, // Include database order ID if created
     });
   } catch (error) {
     console.error('Create Razorpay order error:', error);
@@ -146,6 +253,7 @@ export const verifyPayment = async (req: Request, res: Response) => {
       return res.json({
         success: true,
         message: 'Payment verified successfully',
+        orderId: order._id,
         order,
         payment: paymentRecord,
       });

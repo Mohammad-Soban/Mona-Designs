@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IPayment extends Document {
   _id: string;
-  orderId: mongoose.Types.ObjectId;
+  orderId?: mongoose.Types.ObjectId; // Make optional for guest payments
   providerPaymentId: string;
   providerOrderId: string;
   amount: number;
@@ -17,7 +17,7 @@ const paymentSchema = new Schema<IPayment>({
   orderId: {
     type: Schema.Types.ObjectId,
     ref: 'Order',
-    required: true,
+    required: false, // Allow null for guest payments
   },
   providerPaymentId: {
     type: String,
