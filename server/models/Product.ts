@@ -29,7 +29,7 @@ export interface IProduct extends Document {
   title: string;
   slug: string;
   description: string;
-  price: number; // in paise (smallest currency unit)
+  price: number; // in rupees
   currency: string;
   sku?: string;
   stock: number;

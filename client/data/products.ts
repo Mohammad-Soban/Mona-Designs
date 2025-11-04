@@ -30,8 +30,8 @@ export interface Product {
 
 // Transform MongoDB product to frontend Product format
 const transformProduct = (dbProduct: any): Product => {
-  // Convert price from paise to rupees and format as string
-  const priceInRupees = (dbProduct.price / 100).toLocaleString('en-IN', {
+  // Price is already in rupees, just format as string
+  const priceInRupees = dbProduct.price.toLocaleString('en-IN', {
     style: 'currency',
     currency: 'INR',
     minimumFractionDigits: 0,

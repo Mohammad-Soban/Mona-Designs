@@ -439,43 +439,138 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// Get order statistics (Admin only)
+/**
+ * Get recent orders for admin dashboard
+ * Returns the last 10 orders with basic customer and status information
+ * 
+ * @route GET /api/orders/recent
+ * @access Admin only
+ */
+export const getRecentOrders = async (req: Request, res: Response) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const orders = await Order.find()
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .populate('userId', 'name email phone')
+      .lean();
+
+    const formattedOrders = orders.map(order => ({
+      id: order.receiptId,
+      customer: (order.userId as any)?.name || 'Guest',
+      amount: `₹${Math.round(order.total).toLocaleString('en-IN')}`,
+      status: order.status.charAt(0).toUpperCase() + order.status.slice(1),
+      date: new Date(order.createdAt).toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      })
+    }));
+
+    res.json({
+      success: true,
+      orders: formattedOrders
+    });
+  } catch (error) {
+    console.error('Get recent orders error:', error);
+    res.status(500).json({
+      success: false,
+      orders: []
+    });
+  }
+};
+
+/**
+ * Get monthly analytics data for the last 6 months
+ * Returns revenue and order counts for each month
+ * 
+ * @route GET /api/orders/analytics
+ * @access Admin only
+ */
+export const getMonthlyAnalytics = async (req: Request, res: Response) => {
+  try {
+    const now = new Date();
+    const monthlyData = [];
+
+    // Get data for the last 6 months
+    for (let i = 5; i >= 0; i--) {
+      const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const startOfMonth = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+      const endOfMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0, 23, 59, 59);
+
+      const orders = await Order.find({
+        createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+        status: { $ne: 'cancelled' }
+      });
+
+      const revenue = orders.reduce((sum, order) => sum + order.total, 0);
+
+      monthlyData.push({
+        month: monthDate.toLocaleString('en-US', { month: 'short' }),
+        revenue: Math.round(revenue),
+        orders: orders.length
+      });
+    }
+
+    res.json({
+      success: true,
+      data: monthlyData
+    });
+  } catch (error) {
+    console.error('Get monthly analytics error:', error);
+    res.status(500).json({
+      success: false,
+      data: []
+    });
+  }
+};
+
+/**
+ * Get order statistics for admin dashboard
+ * Calculates total revenue, order count, and month-over-month growth percentages
+ * 
+ * @route GET /api/orders/stats
+ * @access Admin only
+ */
 export const getOrderStats = async (req: Request, res: Response) => {
   try {
-    // Calculate current month stats
+    // Define time boundaries for current and previous month
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
 
-    // Get this month's orders
-    const thisMonthOrders = await Order.find({
-      createdAt: { $gte: startOfMonth }
-    });
+    // Fetch orders for current and previous month
+    const [thisMonthOrders, lastMonthOrders] = await Promise.all([
+      Order.find({ 
+        createdAt: { $gte: startOfMonth },
+        status: { $ne: 'cancelled' } // Exclude cancelled orders
+      }),
+      Order.find({
+        createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth },
+        status: { $ne: 'cancelled' }
+      })
+    ]);
 
-    // Get last month's orders
-    const lastMonthOrders = await Order.find({
-      createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth }
-    });
-
-    // Calculate revenue
+    // Calculate total revenue (prices are already in rupees)
     const thisMonthRevenue = thisMonthOrders.reduce((sum, order) => sum + order.total, 0);
     const lastMonthRevenue = lastMonthOrders.reduce((sum, order) => sum + order.total, 0);
 
-    // Calculate percentage changes
+    // Calculate percentage changes with proper handling of edge cases
     const revenueChange = lastMonthRevenue > 0 
-      ? ((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue * 100).toFixed(1)
-      : 0;
+      ? parseFloat(((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue * 100).toFixed(1))
+      : thisMonthRevenue > 0 ? 100 : 0;
 
     const ordersChange = lastMonthOrders.length > 0
-      ? ((thisMonthOrders.length - lastMonthOrders.length) / lastMonthOrders.length * 100).toFixed(1)
-      : 0;
+      ? parseFloat(((thisMonthOrders.length - lastMonthOrders.length) / lastMonthOrders.length * 100).toFixed(1))
+      : thisMonthOrders.length > 0 ? 100 : 0;
 
     res.json({
-      totalRevenue: Math.round(thisMonthRevenue / 100), // Convert paise to rupees
+      totalRevenue: Math.round(thisMonthRevenue),
       totalOrders: thisMonthOrders.length,
-      revenueChange: parseFloat(revenueChange as string),
-      ordersChange: parseFloat(ordersChange as string)
+      revenueChange,
+      ordersChange
     });
   } catch (error) {
     console.error('Get order stats error:', error);

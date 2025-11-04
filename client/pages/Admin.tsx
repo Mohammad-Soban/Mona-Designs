@@ -141,16 +141,46 @@ const AdminDashboard = () => {
     }
   ]);
 
-  const analyticsData = [
-    { month: "Jan", revenue: 45000, orders: 32 },
-    { month: "Feb", revenue: 52000, orders: 38 },
-    { month: "Mar", revenue: 48000, orders: 35 },
-    { month: "Apr", revenue: 61000, orders: 42 },
-    { month: "May", revenue: 55000, orders: 39 },
-    { month: "Jun", revenue: 67000, orders: 45 }
-  ];
+  // State for analytics data
+  const [analyticsData, setAnalyticsData] = useState<Array<{month: string; revenue: number; orders: number}>>([]);
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true);
 
-    // Fetch dashboard stats
+  /**
+   * Fetch monthly analytics data from the server
+   * Retrieves the last 6 months of revenue and order statistics
+   */
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        setIsLoadingAnalytics(true);
+        const response = await fetch('/api/orders/analytics', {
+          headers: {
+            'Authorization': `Bearer ${sessionStorage.getItem('mona-admin-token')}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            setAnalyticsData(data.data);
+          }
+        } else {
+          console.warn('Failed to fetch analytics data');
+        }
+      } catch (error) {
+        console.error('Error fetching analytics:', error);
+      } finally {
+        setIsLoadingAnalytics(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, []);
+
+  /**
+   * Fetch comprehensive dashboard statistics
+   * Fetches products, orders, and user counts with month-over-month growth
+   */
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -258,7 +288,7 @@ const AdminDashboard = () => {
           id: p._id,
           name: p.title,
           category: p.categories[0]?.name || 'Uncategorized',
-          price: `₹${(p.price / 100).toLocaleString('en-IN')}`,
+          price: `₹${p.price.toLocaleString('en-IN')}`,
           stock: p.stock,
           status: p.stock > 10 ? "In Stock" : p.stock > 0 ? "Low Stock" : "Out of Stock",
           sales: p.metadata?.sales || 0,
@@ -275,12 +305,49 @@ const AdminDashboard = () => {
     }
   };
 
-  const recentOrders = [
-    { id: "ORD001", customer: "Rajesh Kumar", amount: "₹12,999", status: "Processing", date: "2024-01-20" },
-    { id: "ORD002", customer: "Priya Sharma", amount: "₹8,999", status: "Shipped", date: "2024-01-19" },
-    { id: "ORD003", customer: "Amit Patel", amount: "₹5,498", status: "Delivered", date: "2024-01-18" },
-    { id: "ORD004", customer: "Sneha Reddy", amount: "₹15,999", status: "Processing", date: "2024-01-17" }
-  ];
+  // State for recent orders
+  interface RecentOrder {
+    id: string;
+    customer: string;
+    amount: string;
+    status: string;
+    date: string;
+  }
+  
+  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(true);
+
+  /**
+   * Fetch recent orders for the dashboard
+   * Retrieves the last 10 orders from the database
+   */
+  useEffect(() => {
+    const fetchRecentOrders = async () => {
+      try {
+        setIsLoadingOrders(true);
+        const response = await fetch('/api/orders/recent?limit=10', {
+          headers: {
+            'Authorization': `Bearer ${sessionStorage.getItem('mona-admin-token')}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.orders) {
+            setRecentOrders(data.orders);
+          }
+        } else {
+          console.warn('Failed to fetch recent orders');
+        }
+      } catch (error) {
+        console.error('Error fetching recent orders:', error);
+      } finally {
+        setIsLoadingOrders(false);
+      }
+    };
+
+    fetchRecentOrders();
+  }, []);
 
   // Product CRUD helper functions
   const viewProduct = async (id: string) => {
@@ -307,11 +374,13 @@ const AdminDashboard = () => {
         setNewProduct({
           name: product.title,
           category: product.categories[0]?.name || '',
-          price: `₹${(product.price / 100).toLocaleString('en-IN')}`,
+          price: `₹${product.price.toLocaleString('en-IN')}`,
           stock: product.stock.toString(),
           description: product.description,
           fabric: product.attributes?.fabric || '',
-          occasion: product.attributes?.occasions?.join(', ') || '',
+          occasion: Array.isArray(product.attributes?.occasions) 
+            ? product.attributes.occasions.join(', ') 
+            : (product.attributes?.occasion || ''),
           sizes: product.sizes?.map((s: any) => s.label).join(', ') || '',
           colors: product.colors?.map((c: any) => c.label).join(', ') || '',
           keyFeatures: product.attributes?.keyFeatures || ['', '', '', '', ''],
@@ -333,13 +402,13 @@ const AdminDashboard = () => {
 
   const updateProduct = async () => {
     try {
-      // Convert price to paise
-      const priceInPaise = Math.round(parseFloat(newProduct.price.replace(/[^0-9.]/g, '')) * 100);
+      // Price in rupees (no conversion needed)
+      const priceInRupees = Math.round(parseFloat(newProduct.price.replace(/[^0-9.]/g, '')));
       
       const productData = {
         title: newProduct.name,
         description: newProduct.description || `${newProduct.name} - ${newProduct.category}`,
-        price: priceInPaise,
+        price: priceInRupees,
         stock: parseInt(newProduct.stock),
         categories: [{
           name: newProduct.category.toLowerCase(),
@@ -356,7 +425,7 @@ const AdminDashboard = () => {
         })),
         attributes: {
           fabric: newProduct.fabric,
-          occasion: newProduct.occasion,
+          occasions: newProduct.occasion ? newProduct.occasion.split(',').map(o => o.trim()).filter(o => o) : [],
           fit: newProduct.fit,
           careInstructions: newProduct.careInstructions,
           keyFeatures: newProduct.keyFeatures.filter(f => f.trim()),
@@ -434,8 +503,8 @@ const AdminDashboard = () => {
     try {
       setError(null); // Clear any previous errors
       
-      // Convert price to paise (smallest currency unit)
-      const priceInPaise = Math.round(parseFloat(newProduct.price.replace(/[^0-9.]/g, '')) * 100);
+      // Price in rupees (no conversion needed)
+      const priceInRupees = Math.round(parseFloat(newProduct.price.replace(/[^0-9.]/g, '')));
       
       // Validate required fields first
       if (!newProduct.name || !newProduct.price || !newProduct.stock || !newProduct.category) {
@@ -456,7 +525,7 @@ const AdminDashboard = () => {
       const productData = {
         title: newProduct.name,
         description: newProduct.description || `${newProduct.name} - ${newProduct.category}`, // Fallback description
-        price: priceInPaise,
+        price: priceInRupees,
         stock: parseInt(newProduct.stock),
         categories: [{
           name: newProduct.category.toLowerCase(),
@@ -671,17 +740,52 @@ const AdminDashboard = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <LineChart className="h-5 w-5 text-gold" />
-                      <span>Revenue Trends</span>
+                      <span>Revenue Trends (Last 6 Months)</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="h-64 flex items-center justify-center bg-muted/30 rounded-lg">
-                      <div className="text-center">
-                        <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-muted-foreground">Revenue chart would be here</p>
-                        <p className="text-sm text-muted-foreground">Integrate with Chart.js or Recharts</p>
+                    {isLoadingAnalytics ? (
+                      <div className="h-64 flex items-center justify-center">
+                        <div className="text-center">
+                          <Activity className="h-12 w-12 text-gold animate-pulse mx-auto mb-2" />
+                          <p className="text-muted-foreground">Loading analytics...</p>
+                        </div>
                       </div>
-                    </div>
+                    ) : analyticsData.length > 0 ? (
+                      <div className="space-y-4">
+                        {analyticsData.map((data, index) => (
+                          <div key={index} className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="font-medium">{data.month}</span>
+                              <div className="text-right">
+                                <div className="font-bold text-gold">
+                                  ₹{data.revenue.toLocaleString('en-IN')}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {data.orders} orders
+                                </div>
+                              </div>
+                            </div>
+                            <div className="w-full bg-muted rounded-full h-2">
+                              <div 
+                                className="bg-gradient-to-r from-gold to-amber-500 h-2 rounded-full transition-all duration-500"
+                                style={{ 
+                                  width: `${Math.min((data.revenue / Math.max(...analyticsData.map(d => d.revenue))) * 100, 100)}%` 
+                                }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="h-64 flex items-center justify-center bg-muted/30 rounded-lg">
+                        <div className="text-center">
+                          <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+                          <p className="text-muted-foreground">No analytics data available</p>
+                          <p className="text-sm text-muted-foreground">Data will appear as orders are placed</p>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
@@ -1148,8 +1252,16 @@ const AdminDashboard = () => {
                   <CardTitle>Recent Orders</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {recentOrders.map((order) => (
+                  {isLoadingOrders ? (
+                    <div className="flex items-center justify-center py-12">
+                      <div className="text-center">
+                        <Activity className="h-12 w-12 text-gold animate-pulse mx-auto mb-2" />
+                        <p className="text-muted-foreground">Loading recent orders...</p>
+                      </div>
+                    </div>
+                  ) : recentOrders.length > 0 ? (
+                    <div className="space-y-4">
+                      {recentOrders.map((order) => (
                       <div key={order.id} className="border rounded-lg hover:shadow-md transition-all">
                         {/* Desktop Layout */}
                         <div className="hidden md:flex items-center justify-between p-4">
@@ -1213,6 +1325,13 @@ const AdminDashboard = () => {
                       </div>
                     ))}
                   </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-muted-foreground">No orders found</p>
+                      <p className="text-sm text-muted-foreground">Orders will appear here once customers place them</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

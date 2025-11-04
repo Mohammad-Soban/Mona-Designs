@@ -392,35 +392,40 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 };
 
 // Get user statistics (Admin only)
+/**
+ * Get user statistics for admin dashboard
+ * Returns total active users and month-over-month growth percentage
+ * 
+ * @route GET /api/users/stats
+ * @access Admin only
+ */
 export const getUserStats = async (req: Request, res: Response) => {
   try {
-    // Calculate current month stats
+    // Define time boundaries for current and previous month
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
 
-    // Get this month's users
-    const thisMonthUsers = await User.countDocuments({
-      createdAt: { $gte: startOfMonth }
-    });
+    // Fetch user counts in parallel for better performance
+    const [thisMonthUsers, lastMonthUsers, totalUsers] = await Promise.all([
+      User.countDocuments({
+        createdAt: { $gte: startOfMonth }
+      }),
+      User.countDocuments({
+        createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth }
+      }),
+      User.countDocuments()
+    ]);
 
-    // Get last month's users
-    const lastMonthUsers = await User.countDocuments({
-      createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth }
-    });
-
-    // Calculate total users
-    const totalUsers = await User.countDocuments();
-
-    // Calculate percentage change
+    // Calculate percentage change with proper edge case handling
     const userChange = lastMonthUsers > 0
-      ? ((thisMonthUsers - lastMonthUsers) / lastMonthUsers * 100).toFixed(1)
-      : 0;
+      ? parseFloat(((thisMonthUsers - lastMonthUsers) / lastMonthUsers * 100).toFixed(1))
+      : thisMonthUsers > 0 ? 100 : 0;
 
     res.json({
       totalUsers,
-      userChange: parseFloat(userChange as string)
+      userChange
     });
   } catch (error) {
     console.error('Get user stats error:', error);

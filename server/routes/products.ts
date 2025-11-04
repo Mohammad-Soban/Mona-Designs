@@ -10,6 +10,7 @@ import {
   updateProduct,
   deleteProduct,
   getCategories,
+  getFeaturedProducts,
   createProductSchema,
   updateProductSchema,
   upload
@@ -22,7 +23,7 @@ const router = Router();
 // Public routes
 router.get('/', getProducts);
 router.get('/all', getAllProducts);
-router.get('/featured', getProducts);
+router.get('/featured', getFeaturedProducts);
 router.get('/category/:category', getProductsByCategory);
 router.get('/tag/:tag', getProductsByTag);
 router.get('/occasion/:occasion', getProductsByOccasion);

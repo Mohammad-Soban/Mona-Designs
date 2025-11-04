@@ -98,6 +98,63 @@ const generateSlug = (title: string): string => {
     .trim();
 };
 
+/**
+ * Get featured products for home page
+ * Returns the latest product from each of the 4 main categories (Sherwanis, Lehengas, Kurtas, Suits)
+ * Falls back to the latest 4 products if category-specific products are not available
+ * 
+ * @route GET /api/products/featured
+ * @access Public
+ */
+export const getFeaturedProducts = async (req: Request, res: Response) => {
+  try {
+    const mainCategories = ['sherwanis', 'lehengas', 'kurtas', 'suits'];
+    const featuredProducts: IProduct[] = [];
+
+    // Fetch the latest product from each main category
+    for (const category of mainCategories) {
+      const product = await Product.findOne({
+        'categories.name': category,
+        isActive: true
+      })
+        .sort({ createdAt: -1 })
+        .populate('createdBy', 'name email')
+        .lean();
+
+      if (product) {
+        featuredProducts.push(product as IProduct);
+      }
+    }
+
+    // If we don't have 4 products, fill with the latest available products
+    if (featuredProducts.length < 4) {
+      const additionalProducts = await Product.find({
+        isActive: true,
+        _id: { $nin: featuredProducts.map(p => p._id) }
+      })
+        .sort({ createdAt: -1 })
+        .limit(4 - featuredProducts.length)
+        .populate('createdBy', 'name email')
+        .lean();
+
+      featuredProducts.push(...(additionalProducts as IProduct[]));
+    }
+
+    res.json({
+      success: true,
+      products: featuredProducts.slice(0, 4), // Ensure we return exactly 4 products
+      message: 'Featured products fetched successfully'
+    });
+  } catch (error) {
+    console.error('Get featured products error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch featured products',
+      products: []
+    });
+  }
+};
+
 // Get all products with filtering and pagination
 export const getProducts = async (req: Request, res: Response) => {
   try {
@@ -139,12 +196,32 @@ export const getProducts = async (req: Request, res: Response) => {
       ];
     }
 
-    // If count=true, return stats only
+    // If count=true, return stats with month-over-month change
     if (count === 'true') {
-      const total = await Product.countDocuments(query);
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+
+      const [total, thisMonthProducts, lastMonthProducts] = await Promise.all([
+        Product.countDocuments(query),
+        Product.countDocuments({ 
+          ...query, 
+          createdAt: { $gte: startOfMonth } 
+        }),
+        Product.countDocuments({
+          ...query,
+          createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth }
+        })
+      ]);
+
+      const change = lastMonthProducts > 0
+        ? parseFloat(((thisMonthProducts - lastMonthProducts) / lastMonthProducts * 100).toFixed(1))
+        : thisMonthProducts > 0 ? 100 : 0;
+
       return res.json({
         total,
-        change: 0 // You can calculate month-over-month change if needed
+        change
       });
     }
 
@@ -340,10 +417,22 @@ export const getProductsByOccasion = async (req: Request, res: Response) => {
 
     const skip = (Number(page) - 1) * Number(limit);
 
+    // Capitalize first letter to match database format (Wedding, Reception, etc.)
+    const capitalizedOccasion = occasion.charAt(0).toUpperCase() + occasion.slice(1).toLowerCase();
+    
+    console.log('🔍 Fetching products by occasion:', {
+      originalOccasion: occasion,
+      capitalizedOccasion,
+      category,
+      tag
+    });
+
     const query: any = {
-      [`attributes.occasions`]: { $in: [occasion] },
+      [`attributes.occasions`]: { $in: [capitalizedOccasion] },
       isActive: true
     };
+    
+    console.log('📋 Query:', JSON.stringify(query, null, 2));
 
     // Optional category filter
     if (category) {
@@ -362,6 +451,14 @@ export const getProductsByOccasion = async (req: Request, res: Response) => {
       .limit(Number(limit));
 
     const total = await Product.countDocuments(query);
+    
+    console.log(`✅ Found ${total} products for occasion: ${capitalizedOccasion}`);
+    if (products.length > 0) {
+      console.log('Sample product:', {
+        title: products[0].title,
+        occasions: products[0].attributes?.occasions
+      });
+    }
 
     res.json({
       success: true,

@@ -19,7 +19,9 @@
     "test": "vitest --run",
     "format.fix": "prettier --write .",
     "typecheck": "tsc",
-    "seed:admin": "tsx server/scripts/seedAdmin.ts"
+    "seed:admin": "tsx server/scripts/seedAdmin.ts",
+    "fix:occasions": "tsx server/scripts/fixOccasions.ts",
+    "fix:prices": "tsx server/scripts/fixPrices.ts"
   },
   "dependencies": {
     "axios": "^1.12.2",
