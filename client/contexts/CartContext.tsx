@@ -2,7 +2,7 @@ import { createContext, useContext, useReducer, ReactNode, useEffect } from "rea
 import { useAuth } from "./AuthContext";
 
 export interface CartItem {
-  id: number;
+  id: string;
   name: string;
   price: string;
   image: string;
@@ -10,6 +10,7 @@ export interface CartItem {
   color?: string;
   quantity: number;
   category: string;
+  options?: Record<string, any>;
 }
 
 interface CartState {
@@ -19,8 +20,8 @@ interface CartState {
 
 type CartAction =
   | { type: "ADD_ITEM"; payload: CartItem }
-  | { type: "REMOVE_ITEM"; payload: { id: number; size: string } }
-  | { type: "UPDATE_QUANTITY"; payload: { id: number; size: string; quantity: number } }
+  | { type: "REMOVE_ITEM"; payload: { id: string; size: string } }
+  | { type: "UPDATE_QUANTITY"; payload: { id: string; size: string; quantity: number } }
   | { type: "CLEAR_CART" }
   | { type: "TOGGLE_CART" }
   | { type: "OPEN_CART" }
@@ -80,8 +81,8 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 interface CartContextType {
   state: CartState;
   addItem: (item: CartItem) => void;
-  removeItem: (id: number, size: string) => void;
-  updateQuantity: (id: number, size: string, quantity: number) => void;
+  removeItem: (id: string, size: string) => void;
+  updateQuantity: (id: string, size: string, quantity: number) => void;
   clearCart: () => void;
   toggleCart: () => void;
   openCart: () => void;
@@ -175,7 +176,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const removeItem = async (id: number, size: string) => {
+  const removeItem = async (id: string, size: string) => {
     dispatch({ type: "REMOVE_ITEM", payload: { id, size } });
     
     // Sync with database if user is logged in
@@ -200,7 +201,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const updateQuantity = async (id: number, size: string, quantity: number) => {
+  const updateQuantity = async (id: string, size: string, quantity: number) => {
     if (quantity <= 0) {
       removeItem(id, size);
     } else {

@@ -1,10 +1,15 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ProductGrid } from "@/components/ui/product-grid";
-import { getProductsByCategory, sortProducts } from "@/data/products";
+import {
+  allProducts,
+  getProductsByCategory,
+  sortProducts,
+} from "@/data/products";
 import { 
   ChevronDown 
 } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const sortOptions = [
   { value: "featured", label: "Featured" },
@@ -16,12 +21,30 @@ const sortOptions = [
 
 export default function Lehengas() {
   const [sortBy, setSortBy] = useState("featured");
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await getProductsByCategory("lehengas");
+        setProducts(data);
+      } catch (error) {
+        console.error('Error fetching lehenga products:', error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   // Get Lehengas products and apply sorting
   const sortedProducts = useMemo(() => {
-    const lehengas = getProductsByCategory("Lehengas");
-    return sortProducts(lehengas, sortBy);
-  }, [sortBy]);
+    return sortProducts(products, sortBy);
+  }, [products, sortBy]);
 
   const handleSortChange = (newSortBy: string) => {
     setSortBy(newSortBy);
@@ -85,17 +108,17 @@ export default function Lehengas() {
       {/* Products Grid */}
       <section className="py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {sortedProducts.length > 0 ? (
-            <>
-              <ProductGrid products={sortedProducts} showPagination={true} itemsPerPage={12} />
-            </>
-          ) : (
-            <div className="text-center py-16">
-              <h3 className="text-lg font-semibold mb-2">No lehengas found</h3>
-              <p className="text-muted-foreground">
-                Try adjusting your search or browse other categories.
-              </p>
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold"></div>
             </div>
+          ) : sortedProducts.length > 0 ? (
+            <ProductGrid products={sortedProducts} showPagination={true} itemsPerPage={12} />
+          ) : (
+            <EmptyState 
+              title="Lehengas Coming Soon"
+              message="Our artisans are crafting an enchanting collection of lehengas. Visit us again soon to discover timeless elegance!"
+            />
           )}
         </div>
       </section>

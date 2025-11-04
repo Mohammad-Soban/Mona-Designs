@@ -1,29 +1,52 @@
 import { Router } from 'express';
 import {
   getProducts,
-  getProductBySlug,
+  getProductsByCategory,
+  getAllProducts,
+  getProductsByTag,
+  getProductsByOccasion,
   getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
-  getProductsSchema,
+  getCategories,
   createProductSchema,
   updateProductSchema,
+  upload
 } from '../controllers/products';
-import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { authenticateAdmin } from '../middleware/adminAuth';
 import { validateRequest } from '../middleware/validation';
 
 const router = Router();
 
 // Public routes
-router.get('/', validateRequest(getProductsSchema), getProducts);
-router.get('/slug/:slug', getProductBySlug);
+router.get('/', getProducts);
+router.get('/all', getAllProducts);
+router.get('/featured', getProducts);
+router.get('/category/:category', getProductsByCategory);
+router.get('/tag/:tag', getProductsByTag);
+router.get('/occasion/:occasion', getProductsByOccasion);
+router.get('/categories', getCategories);
+router.get('/:id', getProductById);
 
 // Admin routes
-router.get('/id/:id', authenticateToken, requireAdmin, getProductById);
-router.post('/', authenticateToken, requireAdmin, validateRequest(createProductSchema), createProduct);
-router.patch('/:id', authenticateToken, requireAdmin, validateRequest(updateProductSchema), updateProduct);
-router.delete('/:id', authenticateToken, requireAdmin, deleteProduct);
-// Image upload endpoints are disabled; use URL fields on product instead.
+router.post('/', 
+  authenticateAdmin,
+  upload.array('images', 10),
+  validateRequest(createProductSchema), 
+  createProduct
+);
+
+router.patch('/:id', 
+  authenticateAdmin,
+  upload.array('images', 10),
+  validateRequest(updateProductSchema), 
+  updateProduct
+);
+
+router.delete('/:id', 
+  authenticateAdmin,
+  deleteProduct
+);
 
 export default router;

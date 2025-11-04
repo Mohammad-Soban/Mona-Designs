@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductGrid } from "@/components/ui/product-grid";
 import {
   allProducts,
-  getProductsByCategory,
+  getProductsByOccasion,
   sortProducts,
 } from "@/data/products";
 import { ChevronDown } from "lucide-react";
@@ -23,11 +23,31 @@ const categories = ["All", "Kurtas", "Suits", "Sherwanis", "Lehengas"];
 export default function General() {
   const [sortBy, setSortBy] = useState("featured");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await getProductsByOccasion("general", {
+          category: selectedCategory !== "All" ? selectedCategory.toLowerCase() : undefined
+        });
+        setProducts(data);
+      } catch (error) {
+        console.error('Error fetching general products:', error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [selectedCategory]);
 
   const generalProducts = useMemo(() => {
-    const categoryProducts = getProductsByCategory(selectedCategory);
-    return categoryProducts;
-  }, [selectedCategory]);
+    return products;
+  }, [products]);
 
   const filteredAndSortedProducts = useMemo(() => {
     return sortProducts(generalProducts, sortBy);
@@ -76,11 +96,6 @@ export default function General() {
                 )}
               >
                 {category}
-                <Badge variant="secondary" className="ml-2 text-xs">
-                  {category === "All"
-                    ? generalProducts.length
-                    : getProductsByCategory(category).length}
-                </Badge>
               </button>
             ))}
           </div>

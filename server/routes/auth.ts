@@ -8,6 +8,7 @@ import {
   verifyRegistrationOTP,
   getProfile,
   updateProfile,
+  getUserStats,
   registerSchema,
   loginSchema,
   sendOTPSchema,

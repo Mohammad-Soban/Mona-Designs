@@ -116,11 +116,11 @@ const mockBills = [
 ];
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { state } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
-    name: user?.name || "Mohammad Soban Shaikh",
-    email: user?.email || "soban@example.com",
+    name: state.user?.name || "Mohammad Soban Shaikh",
+    email: state.user?.email || "soban@example.com",
     phone: "+91 9876543210",
     address: "123 Fashion Street, Mumbai, Maharashtra 400001",
     city: "Mumbai",

@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductGrid } from "@/components/ui/product-grid";
 import {
   allProducts,
-  getProductsByCategory,
+  getProductsByOccasion,
   sortProducts,
 } from "@/data/products";
 import { ChevronDown } from "lucide-react";
@@ -23,13 +23,31 @@ const categories = ["All", "Kurtas", "Sherwanis", "Suits", "Lehengas"];
 export default function Haldi() {
   const [sortBy, setSortBy] = useState("featured");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Filter products suitable for Haldi (bright colors, traditional styles)
-  const haldiProducts = useMemo(() => {
-    const categoryProducts = getProductsByCategory(selectedCategory);
-    // For demo, return all products. In real app, filter by occasion tags
-    return categoryProducts;
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await getProductsByOccasion("haldi", {
+          category: selectedCategory !== "All" ? selectedCategory.toLowerCase() : undefined
+        });
+        setProducts(data);
+      } catch (error) {
+        console.error('Error fetching haldi products:', error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, [selectedCategory]);
+
+  const haldiProducts = useMemo(() => {
+    return products;
+  }, [products]);
 
   const filteredAndSortedProducts = useMemo(() => {
     return sortProducts(haldiProducts, sortBy);
@@ -77,11 +95,6 @@ export default function Haldi() {
                 )}
               >
                 {category}
-                <Badge variant="secondary" className="ml-2 text-xs">
-                  {category === "All"
-                    ? haldiProducts.length
-                    : getProductsByCategory(category).length}
-                </Badge>
               </button>
             ))}
           </div>

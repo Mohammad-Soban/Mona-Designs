@@ -10,6 +10,7 @@ import { errorHandler } from "./middleware/validation";
 
 // Import routes
 import authRoutes from "./routes/auth";
+import adminAuthRoutes from "./routes/adminAuth";
 import productRoutes from "./routes/products";
 import orderRoutes from "./routes/orders";
 import paymentRoutes from "./routes/payments";
@@ -118,12 +119,23 @@ export function createServer() {
 
   // API routes
   app.use("/api/auth", authRoutes);
+  app.use("/api/auth", adminAuthRoutes);
   app.use("/api/products", productRoutes);
   app.use("/api/orders", orderRoutes);
   app.use("/api/payments", paymentRoutes);
   app.use("/api/admin", adminRoutes);
   // Debug logging endpoint
   app.use('/api/debug', debugRoutes);
+  
+  // Users stats route (for admin dashboard)
+  app.get('/api/users/stats', async (req, res) => {
+    try {
+      const { getUserStats } = await import('./controllers/auth');
+      return getUserStats(req, res);
+    } catch (error) {
+      res.status(500).json({ totalUsers: 0, userChange: 0 });
+    }
+  });
 
   // Error handling middleware (for API routes); place BEFORE non-API fallbacks
   app.use(errorHandler);

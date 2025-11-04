@@ -1,13 +1,11 @@
-// Temporary product images using a placeholder service
-const getProductImage = (category: string, color: string, id: number) => {
-  // Using picsum.photos for diverse, high-quality placeholder images
-  const baseUrl = "https://picsum.photos/400/500";
-  const seed = `${category}-${color}-${id}`;
-  return `${baseUrl}?random=${seed}`;
-};
+// Empty products array - data will be loaded from database
+export const allProducts: any[] = [];
+
+// This file is kept for compatibility but products are now loaded from the database
+// via the API endpoints in the components
 
 export interface Product {
-  id: number;
+  id: string; // Changed from number to string for MongoDB ObjectId
   name: string;
   price: string;
   originalPrice?: string;
@@ -30,268 +28,157 @@ export interface Product {
   };
 }
 
-// All products data with temporary images
-export const allProducts: Product[] = [
-  // Sherwanis
-  {
-    id: 1,
-    name: "Royal Blue Silk Sherwani",
-    price: "₹12,999",
-    originalPrice: "₹15,999",
-    rating: 4.8,
-    reviews: 24,
-    image: "https://images.unsplash.com/photo-1506629905645-b178a0c90810?w=400&h=500&fit=crop",
-    badge: "Bestseller",
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    colors: ["Royal Blue", "Navy Blue", "Midnight Blue"],
-    category: "Sherwanis",
-    description: "Elegant royal blue silk sherwani with intricate embroidery work",
-    inStock: true,
-    fabric: "Pure Silk",
-    occasion: "Wedding",
-    sizePricing: {
-      "S": { price: "₹12,999", originalPrice: "₹15,999" },
-      "M": { price: "₹12,999", originalPrice: "₹15,999" },
-      "L": { price: "₹13,499", originalPrice: "₹16,499" },
-      "XL": { price: "₹13,999", originalPrice: "₹16,999" },
-      "XXL": { price: "₹14,499", originalPrice: "₹17,499" }
-    }
-  },
-  {
-    id: 2,
-    name: "Maroon Velvet Sherwani",
-    price: "₹14,999",
-    originalPrice: "₹18,999",
-    rating: 4.9,
-    reviews: 18,
-    image: "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400&h=500&fit=crop",
-    badge: "New Arrival",
-    sizes: ["M", "L", "XL"],
-    colors: ["Maroon", "Burgundy", "Wine"],
-    category: "Sherwanis",
-    description: "Premium maroon velvet sherwani for special occasions",
-    inStock: true,
-    fabric: "Velvet",
-    occasion: "Wedding",
-    sizePricing: {
-      "M": { price: "₹14,999", originalPrice: "₹18,999" },
-      "L": { price: "₹15,499", originalPrice: "₹19,499" },
-      "XL": { price: "₹15,999", originalPrice: "₹19,999" }
-    }
-  },
-  {
-    id: 9,
-    name: "Golden Brocade Sherwani",
-    price: "₹16,999",
-    originalPrice: "₹21,999",
-    rating: 4.7,
-    reviews: 32,
-    image: "https://images.unsplash.com/photo-1583030200306-33ca486d8e30?w=400&h=500&fit=crop",
-    badge: "Premium",
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["Gold", "Cream", "Champagne"],
-    category: "Sherwanis",
-    description: "Luxurious golden brocade sherwani with traditional patterns",
-    inStock: true,
-    fabric: "Brocade",
-    occasion: "Wedding"
-  },
-  {
-    id: 13,
-    name: "Black Bandhgala Sherwani",
-    price: "₹15,999",
-    originalPrice: "₹19,999",
-    rating: 4.9,
-    reviews: 21,
-    image: "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400&h=500&fit=crop&sat=-100",
-    badge: "Limited Edition",
-    sizes: ["M", "L", "XL"],
-    colors: ["Black", "Charcoal", "Midnight"],
-    category: "Sherwanis",
-    description: "Classic black bandhgala sherwani for formal events",
-    inStock: true,
-    fabric: "Silk",
-    occasion: "Formal"
-  },
-  
-  // Kurtas
-  {
-    id: 3,
-    name: "Ivory Cotton Kurta Set",
-    price: "₹2,999",
-    originalPrice: "₹4,999",
-    rating: 4.7,
-    reviews: 45,
-    image: "https://images.unsplash.com/photo-1622122201714-77da0ca8e5d2?w=400&h=500&fit=crop",
-    badge: "Sale",
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["Ivory", "White", "Cream"],
-    category: "Kurtas",
-    description: "Comfortable cotton kurta set perfect for daily wear",
-    inStock: true,
-    fabric: "Cotton",
-    occasion: "Casual"
-  },
-  {
-    id: 4,
-    name: "Navy Blue Silk Kurta",
-    price: "₹3,499",
-    originalPrice: "₹4,999",
-    rating: 4.6,
-    reviews: 32,
-    image: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=400&h=500&fit=crop",
-    sizes: ["M", "L", "XL", "XXL"],
-    colors: ["Navy Blue", "Royal Blue", "Prussian Blue"],
-    category: "Kurtas",
-    description: "Premium silk kurta in elegant navy blue",
-    inStock: true,
-    fabric: "Silk",
-    occasion: "Festival"
-  },
-  {
-    id: 10,
-    name: "Mint Green Kurta Pajama",
-    price: "₹2,499",
-    originalPrice: "₹3,999",
-    rating: 4.4,
-    reviews: 18,
-    image: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=500&fit=crop",
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["Mint Green", "Sage", "Sea Green"],
-    category: "Kurtas",
-    description: "Fresh mint green kurta pajama set",
-    inStock: true,
-    fabric: "Cotton",
-    occasion: "Casual"
-  },
-  {
-    id: 14,
-    name: "White Chikankari Kurta",
-    price: "₹4,999",
-    originalPrice: "₹6,999",
-    rating: 4.8,
-    reviews: 42,
-    image: "https://images.unsplash.com/photo-1605518216938-7c31b7b14ad0?w=400&h=500&fit=crop",
-    badge: "Handcrafted",
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["White", "Off-White", "Cream"],
-    category: "Kurtas",
-    description: "Traditional white chikankari kurta with intricate embroidery",
-    inStock: true,
-    fabric: "Cotton",
-    occasion: "Festival"
-  },
-  
-  // Suits
-  {
-    id: 5,
-    name: "Emerald Green Bandhgala Suit",
-    price: "₹8,999",
-    originalPrice: "₹12,999",
-    rating: 4.8,
-    reviews: 28,
-    image: "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=400&h=500&fit=crop",
-    badge: "Premium",
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["Emerald", "Forest Green", "Jade"],
-    category: "Suits",
-    description: "Sophisticated emerald green bandhgala suit",
-    inStock: true,
-    fabric: "Wool",
-    occasion: "Wedding"
-  },
-  {
-    id: 6,
-    name: "Charcoal Grey Nehru Suit",
-    price: "₹7,999",
-    originalPrice: "₹10,999",
-    rating: 4.5,
-    reviews: 21,
-    image: "https://images.unsplash.com/photo-1564463836146-4e40c2e6e3b5?w=400&h=500&fit=crop",
-    sizes: ["M", "L", "XL"],
-    colors: ["Charcoal", "Slate", "Graphite"],
-    category: "Suits",
-    description: "Classic charcoal grey Nehru suit for formal occasions",
-    inStock: true,
-    fabric: "Wool",
-    occasion: "Formal"
-  },
-  {
-    id: 11,
-    name: "Black Tuxedo Suit",
-    price: "₹15,999",
-    originalPrice: "₹19,999",
-    rating: 4.8,
-    reviews: 25,
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop",
-    badge: "Formal",
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    colors: ["Black", "Midnight", "Charcoal"],
-    category: "Suits",
-    description: "Premium black tuxedo suit for special events",
-    inStock: true,
-    fabric: "Wool",
-    occasion: "Formal"
-  },
-  
-  // Lehengas
-  {
-    id: 7,
-    name: "Bridal Red Lehenga",
-    price: "₹24,999",
-    originalPrice: "₹32,999",
-    rating: 4.9,
-    reviews: 15,
-    image: "https://images.unsplash.com/photo-1583391733956-6c78276477e9?w=400&h=500&fit=crop",
-    badge: "Bridal Special",
-    sizes: ["XS", "S", "M", "L"],
-    colors: ["Bridal Red", "Crimson", "Ruby"],
-    category: "Lehengas",
-    description: "Stunning bridal red lehenga with heavy embroidery",
-    inStock: true,
-    fabric: "Silk",
-    occasion: "Wedding"
-  },
-  {
-    id: 8,
-    name: "Pink & Gold Party Lehenga",
-    price: "₹18,999",
-    originalPrice: "₹24,999",
-    rating: 4.7,
-    reviews: 22,
-    image: "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400&h=500&fit=crop&hue=350",
-    badge: "Party Wear",
-    sizes: ["XS", "S", "M", "L", "XL"],
-    colors: ["Pink", "Rose Gold", "Blush"],
-    category: "Lehengas",
-    description: "Elegant pink and gold lehenga perfect for parties",
-    inStock: true,
-    fabric: "Georgette",
-    occasion: "Party"
-  },
-  {
-    id: 12,
-    name: "Royal Purple Lehenga",
-    price: "₹21,999",
-    originalPrice: "₹28,999",
-    rating: 4.6,
-    reviews: 19,
-    image: "https://images.unsplash.com/photo-1583391733975-b8701bd82cd4?w=400&h=500&fit=crop",
-    badge: "Designer",
-    sizes: ["XS", "S", "M", "L"],
-    colors: ["Royal Purple", "Violet", "Plum"],
-    category: "Lehengas",
-    description: "Majestic royal purple designer lehenga",
-    inStock: true,
-    fabric: "Silk",
-    occasion: "Wedding"
-  }
-];
+// Transform MongoDB product to frontend Product format
+const transformProduct = (dbProduct: any): Product => {
+  // Convert price from paise to rupees and format as string
+  const priceInRupees = (dbProduct.price / 100).toLocaleString('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 0,
+  });
 
-// Helper functions
-export const getProductsByCategory = (category: string): Product[] => {
-  if (category === "All") return allProducts;
-  return allProducts.filter(product => product.category === category);
+  // Extract sizes as string array
+  const sizes = dbProduct.sizes?.map((size: any) => size.label) || [];
+
+  // Extract colors as string array
+  const colors = dbProduct.colors?.map((color: any) => color.label) || [];
+
+  // Get primary category (first one with lowest rank)
+  const primaryCategory = dbProduct.categories?.sort((a: any, b: any) => a.rank - b.rank)[0]?.name || 'general';
+
+  // Get hero image or first image
+  const heroImage = dbProduct.images?.find((img: any) => img.role === 'hero') ||
+                   dbProduct.images?.[0];
+  const imageUrl = heroImage?.url ? `${heroImage.url}` : '/placeholder-product.jpg';
+
+  return {
+    id: dbProduct._id.toString(), // Use MongoDB ObjectId as string
+    name: dbProduct.title,
+    price: priceInRupees,
+    rating: 4.5, // Default rating since not in DB
+    reviews: 0, // Default reviews since not in DB
+    image: imageUrl,
+    sizes,
+    colors,
+    category: primaryCategory,
+    description: dbProduct.description,
+    inStock: dbProduct.stock > 0,
+  };
+};
+
+// Helper functions - now use API calls instead of local data
+export const getProductsByCategory = async (category: string, options?: {
+  tag?: string;
+  occasion?: string;
+  page?: number;
+  limit?: number;
+}): Promise<Product[]> => {
+  try {
+    const params = new URLSearchParams();
+    if (options?.tag) params.append('tag', options.tag);
+    if (options?.occasion) params.append('occasion', options.occasion);
+    if (options?.page) params.append('page', options.page.toString());
+    if (options?.limit) params.append('limit', options.limit.toString());
+
+    const queryString = params.toString();
+    const url = category === 'All'
+      ? `/api/products/all${queryString ? `?${queryString}` : ''}`
+      : `/api/products/category/${category}${queryString ? `?${queryString}` : ''}`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.success && data.products) {
+      return data.products.map(transformProduct);
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching products by category:', error);
+    return [];
+  }
+};
+
+export const getProductsByTag = async (tag: string, options?: {
+  category?: string;
+  occasion?: string;
+  page?: number;
+  limit?: number;
+}): Promise<Product[]> => {
+  try {
+    const params = new URLSearchParams();
+    if (options?.category) params.append('category', options.category);
+    if (options?.occasion) params.append('occasion', options.occasion);
+    if (options?.page) params.append('page', options.page.toString());
+    if (options?.limit) params.append('limit', options.limit.toString());
+
+    const queryString = params.toString();
+    const url = `/api/products/tag/${tag}${queryString ? `?${queryString}` : ''}`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.success && data.products) {
+      return data.products.map(transformProduct);
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching products by tag:', error);
+    return [];
+  }
+};
+
+export const getProductsByOccasion = async (occasion: string, options?: {
+  category?: string;
+  tag?: string;
+  page?: number;
+  limit?: number;
+}): Promise<Product[]> => {
+  try {
+    const params = new URLSearchParams();
+    if (options?.category) params.append('category', options.category);
+    if (options?.tag) params.append('tag', options.tag);
+    if (options?.page) params.append('page', options.page.toString());
+    if (options?.limit) params.append('limit', options.limit.toString());
+
+    const queryString = params.toString();
+    const url = `/api/products/occasion/${occasion}${queryString ? `?${queryString}` : ''}`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.success && data.products) {
+      return data.products.map(transformProduct);
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching products by occasion:', error);
+    return [];
+  }
+};
+
+export const getAllProducts = async (options?: {
+  tag?: string;
+  occasion?: string;
+  page?: number;
+  limit?: number;
+}): Promise<Product[]> => {
+  try {
+    const params = new URLSearchParams();
+    if (options?.tag) params.append('tag', options.tag);
+    if (options?.occasion) params.append('occasion', options.occasion);
+    if (options?.page) params.append('page', options.page.toString());
+    if (options?.limit) params.append('limit', options.limit.toString());
+
+    const queryString = params.toString();
+    const url = `/api/products/all${queryString ? `?${queryString}` : ''}`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.success && data.products) {
+      return data.products.map(transformProduct);
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching all products:', error);
+    return [];
+  }
 };
 
 export const sortProducts = (products: Product[], sortBy: string): Product[] => {
@@ -316,7 +203,7 @@ export const sortProducts = (products: Product[], sortBy: string): Product[] => 
       return sortedProducts.sort((a, b) => b.rating - a.rating);
     
     case "newest":
-      return sortedProducts.sort((a, b) => b.id - a.id);
+      return sortedProducts.sort((a, b) => b.id.localeCompare(a.id));
     
     case "featured":
     default:
@@ -329,8 +216,18 @@ export const sortProducts = (products: Product[], sortBy: string): Product[] => 
   }
 };
 
-export const getProductById = (id: string | number): Product | null => {
-  return allProducts.find(product => product.id === parseInt(id.toString())) || null;
+export const getProductById = async (id: string | number): Promise<Product | null> => {
+  try {
+    const response = await fetch(`/api/products/${id}`);
+    const data = await response.json();
+    if (data.success && data.product) {
+      return transformProduct(data.product);
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching product by ID:', error);
+    return null;
+  }
 };
 
 export const getProductPricing = (product: Product, size?: string): { price: string; originalPrice?: string } => {

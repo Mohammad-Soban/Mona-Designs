@@ -19,6 +19,11 @@ export interface IProductColor {
   hex: string;
 }
 
+export interface IProductCategory {
+  name: string;
+  rank: number; // Lower rank = higher priority/position
+}
+
 export interface IProduct extends Document {
   _id: string;
   title: string;
@@ -28,7 +33,7 @@ export interface IProduct extends Document {
   currency: string;
   sku?: string;
   stock: number;
-  categories: string[];
+  categories: IProductCategory[];
   tags: string[];
   sizes?: IProductSize[];
   colors?: IProductColor[];
@@ -80,8 +85,17 @@ const productSchema = new Schema<IProduct>({
     default: 0,
   },
   categories: [{
-    type: String,
-    required: true,
+    name: {
+      type: String,
+      required: true,
+      enum: ['home', 'lehengas', 'kurtas', 'sherwanis', 'suits', 'accessories', 'wedding', 'reception', 'sangeet', 'mehendi', 'haldi', 'festivals', 'general', 'new-arrivals']
+    },
+    rank: {
+      type: Number,
+      required: true,
+      min: 1,
+      default: 1
+    }
   }],
   tags: [String],
   sizes: [{
@@ -95,7 +109,7 @@ const productSchema = new Schema<IProduct>({
   images: [{
     url: {
       type: String,
-      required: true,
+      required: false,
     },
     public_id: String,
     alt: String,
@@ -128,7 +142,7 @@ const productSchema = new Schema<IProduct>({
   createdBy: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
+    required: false,
   },
 }, {
   timestamps: true,

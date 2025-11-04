@@ -1,32 +1,62 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
+import mongoose from 'mongoose';
 import { Product, IProduct } from '../models/Product';
-import { AuthRequest } from '../middleware/auth';
-// Image uploads via Cloudinary are disabled for now.
+import { AdminAuthRequest } from '../middleware/adminAuth';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+
+// Multer configuration for image uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(process.cwd(), 'public', 'uploads', 'products');
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+export const upload = multer({ 
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  }
+});
 
 // Validation schemas
 const createProductSchema = z.object({
   body: z.object({
-    title: z.string().min(1, 'Title is required'),
-    description: z.string().min(1, 'Description is required'),
-    price: z.number().min(0, 'Price must be positive'),
-    currency: z.string().default('INR'),
-    sku: z.string().optional(),
-    stock: z.number().min(0).default(0),
-    categories: z.array(z.string()).min(1, 'At least one category is required'),
-    tags: z.array(z.string()).default([]),
+    title: z.string().min(1),
+    description: z.string().min(1),
+    price: z.number().min(0),
+    stock: z.number().min(0),
+    categories: z.array(z.object({
+      name: z.enum(['home', 'lehengas', 'kurtas', 'sherwanis', 'suits', 'accessories', 'wedding', 'reception', 'sangeet', 'mehendi', 'haldi', 'festivals', 'general', 'new-arrivals']),
+      rank: z.number().min(1)
+    })),
+    tags: z.array(z.string()).optional(),
     sizes: z.array(z.object({
       label: z.string(),
-      qty: z.number().min(0),
+      qty: z.number().min(0)
     })).optional(),
     colors: z.array(z.object({
       label: z.string(),
-      hex: z.string(),
+      hex: z.string()
     })).optional(),
-    attributes: z.record(z.any()).default({}),
-    isActive: z.boolean().default(true),
-    featured: z.boolean().default(false),
-    metadata: z.record(z.any()).default({}),
+    attributes: z.record(z.any()).optional(),
+    featured: z.boolean().optional(),
+    isActive: z.boolean().optional(),
   }),
 });
 
@@ -38,125 +68,106 @@ const updateProductSchema = z.object({
     title: z.string().min(1).optional(),
     description: z.string().min(1).optional(),
     price: z.number().min(0).optional(),
-    currency: z.string().optional(),
-    sku: z.string().optional(),
     stock: z.number().min(0).optional(),
-    categories: z.array(z.string()).optional(),
+    categories: z.array(z.object({
+      name: z.enum(['home', 'lehengas', 'kurtas', 'sherwanis', 'suits', 'accessories', 'wedding', 'reception', 'sangeet', 'mehendi', 'haldi', 'festivals', 'general', 'new-arrivals']),
+      rank: z.number().min(1)
+    })).optional(),
     tags: z.array(z.string()).optional(),
     sizes: z.array(z.object({
       label: z.string(),
-      qty: z.number().min(0),
+      qty: z.number().min(0)
     })).optional(),
     colors: z.array(z.object({
       label: z.string(),
-      hex: z.string(),
+      hex: z.string()
     })).optional(),
     attributes: z.record(z.any()).optional(),
-    isActive: z.boolean().optional(),
     featured: z.boolean().optional(),
-    metadata: z.record(z.any()).optional(),
+    isActive: z.boolean().optional(),
   }),
 });
 
-const getProductsSchema = z.object({
-  query: z.object({
-    search: z.string().optional(),
-    category: z.string().optional(),
-    featured: z.string().optional(),
-    page: z.string().optional(),
-    limit: z.string().optional(),
-    sort: z.string().optional(),
-  }),
-});
-
-// Helper function to generate slug
+// Generate slug from title
 const generateSlug = (title: string): string => {
   return title
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
+    .replace(/[^a-z0-9 -]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim();
 };
 
-// Upload image endpoint removed; use direct URL fields on products.
-
-// Get all products (public)
+// Get all products with filtering and pagination
 export const getProducts = async (req: Request, res: Response) => {
   try {
-    const { search, category, featured, page = '1', limit = '12', sort = 'createdAt' } = req.query;
+    const { 
+      category, 
+      featured, 
+      active, 
+      page = 1, 
+      limit = 10, 
+      sort = 'createdAt',
+      order = 'desc',
+      search,
+      count // If true, return count only for stats
+    } = req.query;
 
-    const query: any = { isActive: true };
+    const query: any = {};
+
+    // Filter by category
+    if (category) {
+      query['categories.name'] = category;
+    }
+
+    // Filter by featured
+    if (featured !== undefined) {
+      query.featured = featured === 'true';
+    }
+
+    // Filter by active status
+    if (active !== undefined) {
+      query.isActive = active === 'true';
+    }
 
     // Search functionality
     if (search) {
-      query.$text = { $search: search as string };
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { tags: { $in: [new RegExp(search as string, 'i')] } }
+      ];
     }
 
-    // Category filter
-    if (category) {
-      query.categories = category;
+    // If count=true, return stats only
+    if (count === 'true') {
+      const total = await Product.countDocuments(query);
+      return res.json({
+        total,
+        change: 0 // You can calculate month-over-month change if needed
+      });
     }
 
-    // Featured filter
-    if (featured === 'true') {
-      query.featured = true;
-    }
-
-    // Pagination
-    const pageNum = parseInt(page as string);
-    const limitNum = parseInt(limit as string);
-    const skip = (pageNum - 1) * limitNum;
-
-    // Sort options
-    let sortOption: any = { createdAt: -1 };
-    if (sort === 'price-asc') sortOption = { price: 1 };
-    if (sort === 'price-desc') sortOption = { price: -1 };
-    if (sort === 'name') sortOption = { title: 1 };
-    if (sort === 'featured') sortOption = { featured: -1, createdAt: -1 };
+    const skip = (Number(page) - 1) * Number(limit);
+    const sortOrder = order === 'desc' ? -1 : 1;
 
     const products = await Product.find(query)
-      .populate('createdBy', 'name')
-      .sort(sortOption)
+      .populate('createdBy', 'name email')
+      .sort({ [sort as string]: sortOrder, 'categories.rank': 1 })
       .skip(skip)
-      .limit(limitNum)
-      .lean();
+      .limit(Number(limit));
 
     const total = await Product.countDocuments(query);
 
-    // Transform products to match frontend expectations
-    const transformedProducts = products.map(product => ({
-      id: product._id,
-      name: product.title,
-      price: `₹${(product.price / 100).toLocaleString()}`,
-      originalPrice: product.price > 0 ? `₹${((product.price * 1.2) / 100).toLocaleString()}` : undefined,
-      rating: 4.5, // Default rating for now
-      reviews: Math.floor(Math.random() * 50) + 10, // Random reviews for demo
-      image: product.images.find(img => img.role === 'hero')?.url || product.images[0]?.url || '',
-      badge: product.featured ? 'Featured' : undefined,
-      sizes: product.sizes?.map(size => size.label) || [],
-      colors: product.colors?.map(color => color.label) || [],
-      category: product.categories[0] || 'General',
-      description: product.description,
-      inStock: product.stock > 0,
-      fabric: product.attributes.fabric || 'Premium',
-      occasion: product.attributes.occasion || 'General',
-      sizePricing: product.sizes?.reduce((acc, size) => {
-        acc[size.label] = {
-          price: `₹${(product.price / 100).toLocaleString()}`,
-          originalPrice: `₹${((product.price * 1.2) / 100).toLocaleString()}`,
-        };
-        return acc;
-      }, {} as Record<string, { price: string; originalPrice: string }>) || {},
-    }));
-
     res.json({
       success: true,
-      products: transformedProducts,
+      products,
       pagination: {
-        page: pageNum,
-        limit: limitNum,
+        page: Number(page),
+        limit: Number(limit),
         total,
-        pages: Math.ceil(total / limitNum),
-      },
+        pages: Math.ceil(total / Number(limit))
+      }
     });
   } catch (error) {
     console.error('Get products error:', error);
@@ -167,69 +178,217 @@ export const getProducts = async (req: Request, res: Response) => {
   }
 };
 
-// Get product by slug
-export const getProductBySlug = async (req: Request, res: Response) => {
+// Get products by category with ranking (supports tags and occasions)
+export const getProductsByCategory = async (req: Request, res: Response) => {
   try {
-    const { slug } = req.params;
+    const { category } = req.params;
+    const { page = 1, limit = 12, tag, occasion } = req.query;
 
-    const product = await Product.findOne({ slug, isActive: true })
-      .populate('createdBy', 'name')
-      .lean();
+    const skip = (Number(page) - 1) * Number(limit);
 
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: 'Product not found',
-      });
+    // Build query based on category, tags, and occasions
+    const query: any = {
+      isActive: true
+    };
+
+    // If category is "All", don't filter by category
+    if (category !== 'All') {
+      query['categories.name'] = category;
     }
 
-    // Transform product to match frontend expectations
-    const transformedProduct = {
-      id: product._id,
-      name: product.title,
-      price: `₹${(product.price / 100).toLocaleString()}`,
-      originalPrice: product.price > 0 ? `₹${((product.price * 1.2) / 100).toLocaleString()}` : undefined,
-      rating: 4.5,
-      reviews: Math.floor(Math.random() * 50) + 10,
-      image: product.images.find(img => img.role === 'hero')?.url || product.images[0]?.url || '',
-      badge: product.featured ? 'Featured' : undefined,
-      sizes: product.sizes?.map(size => size.label) || [],
-      colors: product.colors?.map(color => color.label) || [],
-      category: product.categories[0] || 'General',
-      description: product.description,
-      inStock: product.stock > 0,
-      fabric: product.attributes.fabric || 'Premium',
-      occasion: product.attributes.occasion || 'General',
-      sizePricing: product.sizes?.reduce((acc, size) => {
-        acc[size.label] = {
-          price: `₹${(product.price / 100).toLocaleString()}`,
-          originalPrice: `₹${((product.price * 1.2) / 100).toLocaleString()}`,
-        };
-        return acc;
-      }, {} as Record<string, { price: string; originalPrice: string }>) || {},
-      images: product.images.map(img => img.url),
-    };
+    // Filter by tag if provided (for clothing types like lehenga, kurta, etc.)
+    if (tag) {
+      query.tags = { $in: [tag] };
+    }
+
+    // Filter by occasion if provided (from attributes)
+    if (occasion) {
+      query[`attributes.occasions`] = { $in: [occasion] };
+    }
+
+    const products = await Product.find(query)
+      .populate('createdBy', 'name email')
+      .sort({ 'categories.rank': 1, createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await Product.countDocuments(query);
 
     res.json({
       success: true,
-      product: transformedProduct,
+      products,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        pages: Math.ceil(total / Number(limit))
+      }
     });
   } catch (error) {
-    console.error('Get product by slug error:', error);
+    console.error('Get products by category error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch product',
+      message: 'Failed to fetch products by category',
     });
   }
 };
 
-// Get product by ID (admin)
+// Get all products (for "All" category)
+export const getAllProducts = async (req: Request, res: Response) => {
+  try {
+    const { page = 1, limit = 12, tag, occasion } = req.query;
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    // Build query based on tags and occasions
+    const query: any = {
+      isActive: true
+    };
+
+    // Filter by tag if provided
+    if (tag) {
+      query.tags = { $in: [tag] };
+    }
+
+    // Filter by occasion if provided
+    if (occasion) {
+      query[`attributes.occasions`] = { $in: [occasion] };
+    }
+
+    const products = await Product.find(query)
+      .populate('createdBy', 'name email')
+      .sort({ featured: -1, 'categories.rank': 1, createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await Product.countDocuments(query);
+
+    res.json({
+      success: true,
+      products,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        pages: Math.ceil(total / Number(limit))
+      }
+    });
+  } catch (error) {
+    console.error('Get all products error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch all products',
+    });
+  }
+};
+
+// Get products by tag (clothing type)
+export const getProductsByTag = async (req: Request, res: Response) => {
+  try {
+    const { tag } = req.params;
+    const { page = 1, limit = 12, category, occasion } = req.query;
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const query: any = {
+      tags: { $in: [tag] },
+      isActive: true
+    };
+
+    // Optional category filter
+    if (category) {
+      query['categories.name'] = category;
+    }
+
+    // Optional occasion filter
+    if (occasion) {
+      query[`attributes.occasions`] = { $in: [occasion] };
+    }
+
+    const products = await Product.find(query)
+      .populate('createdBy', 'name email')
+      .sort({ 'categories.rank': 1, createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await Product.countDocuments(query);
+
+    res.json({
+      success: true,
+      products,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        pages: Math.ceil(total / Number(limit))
+      }
+    });
+  } catch (error) {
+    console.error('Get products by tag error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch products by tag',
+    });
+  }
+};
+
+// Get products by occasion
+export const getProductsByOccasion = async (req: Request, res: Response) => {
+  try {
+    const { occasion } = req.params;
+    const { page = 1, limit = 12, category, tag } = req.query;
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const query: any = {
+      [`attributes.occasions`]: { $in: [occasion] },
+      isActive: true
+    };
+
+    // Optional category filter
+    if (category) {
+      query['categories.name'] = category;
+    }
+
+    // Optional tag filter
+    if (tag) {
+      query.tags = { $in: [tag] };
+    }
+
+    const products = await Product.find(query)
+      .populate('createdBy', 'name email')
+      .sort({ 'categories.rank': 1, createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await Product.countDocuments(query);
+
+    res.json({
+      success: true,
+      products,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        pages: Math.ceil(total / Number(limit))
+      }
+    });
+  } catch (error) {
+    console.error('Get products by occasion error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch products by occasion',
+    });
+  }
+};
+
+// Get single product
 export const getProductById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
     const product = await Product.findById(id)
-      .populate('createdBy', 'name');
+      .populate('createdBy', 'name email');
 
     if (!product) {
       return res.status(404).json({
@@ -251,81 +410,57 @@ export const getProductById = async (req: Request, res: Response) => {
   }
 };
 
-// Create product (admin)
-export const createProduct = async (req: AuthRequest, res: Response) => {
+// Create product (Admin only)
+export const createProduct = async (req: AdminAuthRequest, res: Response) => {
   try {
-    const userId = req.user!._id;
+    console.log('Create product request body:', req.body);
     const productData = req.body;
+    const files = req.files as Express.Multer.File[];
 
     // Generate slug
     const slug = generateSlug(productData.title);
 
-    // Check if slug already exists
-    const existingProduct = await Product.findOne({ slug });
-    if (existingProduct) {
-      return res.status(400).json({
-        success: false,
-        message: 'A product with this title already exists',
-      });
-    }
+    // Process uploaded images
+    const images = files?.map((file, index) => ({
+      url: `/uploads/products/${file.filename}`,
+      alt: productData.title,
+      role: index === 0 ? 'hero' : 'gallery',
+      position: index
+    })) || [];
 
-    // Create product
+    // Create product without createdBy field (since we're using admin auth, not user auth)
     const product = new Product({
       ...productData,
       slug,
-      createdBy: userId,
-      price: productData.price * 100, // Convert to paise
+      images,
     });
 
     await product.save();
+    console.log('Product saved successfully:', product._id);
 
     res.status(201).json({
       success: true,
       message: 'Product created successfully',
       product,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Create product error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to create product',
+      message: error.message || 'Failed to create product',
+      error: error.toString()
     });
   }
 };
 
-// Update product (admin)
-export const updateProduct = async (req: AuthRequest, res: Response) => {
+// Update product (Admin only)
+export const updateProduct = async (req: AdminAuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const updates = req.body;
+    const updateData = req.body;
+    const files = req.files as Express.Multer.File[];
 
-    // If title is being updated, generate new slug
-    if (updates.title) {
-      const slug = generateSlug(updates.title);
-      
-      // Check if new slug already exists (excluding current product)
-      const existingProduct = await Product.findOne({ slug, _id: { $ne: id } });
-      if (existingProduct) {
-        return res.status(400).json({
-          success: false,
-          message: 'A product with this title already exists',
-        });
-      }
-      
-      updates.slug = slug;
-    }
-
-    // Convert price to paise if provided
-    if (updates.price) {
-      updates.price = updates.price * 100;
-    }
-
-    const product = await Product.findByIdAndUpdate(
-      id,
-      updates,
-      { new: true, runValidators: true }
-    ).populate('createdBy', 'name');
-
+    const product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -333,10 +468,32 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
       });
     }
 
+    // Update slug if title changed
+    if (updateData.title && updateData.title !== product.title) {
+      updateData.slug = generateSlug(updateData.title);
+    }
+
+    // Process new images if uploaded
+    if (files && files.length > 0) {
+      const newImages = files.map((file, index) => ({
+        url: `/uploads/products/${file.filename}`,
+        alt: updateData.title || product.title,
+        role: 'gallery',
+        position: product.images.length + index
+      }));
+      updateData.images = [...product.images, ...newImages];
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
     res.json({
       success: true,
       message: 'Product updated successfully',
-      product,
+      product: updatedProduct,
     });
   } catch (error) {
     console.error('Update product error:', error);
@@ -347,13 +504,12 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// Delete product (admin)
-export const deleteProduct = async (req: AuthRequest, res: Response) => {
+// Delete product (Admin only)
+export const deleteProduct = async (req: AdminAuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 
-    const product = await Product.findByIdAndDelete(id);
-
+    const product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -361,16 +517,15 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Delete images from Cloudinary
-    for (const image of product.images) {
-      if (image.public_id) {
-        try {
-          await cloudinary.uploader.destroy(image.public_id);
-        } catch (error) {
-          console.error('Error deleting image from Cloudinary:', error);
-        }
+    // Delete associated images
+    product.images.forEach(image => {
+      const imagePath = path.join(process.cwd(), 'public', image.url);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
       }
-    }
+    });
+
+    await Product.findByIdAndDelete(id);
 
     res.json({
       success: true,
@@ -385,14 +540,40 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// Upload product image (admin)
-export const uploadProductImage = undefined as unknown as never;
+// Get available categories
+export const getCategories = async (req: Request, res: Response) => {
+  try {
+    const categories = [
+      { name: 'home', label: 'Home', description: 'Featured on homepage' },
+      { name: 'lehengas', label: 'Lehengas', description: 'Traditional lehengas' },
+      { name: 'kurtas', label: 'Kurtas', description: 'Traditional kurtas' },
+      { name: 'sherwanis', label: 'Sherwanis', description: 'Men\'s sherwanis' },
+      { name: 'suits', label: 'Suits', description: 'Formal suits' },
+      { name: 'accessories', label: 'Accessories', description: 'Fashion accessories' },
+      { name: 'wedding', label: 'Wedding', description: 'Wedding collection' },
+      { name: 'reception', label: 'Reception', description: 'Reception wear' },
+      { name: 'sangeet', label: 'Sangeet', description: 'Sangeet ceremony wear' },
+      { name: 'mehendi', label: 'Mehendi', description: 'Mehendi ceremony wear' },
+      { name: 'haldi', label: 'Haldi', description: 'Haldi ceremony wear' },
+      { name: 'festivals', label: 'Festivals', description: 'Festival wear' },
+      { name: 'general', label: 'General', description: 'General collection' },
+      { name: 'new-arrivals', label: 'New Arrivals', description: 'Latest arrivals' }
+    ];
 
-// Delete product image (admin)
-export const deleteProductImage = undefined as unknown as never;
+    res.json({
+      success: true,
+      categories
+    });
+  } catch (error) {
+    console.error('Get categories error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch categories',
+    });
+  }
+};
 
 export {
   createProductSchema,
   updateProductSchema,
-  getProductsSchema,
 };

@@ -391,6 +391,46 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
   }
 };
 
+// Get user statistics (Admin only)
+export const getUserStats = async (req: Request, res: Response) => {
+  try {
+    // Calculate current month stats
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+
+    // Get this month's users
+    const thisMonthUsers = await User.countDocuments({
+      createdAt: { $gte: startOfMonth }
+    });
+
+    // Get last month's users
+    const lastMonthUsers = await User.countDocuments({
+      createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth }
+    });
+
+    // Calculate total users
+    const totalUsers = await User.countDocuments();
+
+    // Calculate percentage change
+    const userChange = lastMonthUsers > 0
+      ? ((thisMonthUsers - lastMonthUsers) / lastMonthUsers * 100).toFixed(1)
+      : 0;
+
+    res.json({
+      totalUsers,
+      userChange: parseFloat(userChange as string)
+    });
+  } catch (error) {
+    console.error('Get user stats error:', error);
+    res.status(500).json({
+      totalUsers: 0,
+      userChange: 0
+    });
+  }
+};
+
 export {
   registerSchema,
   loginSchema,

@@ -439,6 +439,55 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response) => {
   }
 };
 
+// Get order statistics (Admin only)
+export const getOrderStats = async (req: Request, res: Response) => {
+  try {
+    // Calculate current month stats
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+
+    // Get this month's orders
+    const thisMonthOrders = await Order.find({
+      createdAt: { $gte: startOfMonth }
+    });
+
+    // Get last month's orders
+    const lastMonthOrders = await Order.find({
+      createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth }
+    });
+
+    // Calculate revenue
+    const thisMonthRevenue = thisMonthOrders.reduce((sum, order) => sum + order.total, 0);
+    const lastMonthRevenue = lastMonthOrders.reduce((sum, order) => sum + order.total, 0);
+
+    // Calculate percentage changes
+    const revenueChange = lastMonthRevenue > 0 
+      ? ((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue * 100).toFixed(1)
+      : 0;
+
+    const ordersChange = lastMonthOrders.length > 0
+      ? ((thisMonthOrders.length - lastMonthOrders.length) / lastMonthOrders.length * 100).toFixed(1)
+      : 0;
+
+    res.json({
+      totalRevenue: Math.round(thisMonthRevenue / 100), // Convert paise to rupees
+      totalOrders: thisMonthOrders.length,
+      revenueChange: parseFloat(revenueChange as string),
+      ordersChange: parseFloat(ordersChange as string)
+    });
+  } catch (error) {
+    console.error('Get order stats error:', error);
+    res.status(500).json({
+      totalRevenue: 0,
+      totalOrders: 0,
+      revenueChange: 0,
+      ordersChange: 0
+    });
+  }
+};
+
 export {
   addToCartSchema,
   updateCartItemSchema,

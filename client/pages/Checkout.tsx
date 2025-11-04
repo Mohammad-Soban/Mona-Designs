@@ -197,7 +197,7 @@ export default function Checkout() {
             address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.pincode}`,
           },
           orderData: {
-            ...(authState.user?._id && { userId: authState.user._id }),
+            ...(authState.user?.id && { userId: authState.user.id }),
             items: cartState.items.map(item => ({
               productId: item.id.toString(),
               title: item.name,
@@ -226,7 +226,7 @@ export default function Checkout() {
       console.log('Sending order data:', {
         amount: calculateTotal(),
         orderData: {
-          ...(authState.user?._id && { userId: authState.user._id }),
+          ...(authState.user?.id && { userId: authState.user.id }),
           items: cartState.items.map(item => ({
             productId: item.id.toString(),
             title: item.name,

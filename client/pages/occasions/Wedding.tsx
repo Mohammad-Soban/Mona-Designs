@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductGrid } from "@/components/ui/product-grid";
 import {
   allProducts,
-  getProductsByCategory,
+  getProductsByOccasion,
   sortProducts,
 } from "@/data/products";
 import { ChevronDown } from "lucide-react";
@@ -23,13 +23,33 @@ const categories = ["All", "Sherwanis", "Lehengas", "Suits", "Kurtas"];
 export default function Wedding() {
   const [sortBy, setSortBy] = useState("featured");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await getProductsByOccasion("wedding", {
+          category: selectedCategory !== "All" ? selectedCategory.toLowerCase() : undefined
+        });
+        setProducts(data);
+      } catch (error) {
+        console.error('Error fetching wedding products:', error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [selectedCategory]);
 
   // Filter products suitable for Wedding (heavy work, rich colors)
   const weddingProducts = useMemo(() => {
-    const categoryProducts = getProductsByCategory(selectedCategory);
     // For demo, return all products. In real app, filter by occasion tags
-    return categoryProducts;
-  }, [selectedCategory]);
+    return products;
+  }, [products]);
 
   const filteredAndSortedProducts = useMemo(() => {
     return sortProducts(weddingProducts, sortBy);
@@ -78,11 +98,6 @@ export default function Wedding() {
                 )}
               >
                 {category}
-                <Badge variant="secondary" className="ml-2 text-xs">
-                  {category === "All"
-                    ? weddingProducts.length
-                    : getProductsByCategory(category).length}
-                </Badge>
               </button>
             ))}
           </div>

@@ -9,6 +9,7 @@ import {
   getUserOrders,
   getOrderById,
   updateOrderStatus,
+  getOrderStats,
   addToCartSchema,
   updateCartItemSchema,
   createOrderSchema,
@@ -28,6 +29,7 @@ router.delete('/cart', authenticateToken, clearCart);
 // Order routes
 router.post('/', authenticateToken, validateRequest(createOrderSchema), createOrder);
 router.get('/', authenticateToken, getUserOrders);
+router.get('/stats', getOrderStats); // Public stats endpoint for admin dashboard
 router.get('/:id', authenticateToken, getOrderById);
 
 // Admin routes

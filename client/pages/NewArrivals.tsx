@@ -24,16 +24,33 @@ export default function NewArrivals() {
   const [sortBy, setSortBy] = useState("newest");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // Filter new arrivals (for demo, we'll show all products as new arrivals)
-  const newArrivalsProducts = useMemo(() => {
-    const categoryProducts = getProductsByCategory(selectedCategory);
-    // In a real app, you'd filter by a "new" flag or date
-    return categoryProducts;
+  // State to hold the loaded products
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [products, setProducts] = useState<any[]>([]);
+
+  // Load products when category changes
+  useMemo(() => {
+    const loadProducts = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const categoryProducts = await getProductsByCategory(selectedCategory);
+        setProducts(categoryProducts);
+      } catch (err) {
+        setError('Failed to load products');
+        setProducts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadProducts();
   }, [selectedCategory]);
 
+  // Sort the loaded products
   const filteredAndSortedProducts = useMemo(() => {
-    return sortProducts(newArrivalsProducts, sortBy);
-  }, [newArrivalsProducts, sortBy]);
+    return sortProducts(products, sortBy);
+  }, [products, sortBy]);
 
   const handleSortChange = (newSortBy: string) => {
     setSortBy(newSortBy);
@@ -127,9 +144,7 @@ export default function NewArrivals() {
               >
                 {category}
                 <Badge variant="secondary" className="ml-2 text-xs">
-                  {category === "All"
-                    ? newArrivalsProducts.length
-                    : getProductsByCategory(category).length}
+                  {category === selectedCategory ? products.length : '...'}
                 </Badge>
               </button>
             ))}
@@ -178,17 +193,27 @@ export default function NewArrivals() {
       {/* Products Grid */}
       <section className="py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {filteredAndSortedProducts.length > 0 ? (
-            <>
-              <ProductGrid products={filteredAndSortedProducts} showPagination={true} itemsPerPage={12} />
-            </>
+          {isLoading ? (
+            <div className="text-center py-16">
+              <h3 className="text-lg font-semibold mb-2">Loading products...</h3>
+              <p className="text-muted-foreground">Please wait while we fetch the latest arrivals.</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-16">
+              <h3 className="text-lg font-semibold mb-2 text-red-600">{error}</h3>
+              <p className="text-muted-foreground">
+                Please try refreshing the page or check back later.
+              </p>
+            </div>
+          ) : filteredAndSortedProducts.length > 0 ? (
+            <ProductGrid products={filteredAndSortedProducts} showPagination={true} itemsPerPage={12} />
           ) : (
             <div className="text-center py-16">
               <h3 className="text-lg font-semibold mb-2">
                 No new arrivals found
               </h3>
               <p className="text-muted-foreground">
-                Try adjusting your filters or check back soon for new products.
+                We are updating our collection soon. Try checking a different category or come back later.
               </p>
             </div>
           )}
