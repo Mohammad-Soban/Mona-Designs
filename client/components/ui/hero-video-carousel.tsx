@@ -102,6 +102,7 @@ export function HeroVideoCarousel() {
     );
   };
 
+  // Return hero section — we'll control visual focal point with CSS instead of adding top padding
   return (
     <section className="relative h-screen overflow-hidden">
       {/* Background Animation */}
@@ -130,7 +131,7 @@ export function HeroVideoCarousel() {
                   loop
                   muted
                   playsInline
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover hero-video-media"
                   style={{ width: "100%", height: "100%" }}
                 />
               </div>

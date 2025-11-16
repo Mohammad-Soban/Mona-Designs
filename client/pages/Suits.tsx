@@ -57,7 +57,7 @@ export default function Suits() {
         <div className="absolute inset-0 bg-gradient-to-br from-slate-500/20 to-gray-600/20" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
+            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4 scroll-offset">
               Suits Collection
             </h1>
             <p className="text-slate-100 text-lg">

@@ -268,9 +268,10 @@ export const getProductsByCategory = async (req: Request, res: Response) => {
       isActive: true
     };
 
-    // If category is "All", don't filter by category
-    if (category !== 'All') {
-      query['categories.name'] = category;
+    // If category is "All" (case-insensitive), don't filter by category.
+    // Normalize category to lowercase to match the enum values stored in the DB
+    if (String(category).toLowerCase() !== 'all') {
+      query['categories.name'] = String(category).toLowerCase();
     }
 
     // Filter by tag if provided (for clothing types like lehenga, kurta, etc.)

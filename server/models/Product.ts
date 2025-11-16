@@ -155,4 +155,32 @@ productSchema.index({ categories: 1 });
 productSchema.index({ isActive: 1 });
 productSchema.index({ title: 'text', description: 'text' });
 
+// Ensure Maps (attributes, metadata) are converted to plain objects when
+// documents are serialized to JSON or toObject. This makes it safe for the
+// frontend to access fields like attributes.occasions without dealing with
+// Mongoose Map instances.
+productSchema.set('toJSON', {
+  transform: (doc, ret) => {
+    if (ret.attributes && ret.attributes instanceof Map) {
+      ret.attributes = Object.fromEntries(ret.attributes);
+    }
+    if (ret.metadata && ret.metadata instanceof Map) {
+      ret.metadata = Object.fromEntries(ret.metadata);
+    }
+    return ret;
+  }
+});
+
+productSchema.set('toObject', {
+  transform: (doc, ret) => {
+    if (ret.attributes && ret.attributes instanceof Map) {
+      ret.attributes = Object.fromEntries(ret.attributes);
+    }
+    if (ret.metadata && ret.metadata instanceof Map) {
+      ret.metadata = Object.fromEntries(ret.metadata);
+    }
+    return ret;
+  }
+});
+
 export const Product = mongoose.model<IProduct>('Product', productSchema);

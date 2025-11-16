@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductGrid } from "@/components/ui/product-grid";
@@ -30,21 +30,27 @@ export default function NewArrivals() {
   const [products, setProducts] = useState<any[]>([]);
 
   // Load products when category changes
-  useMemo(() => {
+  // useEffect is the correct hook for side-effects (async fetch). useMemo was being used incorrectly before.
+  useEffect(() => {
+    let mounted = true;
     const loadProducts = async () => {
       setIsLoading(true);
       setError(null);
       try {
         const categoryProducts = await getProductsByCategory(selectedCategory);
+        if (!mounted) return;
         setProducts(categoryProducts);
       } catch (err) {
+        if (!mounted) return;
         setError('Failed to load products');
         setProducts([]);
       } finally {
+        if (!mounted) return;
         setIsLoading(false);
       }
     };
     loadProducts();
+    return () => { mounted = false; };
   }, [selectedCategory]);
 
   // Sort the loaded products

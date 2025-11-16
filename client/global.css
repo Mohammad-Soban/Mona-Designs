@@ -192,6 +192,19 @@
   }
 }
 
+/* Utility to ensure anchored headings are visible below the fixed navbar */
+.scroll-offset {
+  scroll-margin-top: 5rem; /* 80px ~= navbar height (h-20) */
+}
+
+/* Shift hero video focal point slightly downward on larger screens so navbar doesn't obscure key content */
+@media (min-width: 768px) {
+  .hero-video-media {
+    /* move the visible center of the video lower (25% from top) */
+    object-position: 50% 25%;
+  }
+}
+
 .bg-gradient-radial {
   background: radial-gradient(circle, var(--tw-gradient-stops));
 }
