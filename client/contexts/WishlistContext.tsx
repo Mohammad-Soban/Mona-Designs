@@ -1,7 +1,7 @@
 import { createContext, useContext, useReducer, ReactNode } from "react";
 
 export interface WishlistItem {
-  id: number;
+  id: string;
   name: string;
   price: string;
   image: string;
@@ -15,7 +15,7 @@ interface WishlistState {
 
 type WishlistAction =
   | { type: "ADD_ITEM"; payload: WishlistItem }
-  | { type: "REMOVE_ITEM"; payload: { id: number } }
+  | { type: "REMOVE_ITEM"; payload: { id: string } }
   | { type: "CLEAR_WISHLIST" };
 
 const wishlistReducer = (state: WishlistState, action: WishlistAction): WishlistState => {
@@ -49,9 +49,9 @@ interface WishlistContextType {
   state: WishlistState;
   wishlistItems: WishlistItem[];
   addItem: (item: WishlistItem) => void;
-  removeItem: (id: number) => void;
+  removeItem: (id: string) => void;
   clearWishlist: () => void;
-  isInWishlist: (id: number) => boolean;
+  isInWishlist: (id: string) => boolean;
   getWishlistCount: () => number;
 }
 
@@ -66,7 +66,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "ADD_ITEM", payload: item });
   };
 
-  const removeItem = (id: number) => {
+  const removeItem = (id: string) => {
     dispatch({ type: "REMOVE_ITEM", payload: { id } });
   };
 
@@ -74,7 +74,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "CLEAR_WISHLIST" });
   };
 
-  const isInWishlist = (id: number) => {
+  const isInWishlist = (id: string) => {
     return state.items.some(item => item.id === id);
   };
 

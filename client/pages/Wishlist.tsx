@@ -34,7 +34,7 @@ export default function Wishlist() {
     }
   }, [wishlistItems.length]);
 
-  const handleRemoveFromWishlist = (productId: number) => {
+  const handleRemoveFromWishlist = (productId: string) => {
     removeItem(productId);
     toast({
       title: "Removed from Wishlist",

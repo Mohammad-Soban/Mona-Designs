@@ -9,7 +9,7 @@ import { usePagination } from "@/hooks/use-pagination";
 import { Pagination } from "@/components/ui/pagination";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: string;
   originalPrice?: string;
@@ -143,7 +143,7 @@ export function ProductGrid({ products, className, showPagination = false, items
                   <span className="text-xs text-muted-foreground">Sizes:</span>
                   {product.sizes.slice(0, 4).map((size, index) => (
                     <Badge key={index} variant="outline" className="text-xs">
-                      {size}
+                      {typeof size === 'string' ? size : (size as any)?.label || 'Unknown'}
                     </Badge>
                   ))}
                   {product.sizes.length > 4 && (

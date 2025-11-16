@@ -157,10 +157,20 @@ export default function Checkout() {
       return false;
     }
 
+    // Ensure payment method is Razorpay
+    if (orderData.paymentMethod !== "razorpay") {
+      toast({
+        title: "Payment Required",
+        description: "You must complete the payment process. No other payment methods are available.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     return true;
   };
 
-  const handleRazorpayPayment = () => {
+  const handleRazorpayPayment = async () => {
     if (!window.Razorpay) {
       toast({
         title: "Payment Error",
@@ -170,61 +180,259 @@ export default function Checkout() {
       return;
     }
 
-    const amount = calculateTotal() * 100; // Razorpay expects amount in paise
+    try {
+      // 1. Create order on server
+      const token = localStorage.getItem("token");
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const options = {
-      key: "rzp_test_1234567890", // Replace with your actual Razorpay key
-      amount: amount,
-      currency: "INR",
-      name: "Mona Designers",
-      description: "Payment for ethnic wear order",
-      image: "/static/images/logo.webp",
-      handler: function (response: any) {
-        // Payment successful
-        console.log("Payment successful:", response);
+      const orderResponse = await fetch("/api/payments/razorpay/create-order", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          amount: calculateTotal(), // Server will convert to paise
+          currency: "INR",
+          receipt: `order_${Date.now()}`,
+          notes: {
+            address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.pincode}`,
+          },
+          orderData: {
+            ...(authState.user?.id && { userId: authState.user.id }),
+            items: cartState.items.map(item => ({
+              productId: item.id.toString(),
+              title: item.name,
+              price: parseInt(item.price.replace(/[₹,]/g, '')),
+              qty: item.quantity,
+              size: item.size,
+              color: item.color,
+              options: item.options,
+            })),
+            shippingAddress: {
+              address: orderData.address,
+              city: orderData.city,
+              state: orderData.state,
+              pincode: orderData.pincode,
+            },
+            billingAddress: {
+              address: orderData.address,
+              city: orderData.city,
+              state: orderData.state,
+              pincode: orderData.pincode,
+            },
+          }
+        }),
+      });
+
+      console.log('Sending order data:', {
+        amount: calculateTotal(),
+        orderData: {
+          ...(authState.user?.id && { userId: authState.user.id }),
+          items: cartState.items.map(item => ({
+            productId: item.id.toString(),
+            title: item.name,
+            price: parseInt(item.price.replace(/[₹,]/g, '')),
+            qty: item.quantity,
+            size: item.size,
+            color: item.color,
+            options: item.options,
+          })),
+          shippingAddress: {
+            address: orderData.address,
+            city: orderData.city,
+            state: orderData.state,
+            pincode: orderData.pincode,
+          },
+          billingAddress: {
+            address: orderData.address,
+            city: orderData.city,
+            state: orderData.state,
+            pincode: orderData.pincode,
+          },
+        }
+      });
+
+      if (!orderResponse.ok) {
+        // Try to parse returned body for debug
+        let errBody: any = null;
+        try {
+          errBody = await orderResponse.json();
+        } catch (e) {
+          errBody = await orderResponse.text();
+        }
+        console.error('Create order failed', orderResponse.status, errBody);
+        setIsProcessing(false);
+        throw new Error(`Failed to create order: ${orderResponse.status} - ${JSON.stringify(errBody)}`);
+      }
+
+      const razorpayOrder = await orderResponse.json();
+
+      // 2. Initialize Razorpay payment
+      console.log('Initializing Razorpay with order:', {
+        orderId: razorpayOrder.id,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        keyId: razorpayOrder.key_id
+      });
+
+      const options = {
+        key: razorpayOrder.key_id, // Key from server
+        amount: razorpayOrder.amount, // Already in paise from server
+        currency: razorpayOrder.currency,
+        name: "Mona Designers",
+        description: "Payment for ethnic wear order",
+        order_id: razorpayOrder.id,
+        image: "", // Remove logo to avoid CORS issues
+        handler: async function (response: any) {
+          try {
+            // 3. Verify payment on server
+            // Verify payment on server (send Authorization only if token exists)
+            const vtoken = localStorage.getItem("token");
+            const vheaders: Record<string, string> = { "Content-Type": "application/json" };
+            if (vtoken) vheaders["Authorization"] = `Bearer ${vtoken}`;
+
+            const verifyResponse = await fetch("/api/payments/razorpay/verify", {
+              method: "POST",
+              headers: vheaders,
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            if (!verifyResponse.ok) {
+              let errBody: any = null;
+              try {
+                errBody = await verifyResponse.json();
+              } catch (e) {
+                errBody = await verifyResponse.text();
+              }
+              console.error('Verify payment failed', verifyResponse.status, errBody);
+              throw new Error(`Payment verification failed: ${verifyResponse.status} - ${JSON.stringify(errBody)}`);
+            }
+
+            const verificationResult = await verifyResponse.json();
+
+            console.log('Payment verification successful:', verificationResult);
+
+            toast({
+              title: "Payment Successful! 🎉",
+              description: `Order ID: ${verificationResult.orderId || 'N/A'}`,
+            });
+
+            // Clear cart from database if user is logged in
+            if (authState.user) {
+              try {
+                await fetch("/api/orders/cart", {
+                  method: "DELETE",
+                  headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                  },
+                });
+                console.log('Cart cleared from database');
+              } catch (error) {
+                console.warn("Failed to clear cart from database:", error);
+              }
+            }
+
+            // Clear cart and redirect
+            clearCart();
+            setIsProcessing(false);
+            navigate("/", { replace: true });
+          } catch (error) {
+            console.error("Payment verification error:", error);
+            toast({
+              title: "Payment Verification Failed",
+              description: "Please contact support with your order ID",
+              variant: "destructive",
+            });
+            setIsProcessing(false);
+          }
+        },
+        prefill: {
+          name: `${orderData.firstName} ${orderData.lastName}`,
+          email: orderData.email,
+          contact: orderData.phone,
+        },
+        notes: {
+          address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.pincode}`,
+        },
+        theme: {
+          color: "#F59E0B", // Gold color
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+          },
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+
+        rzp.on("payment.failed", function (response: any) {
+        console.log("Full payment failure response:", response);
+        console.error("Payment failed with error:", response.error);
+        console.log("Error code:", response.error.code);
+        console.log("Error description:", response.error.description);
+        console.log("Error source:", response.error.source);
+        console.log("Error step:", response.error.step);
+        console.log("Error reason:", response.error.reason);
+
+        // Handle specific error cases
+        let errorMessage = response.error.description || "Payment could not be processed. Please try again.";
+        
+        if (response.error.reason === "international_transaction_not_allowed") {
+          errorMessage = "Please use Indian test cards: 4111 1111 1111 1111 or 5555 5555 5555 4444";
+        }
 
         toast({
-          title: "Payment Successful!",
-          description: `Payment ID: ${response.razorpay_payment_id}`,
+          title: "Payment Failed",
+          description: errorMessage,
+          variant: "destructive",
         });
+        setIsProcessing(false);
 
-        // Clear cart and redirect
-        clearCart();
-        navigate("/", { replace: true });
-      },
-      prefill: {
-        name: `${orderData.firstName} ${orderData.lastName}`,
-        email: orderData.email,
-        contact: orderData.phone,
-      },
-      notes: {
-        address: `${orderData.address}, ${orderData.city}, ${orderData.state} - ${orderData.pincode}`,
-      },
-      theme: {
-        color: "#F59E0B", // Gold color
-      },
-      modal: {
-        ondismiss: function () {
-          setIsProcessing(false);
-        },
-      },
-    };
+        // Send detailed failure payload to server for debugging
+        try {
+          fetch('/api/debug/log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'razorpay_payment_failed',
+              error: {
+                code: response.error.code,
+                description: response.error.description,
+                source: response.error.source,
+                step: response.error.step,
+                reason: response.error.reason
+              },
+              orderDetails: {
+                amount: calculateTotal(),
+                receipt: `order_${Date.now()}`,
+                currency: 'INR'
+              },
+              metadata: {
+                userAgent: window.navigator.userAgent,
+                timestamp: new Date().toISOString()
+              }
+            }),
+          }).catch((e) => console.warn('Failed to send debug log:', e));
+        } catch (e) {
+          console.warn('Debug log error:', e);
+        }
+      });
 
-    const rzp = new window.Razorpay(options);
-
-    rzp.on("payment.failed", function (response: any) {
-      console.error("Payment failed:", response.error);
+      rzp.open();
+    } catch (error) {
+      console.error("Payment error:", error);
       toast({
-        title: "Payment Failed",
-        description:
-          response.error.description ||
-          "Payment could not be processed. Please try again.",
+        title: "Payment Error",
+        description: "Could not process payment. Please try again.",
         variant: "destructive",
       });
       setIsProcessing(false);
-    });
-
-    rzp.open();
+      return;
+    }
   };
 
   const handleSubmitOrder = (e?: React.FormEvent) => {
@@ -238,21 +446,8 @@ export default function Checkout() {
 
     setIsProcessing(true);
 
-    // Simulate order creation API call
-    setTimeout(() => {
-      if (orderData.paymentMethod === "razorpay") {
-        handleRazorpayPayment();
-      } else {
-        // Handle other payment methods (COD, etc.)
-        toast({
-          title: "Order Placed",
-          description: "Your order has been placed successfully!",
-        });
-        clearCart();
-        navigate("/", { replace: true });
-        setIsProcessing(false);
-      }
-    }, 1000);
+    // Always use Razorpay payment - no other options
+    handleRazorpayPayment();
   };
 
   if (cartState.items.length === 0) {
@@ -433,6 +628,7 @@ export default function Checkout() {
                           handleInputChange("paymentMethod", e.target.value)
                         }
                         className="text-gold"
+                        disabled={true}
                       />
                       <Label
                         htmlFor="razorpay"
@@ -440,7 +636,7 @@ export default function Checkout() {
                       >
                         <div className="flex items-center justify-between">
                           <span className="font-medium">
-                            Online Payment (Recommended)
+                            Online Payment (Required)
                           </span>
                           <div className="flex items-center space-x-1">
                             <Shield className="h-4 w-4 text-green-600" />
@@ -452,6 +648,11 @@ export default function Checkout() {
                         <p className="text-sm text-muted-foreground mt-1">
                           Pay securely with UPI, Cards, NetBanking & Wallets
                         </p>
+                        {process.env.NODE_ENV === 'development' && (
+                          <p className="text-xs text-yellow-600 mt-1 font-medium">
+                            ⚠️ Payment is mandatory - Use test cards provided below
+                          </p>
+                        )}
                       </Label>
                     </div>
                   </div>
@@ -544,6 +745,48 @@ export default function Checkout() {
                 <p className="text-xs text-muted-foreground text-center">
                   Your payment information is secure and encrypted
                 </p>
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="flex items-center mb-3">
+                      <div className="text-yellow-600 mr-2">⚠️</div>
+                      <p className="text-sm font-semibold text-yellow-800">Development Mode - Payment Required</p>
+                    </div>
+                    <p className="text-xs text-yellow-700 mb-3">
+                      You must complete the payment process using the test cards below. No skipping allowed!
+                    </p>
+                    <div className="space-y-3">
+                      <div className="p-3 bg-green-50 border border-green-200 rounded">
+                        <p className="text-sm font-semibold text-green-800 mb-2">✅ INDIAN TEST CARDS (Use These):</p>
+                        <div className="text-sm space-y-1 text-green-700">
+                          <p><strong>Visa:</strong> 4111 1111 1111 1111</p>
+                          <p><strong>Mastercard:</strong> 5555 5555 5555 4444</p>
+                          <p><strong>Expiry:</strong> 12/25 (or any future date)</p>
+                          <p><strong>CVV:</strong> 123 (or any 3 digits)</p>
+                          <p><strong>OTP:</strong> 1111</p>
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 bg-blue-50 border border-blue-200 rounded">
+                        <p className="text-sm font-semibold text-blue-800 mb-2">💳 More Indian Test Cards:</p>
+                        <div className="text-sm space-y-1 text-blue-700">
+                          <p>• <strong>Visa:</strong> 4000 0000 0000 0002</p>
+                          <p>• <strong>RuPay:</strong> 6073 0000 0000 0000</p>
+                          <p>• <strong>UPI:</strong> Use UPI option instead</p>
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-purple-50 border border-purple-200 rounded">
+                        <p className="text-sm font-semibold text-purple-800 mb-2">📱 UPI Payment (Recommended):</p>
+                        <div className="text-sm space-y-1 text-purple-700">
+                          <p>• Select <strong>UPI</strong> option in Razorpay</p>
+                          <p>• Use any UPI ID: <strong>test@paytm</strong></p>
+                          <p>• Or use: <strong>test@upi</strong></p>
+                          <p>• This works better than cards for testing</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
