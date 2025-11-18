@@ -1,0 +1,160 @@
+Requirements and Environment Variables (Mona-Designs backend)
+
+Overview
+This file lists the packages, environment variables, third-party services, and exact steps to acquire required credentials (Razorpay, MongoDB, Cloudinary) for a cost-efficient MERN backend.
+
+1) Node / TypeScript packages
+- runtime dependencies (npm install --save):
+  - express
+  - mongoose
+  - dotenv
+  - bcryptjs
+  - jsonwebtoken
+  - cors
+  - helmet
+  - morgan
+  - razorpay
+  - cloudinary
+  - multer
+  - express-rate-limit
+  - cookie-parser
+  - axios (optional)
+
+- TypeScript + dev dependencies (npm install --save-dev):
+  - typescript
+  - ts-node-dev
+  - @types/express
+  - @types/node
+  - @types/cors
+  - @types/jsonwebtoken
+  - @types/multer
+  - vitest (or jest) + @types for testing if needed
+  - zod (or express-validator) for validation
+  - eslint + prettier (optional)
+
+2) Environment variables (.env)
+Create a `.env` file at server root (do NOT commit). Required variables:
+
+- PORT=8080
+- NODE_ENV=development
+
+- MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/<dbname>?retryWrites=true&w=majority
+  - Use MongoDB Atlas free tier. Replace placeholders with your credentials.
+
+- JWT_SECRET=super-secret-long-random-string
+- JWT_EXPIRES_IN=1h
+- REFRESH_TOKEN_SECRET=another-secret (optional)
+
+- RAZORPAY_KEY_ID=rzp_test_xxx
+- RAZORPAY_KEY_SECRET=rzp_test_yyy
+- RAZORPAY_WEBHOOK_SECRET=some-webhook-secret (for verifying webhooks)
+
+- CLOUDINARY_CLOUD_NAME=your_cloud_name
+- CLOUDINARY_API_KEY=your_cloudinary_key
+- CLOUDINARY_API_SECRET=your_cloudinary_secret
+
+- ADMIN_INIT_EMAIL=you@example.com (optional seed admin)
+- ADMIN_INIT_PASSWORD=ChangeMe123!
+
+- FRONTEND_URL=http://localhost:5173 (or the deployed Netlify/Vercel URL)
+
+3) Razorpay account setup (test keys)
+- Create a Razorpay account at https://razorpay.com
+- Go to Dashboard -> Settings -> API Keys -> Generate test keypair
+- Copy Key ID -> set as RAZORPAY_KEY_ID
+- Copy Key Secret -> set as RAZORPAY_KEY_SECRET
+- For webhooks, create a webhook in Razorpay dashboard using your server URL and generate a webhook secret -> set RAZORPAY_WEBHOOK_SECRET
+- Use the test keys for end-to-end testing in sandbox mode.
+
+4) MongoDB Atlas setup
+- Create free-tier cluster (M0) at https://www.mongodb.com/cloud/atlas
+- Create a database user with password and whitelist your IP or allow access from anywhere (0.0.0.0/0) during dev.
+- Copy connection string and set as MONGO_URI.
+
+5) Cloudinary setup (images)
+- Create free account at https://cloudinary.com/
+- Get CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET from dashboard -> Account Details.
+- Use Cloudinary SDK to upload images server-side; store returned url and public_id in the product document.
+- Alternative (zero-cost): allow admins to paste external image URLs in the admin UI and avoid storage and transformation costs.
+
+6) Hosting (cost-efficient)
+- Backend: Railway.app or Render.com (free tier) — both support environment variables and easy deploy from GitHub. Choose the one with the best free-credit terms at the time.
+- Frontend: already configured for Netlify (see netlify.toml). Netlify has a free tier for static sites.
+- Database: MongoDB Atlas free tier.
+- Images: Cloudinary free tier (or external URLs for true zero-cost).
+
+7) Exact npm install commands (recommended)
+- In `server/` folder run:
+
+  npm init -y
+  npm install express mongoose dotenv bcryptjs jsonwebtoken cors helmet morgan razorpay cloudinary multer express-rate-limit cookie-parser axios
+  npm install -D typescript ts-node-dev @types/node @types/express @types/cors @types/jsonwebtoken @types/multer vitest zod eslint prettier
+
+- Add a `tsconfig.json` with target ES2020 and moduleResolution node, plus outDir build if building.
+- Add `scripts` in package.json:
+  - "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+  - "build": "tsc"
+  - "start": "node build/index.js"
+  - "test": "vitest"
+
+8) Security checklist
+- Never commit `.env` or keys.
+- Use HTTPS in production and enable CORS only for your frontend origin.
+- Store secrets in provider secret manager (Render/Railway/Netlify/Heroku) in production.
+
+9) Migration & seeding
+- Provide a small seed script in `server/scripts/seedAdmin.ts` that creates an admin user if not present using `ADMIN_INIT_EMAIL` and `ADMIN_INIT_PASSWORD`.
+
+10) Recommended files & folders (server)
+- server/
+  - src/
+    - index.ts (express bootstrap)
+    - config/
+      - db.ts
+      - cloudinary.ts
+      - razorpay.ts
+    - models/
+      - User.ts
+      - Product.ts
+      - Order.ts
+      - Cart.ts
+      - Payment.ts
+    - controllers/
+      - auth.ts
+      - products.ts
+      - adminProducts.ts
+      - orders.ts
+      - payments.ts
+    - routes/
+      - auth.ts
+      - products.ts
+      - admin.ts
+      - orders.ts
+      - payments.ts
+    - middleware/
+      - auth.ts
+      - errorHandler.ts
+      - validate.ts
+    - utils/
+      - calcPrices.ts
+      - idGen.ts
+    - scripts/
+      - seedAdmin.ts
+
+11) Testing
+- Add a few Vitest tests for:
+  - Auth: register/login happy path + invalid credentials
+  - Product CRUD: create&read (admin-only) using an in-memory MongoDB instance (mongodb-memory-server)
+  - Razorpay signature verify logic (unit test the HMAC compare)
+
+12) Example Razorpay signature verification (pseudocode)
+- server receives { razorpay_order_id, razorpay_payment_id, razorpay_signature }
+- const generated = crypto.createHmac('sha256', RAZORPAY_KEY_SECRET).update(razorpay_order_id + '|' + razorpay_payment_id).digest('hex')
+- compare generated === razorpay_signature
+
+Final notes
+- After you confirm the plan, I can:
+  1) scan the `client/` code to map exact request/response shapes and update the plan if needed.
+  2) scaffold the `server/` with TypeScript, a minimal set of routes and models, and a working Razorpay test integration.
+
+If you'd like me to implement the backend now, say "scaffold backend" and I'll start by mapping frontend needs and creating the server skeleton.

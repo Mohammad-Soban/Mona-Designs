@@ -34,7 +34,7 @@ export default function Wishlist() {
     }
   }, [wishlistItems.length]);
 
-  const handleRemoveFromWishlist = (productId: number) => {
+  const handleRemoveFromWishlist = (productId: string) => {
     removeItem(productId);
     toast({
       title: "Removed from Wishlist",
@@ -108,7 +108,7 @@ export default function Wishlist() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <SectionWrapper variant="hero" padding="lg">
+      <SectionWrapper variant="hero" padding="lg" className="-mt-20 pt-32">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <Badge variant="outline" className="mb-4 bg-red-50 border-red-200 text-red-600 dark:bg-red-950/50 dark:border-red-800 dark:text-red-400">

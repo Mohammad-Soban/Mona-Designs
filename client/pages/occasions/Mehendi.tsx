@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductGrid } from "@/components/ui/product-grid";
 import {
   allProducts,
-  getProductsByCategory,
+  getProductsByOccasion,
   sortProducts,
 } from "@/data/products";
 import { ChevronDown } from "lucide-react";
@@ -23,11 +23,31 @@ const categories = ["All", "Kurtas", "Lehengas", "Suits", "Sherwanis"];
 export default function Mehendi() {
   const [sortBy, setSortBy] = useState("featured");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await getProductsByOccasion("mehendi", {
+          category: selectedCategory !== "All" ? selectedCategory.toLowerCase() : undefined
+        });
+        setProducts(data);
+      } catch (error) {
+        console.error('Error fetching mehendi products:', error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [selectedCategory]);
 
   const mehendiProducts = useMemo(() => {
-    const categoryProducts = getProductsByCategory(selectedCategory);
-    return categoryProducts;
-  }, [selectedCategory]);
+    return products;
+  }, [products]);
 
   const filteredAndSortedProducts = useMemo(() => {
     return sortProducts(mehendiProducts, sortBy);
@@ -44,7 +64,7 @@ export default function Mehendi() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-64 bg-gradient-to-r from-green-500/90 to-emerald-600/90 flex items-center mt-20">
+      <section className="relative h-64 bg-gradient-to-r from-green-500/90 to-emerald-600/90 flex items-center -mt-20 pt-32">
         <div className="absolute inset-0 bg-gradient-to-br from-green-600/20 to-teal-600/20" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
@@ -76,11 +96,6 @@ export default function Mehendi() {
                 )}
               >
                 {category}
-                <Badge variant="secondary" className="ml-2 text-xs">
-                  {category === "All"
-                    ? mehendiProducts.length
-                    : getProductsByCategory(category).length}
-                </Badge>
               </button>
             ))}
           </div>

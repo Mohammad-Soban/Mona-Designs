@@ -67,7 +67,7 @@ export default function SizeGuide() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <SectionWrapper variant="hero" padding="lg">
+      <SectionWrapper variant="hero" padding="lg" className="-mt-20 pt-32">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <Badge variant="outline" className="mb-4 bg-gold/10 border-gold/30 text-gold">

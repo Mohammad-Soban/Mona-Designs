@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -40,20 +42,55 @@ import { cn } from "@/lib/utils";
 import { SectionWrapper } from "@/components/ui/section-wrapper";
 
 interface Product {
-  id: number;
+  _id?: string;
+  id: string;
   name: string;
+  title?: string;
   category: string;
   price: string;
   stock: number;
   status: "In Stock" | "Low Stock" | "Out of Stock";
   sales: number;
   rating: number;
+  description?: string;
+  categories?: Array<{name: string; rank: number}>;
+  attributes?: {
+    fabric?: string;
+    occasion?: string;
+    fit?: string;
+    careInstructions?: string;
+    keyFeatures?: string[];
+    whatsIncluded?: string[];
+  };
+  sizes?: Array<{label: string; qty: number}>;
+  colors?: Array<{label: string; hex: string}>;
+}
+
+interface NewProduct {
+  name: string;
+  category: string;
+  price: string;
+  stock: string;
+  description: string;
+  fabric: string;
+  occasion: string;
+  sizes: string;
+  colors: string;
+  keyFeatures: string[];
+  whatsIncluded: string[];
+  fit: string;
+  careInstructions: string;
 }
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("analytics");
   const [showAddProduct, setShowAddProduct] = useState(false);
-  const [newProduct, setNewProduct] = useState({
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [newProduct, setNewProduct] = useState<NewProduct>({
     name: "",
     category: "",
     price: "",
@@ -69,120 +106,513 @@ const AdminDashboard = () => {
     careInstructions: ""
   });
 
-  // Mock data for admin dashboard
-  const stats = [
+  const [stats, setStats] = useState([
     {
       title: "Total Revenue",
-      value: "₹2,45,670",
-      change: "+12.5%",
+      value: "₹0",
+      change: "0%",
       icon: IndianRupee,
       trend: "up",
       description: "This month"
     },
     {
       title: "Total Orders",
-      value: "156",
-      change: "+8.2%",
+      value: "0",
+      change: "0%",
       icon: ShoppingCart,
       trend: "up",
       description: "This month"
     },
     {
       title: "Total Products",
-      value: "89",
-      change: "+3.1%",
+      value: "0",
+      change: "0%",
       icon: Package,
       trend: "up",
       description: "Active products"
     },
     {
       title: "Active Users",
-      value: "1,234",
-      change: "+15.3%",
+      value: "0",
+      change: "0%",
       icon: Users,
       trend: "up",
       description: "This month"
     }
-  ];
+  ]);
 
-  const analyticsData = [
-    { month: "Jan", revenue: 45000, orders: 32 },
-    { month: "Feb", revenue: 52000, orders: 38 },
-    { month: "Mar", revenue: 48000, orders: 35 },
-    { month: "Apr", revenue: 61000, orders: 42 },
-    { month: "May", revenue: 55000, orders: 39 },
-    { month: "Jun", revenue: 67000, orders: 45 }
-  ];
+  // State for analytics data
+  const [analyticsData, setAnalyticsData] = useState<Array<{month: string; revenue: number; orders: number}>>([]);
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true);
 
-  const mockProducts: Product[] = [
-    {
-      id: 1,
-      name: "Royal Blue Silk Sherwani",
-      category: "Sherwanis",
-      price: "₹12,999",
-      stock: 15,
-      status: "In Stock",
-      sales: 24,
-      rating: 4.8
-    },
-    {
-      id: 2,
-      name: "Maroon Velvet Sherwani",
-      category: "Sherwanis",
-      price: "₹14,999",
-      stock: 3,
-      status: "Low Stock",
-      sales: 18,
-      rating: 4.9
-    },
-    {
-      id: 3,
-      name: "Ivory Cotton Kurta Set",
-      category: "Kurtas",
-      price: "₹2,999",
-      stock: 0,
-      status: "Out of Stock",
-      sales: 45,
-      rating: 4.7
-    },
-    {
-      id: 4,
-      name: "Navy Blue Silk Kurta",
-      category: "Kurtas",
-      price: "₹3,499",
-      stock: 22,
-      status: "In Stock",
-      sales: 32,
-      rating: 4.6
+  /**
+   * Fetch monthly analytics data from the server
+   * Retrieves the last 6 months of revenue and order statistics
+   */
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        setIsLoadingAnalytics(true);
+        const response = await fetch('/api/orders/analytics', {
+          headers: {
+            'Authorization': `Bearer ${sessionStorage.getItem('mona-admin-token')}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            setAnalyticsData(data.data);
+          }
+        } else {
+          console.warn('Failed to fetch analytics data');
+        }
+      } catch (error) {
+        console.error('Error fetching analytics:', error);
+      } finally {
+        setIsLoadingAnalytics(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, []);
+
+  /**
+   * Fetch comprehensive dashboard statistics
+   * Fetches products, orders, and user counts with month-over-month growth
+   */
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Fetch products count first as it's the most important
+        const productsRes = await fetch('/api/products?count=true', {
+          headers: {
+            'Authorization': `Bearer ${sessionStorage.getItem('mona-admin-token')}`
+          }
+        });
+
+        let ordersData = { totalRevenue: 0, totalOrders: 0, revenueChange: 0, ordersChange: 0 };
+        let productsData = { total: 0, change: 0 };
+        let usersData = { totalUsers: 0, userChange: 0 };
+
+        // Get products data
+        if (productsRes.ok) {
+          productsData = await productsRes.json();
+        }
+
+        // Try to fetch orders stats
+        try {
+          const ordersRes = await fetch('/api/orders/stats', {
+            headers: {
+              'Authorization': `Bearer ${sessionStorage.getItem('mona-admin-token')}`
+            }
+          });
+          if (ordersRes.ok) {
+            ordersData = await ordersRes.json();
+          }
+        } catch (error) {
+          console.warn('Orders stats not available yet');
+        }
+
+        // Try to fetch users stats
+        try {
+          const usersRes = await fetch('/api/users/stats', {
+            headers: {
+              'Authorization': `Bearer ${sessionStorage.getItem('mona-admin-token')}`
+            }
+          });
+          if (usersRes.ok) {
+            usersData = await usersRes.json();
+          }
+        } catch (error) {
+          console.warn('Users stats not available yet');
+        }
+
+        setStats([
+          {
+            title: "Total Revenue",
+            value: `₹${ordersData.totalRevenue?.toLocaleString('en-IN') || '0'}`,
+            change: `${ordersData.revenueChange || '0'}%`,
+            icon: IndianRupee,
+            trend: ordersData.revenueChange >= 0 ? "up" : "down",
+            description: "This month"
+          },
+          {
+            title: "Total Orders",
+            value: ordersData.totalOrders?.toString() || '0',
+            change: `${ordersData.ordersChange || '0'}%`,
+            icon: ShoppingCart,
+            trend: ordersData.ordersChange >= 0 ? "up" : "down",
+            description: "This month"
+          },
+          {
+            title: "Total Products",
+            value: productsData.total?.toString() || '0',
+            change: `${productsData.change || '0'}%`,
+            icon: Package,
+            trend: productsData.change >= 0 ? "up" : "down",
+            description: "Active products"
+          },
+          {
+            title: "Active Users",
+            value: usersData.totalUsers?.toString() || '0',
+            change: `${usersData.userChange || '0'}%`,
+            icon: Users,
+            trend: usersData.userChange >= 0 ? "up" : "down",
+            description: "This month"
+          }
+        ]);
+      } catch (err) {
+        console.error('Error fetching stats:', err);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/products', {
+        headers: {
+          'Authorization': `Bearer ${sessionStorage.getItem('mona-admin-token')}`
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setProducts(data.products.map((p: any) => ({
+          id: p._id,
+          name: p.title,
+          category: p.categories[0]?.name || 'Uncategorized',
+          price: `₹${p.price.toLocaleString('en-IN')}`,
+          stock: p.stock,
+          status: p.stock > 10 ? "In Stock" : p.stock > 0 ? "Low Stock" : "Out of Stock",
+          sales: p.metadata?.sales || 0,
+          rating: p.metadata?.rating || 0
+        })));
+      } else {
+        setError('Failed to fetch products');
+      }
+    } catch (err) {
+      setError('Error connecting to server');
+      console.error('Error fetching products:', err);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
-  const recentOrders = [
-    { id: "ORD001", customer: "Rajesh Kumar", amount: "₹12,999", status: "Processing", date: "2024-01-20" },
-    { id: "ORD002", customer: "Priya Sharma", amount: "₹8,999", status: "Shipped", date: "2024-01-19" },
-    { id: "ORD003", customer: "Amit Patel", amount: "₹5,498", status: "Delivered", date: "2024-01-18" },
-    { id: "ORD004", customer: "Sneha Reddy", amount: "₹15,999", status: "Processing", date: "2024-01-17" }
-  ];
+  // State for recent orders
+  interface RecentOrder {
+    id: string;
+    customer: string;
+    amount: string;
+    status: string;
+    date: string;
+  }
+  
+  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(true);
 
-  const handleAddProduct = () => {
-    // In a real app, this would send data to the backend
-    console.log("Adding product:", newProduct);
-    setShowAddProduct(false);
-    setNewProduct({
-      name: "",
-      category: "",
-      price: "",
-      stock: "",
-      description: "",
-      fabric: "",
-      occasion: "",
-      sizes: "",
-      colors: "",
-      keyFeatures: ["", "", "", "", ""],
-      whatsIncluded: ["", "", "", ""],
-      fit: "",
-      careInstructions: ""
-    });
+  /**
+   * Fetch recent orders for the dashboard
+   * Retrieves the last 10 orders from the database
+   */
+  useEffect(() => {
+    const fetchRecentOrders = async () => {
+      try {
+        setIsLoadingOrders(true);
+        const response = await fetch('/api/orders/recent?limit=10', {
+          headers: {
+            'Authorization': `Bearer ${sessionStorage.getItem('mona-admin-token')}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.orders) {
+            setRecentOrders(data.orders);
+          }
+        } else {
+          console.warn('Failed to fetch recent orders');
+        }
+      } catch (error) {
+        console.error('Error fetching recent orders:', error);
+      } finally {
+        setIsLoadingOrders(false);
+      }
+    };
+
+    fetchRecentOrders();
+  }, []);
+
+  // Product CRUD helper functions
+  const viewProduct = async (id: string) => {
+    try {
+      const response = await fetch(`/api/products/${id}`);
+      const data = await response.json();
+      if (data.success) {
+        setSelectedProduct(data.product);
+      } else {
+        setError('Failed to fetch product details');
+      }
+    } catch (err) {
+      console.error('Error fetching product:', err);
+      setError('Error fetching product details');
+    }
+  };
+
+  const editProduct = async (id: string) => {
+    try {
+      const response = await fetch(`/api/products/${id}`);
+      const data = await response.json();
+      if (data.success) {
+        const product = data.product;
+        setNewProduct({
+          name: product.title,
+          category: product.categories[0]?.name || '',
+          price: `₹${product.price.toLocaleString('en-IN')}`,
+          stock: product.stock.toString(),
+          description: product.description,
+          fabric: product.attributes?.fabric || '',
+          occasion: Array.isArray(product.attributes?.occasions) 
+            ? product.attributes.occasions.join(', ') 
+            : (product.attributes?.occasion || ''),
+          sizes: product.sizes?.map((s: any) => s.label).join(', ') || '',
+          colors: product.colors?.map((c: any) => c.label).join(', ') || '',
+          keyFeatures: product.attributes?.keyFeatures || ['', '', '', '', ''],
+          whatsIncluded: product.attributes?.whatsIncluded || ['', '', '', ''],
+          fit: product.attributes?.fit || '',
+          careInstructions: product.attributes?.careInstructions || ''
+        });
+        setSelectedProduct(product);
+        setIsEditing(true);
+        setShowAddProduct(true);
+      } else {
+        setError('Failed to fetch product details');
+      }
+    } catch (err) {
+      console.error('Error fetching product:', err);
+      setError('Error fetching product details');
+    }
+  };
+
+  const updateProduct = async () => {
+    try {
+      // Price in rupees (no conversion needed)
+      const priceInRupees = Math.round(parseFloat(newProduct.price.replace(/[^0-9.]/g, '')));
+      
+      const productData = {
+        title: newProduct.name,
+        description: newProduct.description || `${newProduct.name} - ${newProduct.category}`,
+        price: priceInRupees,
+        stock: parseInt(newProduct.stock),
+        categories: [{
+          name: newProduct.category.toLowerCase(),
+          rank: 1
+        }],
+        tags: [newProduct.category.toLowerCase()],
+        sizes: newProduct.sizes.split(',').map(size => ({
+          label: size.trim(),
+          qty: parseInt(newProduct.stock)
+        })),
+        colors: newProduct.colors.split(',').map(color => ({
+          label: color.trim(),
+          hex: '#000000'
+        })),
+        attributes: {
+          fabric: newProduct.fabric,
+          occasions: newProduct.occasion ? newProduct.occasion.split(',').map(o => o.trim()).filter(o => o) : [],
+          fit: newProduct.fit,
+          careInstructions: newProduct.careInstructions,
+          keyFeatures: newProduct.keyFeatures.filter(f => f.trim()),
+          whatsIncluded: newProduct.whatsIncluded.filter(i => i.trim())
+        },
+        isActive: true
+      };
+
+      const response = await fetch(`/api/products/${selectedProduct._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(productData)
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        await fetchProducts();
+        setShowAddProduct(false);
+        setIsEditing(false);
+        setSelectedProduct(null);
+        setNewProduct({
+          name: "",
+          category: "",
+          price: "",
+          stock: "",
+          description: "",
+          fabric: "",
+          occasion: "",
+          sizes: "",
+          colors: "",
+          keyFeatures: ["", "", "", "", ""],
+          whatsIncluded: ["", "", "", ""],
+          fit: "",
+          careInstructions: ""
+        });
+      } else {
+        setError(data.message || 'Failed to update product');
+      }
+    } catch (err) {
+      console.error('Error updating product:', err);
+      setError('Error updating product');
+    }
+  };
+
+  const deleteProduct = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/products/${id}`, {
+        method: 'DELETE'
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        await fetchProducts();
+      } else {
+        setError(data.message || 'Failed to delete product');
+      }
+    } catch (err) {
+      console.error('Error deleting product:', err);
+      setError('Error deleting product');
+    }
+  };
+
+  // Product add handler
+  const { toast } = useToast();
+
+  const handleAddProduct = async () => {
+    try {
+      setError(null); // Clear any previous errors
+      
+      // Price in rupees (no conversion needed)
+      const priceInRupees = Math.round(parseFloat(newProduct.price.replace(/[^0-9.]/g, '')));
+      
+      // Validate required fields first
+      if (!newProduct.name || !newProduct.price || !newProduct.stock || !newProduct.category) {
+        setError('Please fill in all required fields: Name, Price, Stock, and Category');
+        return;
+      }
+
+      // Get auth token
+      const token = sessionStorage.getItem('mona-admin-token');
+      if (!token) {
+        setError('Please log in again to continue');
+        sessionStorage.removeItem('mona-admin-auth');
+        window.location.reload();
+        return;
+      }
+      
+      // Prepare the product data
+      const productData = {
+        title: newProduct.name,
+        description: newProduct.description || `${newProduct.name} - ${newProduct.category}`, // Fallback description
+        price: priceInRupees,
+        stock: parseInt(newProduct.stock),
+        categories: [{
+          name: newProduct.category.toLowerCase(),
+          rank: 1
+        }],
+        tags: [newProduct.category.toLowerCase()],
+        sizes: newProduct.sizes ? newProduct.sizes.split(',').map(size => ({
+          label: size.trim(),
+          qty: parseInt(newProduct.stock)
+        })) : [],
+        colors: newProduct.colors ? newProduct.colors.split(',').map(color => ({
+          label: color.trim(),
+          hex: '#000000' // You might want to add a color picker in the UI
+        })) : [],
+        attributes: {
+          fabric: newProduct.fabric || '',
+          occasions: newProduct.occasion ? newProduct.occasion.split(',').map(o => o.trim()).filter(o => o) : [],
+          fit: newProduct.fit || '',
+          careInstructions: newProduct.careInstructions || '',
+          keyFeatures: newProduct.keyFeatures.filter(f => f.trim()),
+          whatsIncluded: newProduct.whatsIncluded.filter(i => i.trim())
+        },
+        isActive: true,
+        metadata: {
+          sales: 0,
+          rating: 0
+        }
+      };
+
+      // Send the request with timeout
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+      const response = await fetch('/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(productData),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setError('Your session has expired. Please log in again.');
+          sessionStorage.removeItem('mona-admin-auth');
+          window.location.reload();
+          return;
+        }
+        const errorData = await response.json();
+        setError(errorData.message || 'Failed to save product');
+        return;
+      }
+
+      const data = await response.json();
+      await fetchProducts(); // Refresh products list
+      setShowAddProduct(false); // Close form
+      setNewProduct({
+        name: '',
+        description: '',
+        price: '',
+        stock: '',
+        category: '',
+        sizes: '',
+        colors: '',
+        fabric: '',
+        occasion: '',
+        fit: '',
+        careInstructions: '',
+        keyFeatures: ["", "", "", "", ""],
+        whatsIncluded: ["", "", "", ""]
+      });
+      toast({
+        title: "Success!",
+        description: "Product added successfully"
+      });
+
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        setError('Request timed out. Please try again.');
+      } else {
+        setError(err.message || 'Failed to save product');
+      }
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -310,17 +740,52 @@ const AdminDashboard = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <LineChart className="h-5 w-5 text-gold" />
-                      <span>Revenue Trends</span>
+                      <span>Revenue Trends (Last 6 Months)</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="h-64 flex items-center justify-center bg-muted/30 rounded-lg">
-                      <div className="text-center">
-                        <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-muted-foreground">Revenue chart would be here</p>
-                        <p className="text-sm text-muted-foreground">Integrate with Chart.js or Recharts</p>
+                    {isLoadingAnalytics ? (
+                      <div className="h-64 flex items-center justify-center">
+                        <div className="text-center">
+                          <Activity className="h-12 w-12 text-gold animate-pulse mx-auto mb-2" />
+                          <p className="text-muted-foreground">Loading analytics...</p>
+                        </div>
                       </div>
-                    </div>
+                    ) : analyticsData.length > 0 ? (
+                      <div className="space-y-4">
+                        {analyticsData.map((data, index) => (
+                          <div key={index} className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="font-medium">{data.month}</span>
+                              <div className="text-right">
+                                <div className="font-bold text-gold">
+                                  ₹{data.revenue.toLocaleString('en-IN')}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {data.orders} orders
+                                </div>
+                              </div>
+                            </div>
+                            <div className="w-full bg-muted rounded-full h-2">
+                              <div 
+                                className="bg-gradient-to-r from-gold to-amber-500 h-2 rounded-full transition-all duration-500"
+                                style={{ 
+                                  width: `${Math.min((data.revenue / Math.max(...analyticsData.map(d => d.revenue))) * 100, 100)}%` 
+                                }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="h-64 flex items-center justify-center bg-muted/30 rounded-lg">
+                        <div className="text-center">
+                          <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+                          <p className="text-muted-foreground">No analytics data available</p>
+                          <p className="text-sm text-muted-foreground">Data will appear as orders are placed</p>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
@@ -372,13 +837,28 @@ const AdminDashboard = () => {
                 <Card className="border-gold/30">
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
-                      <span>Add New Product</span>
-                      <Button variant="ghost" size="sm" onClick={() => setShowAddProduct(false)}>
+                      <span>{isEditing ? 'Edit Product' : 'Add New Product'}</span>
+                      <Button variant="ghost" size="sm" onClick={() => {
+                        setShowAddProduct(false);
+                        setIsEditing(false);
+                        setError(null);
+                      }}>
                         <X className="h-4 w-4" />
                       </Button>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    {error && (
+                      <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                        <div className="flex items-start">
+                          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 mr-3 flex-shrink-0" />
+                          <div>
+                            <h4 className="font-semibold text-red-800 dark:text-red-300">Error</h4>
+                            <p className="text-sm text-red-700 dark:text-red-400 mt-1">{error}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="name">Product Name</Label>
@@ -432,12 +912,12 @@ const AdminDashboard = () => {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="occasion">Occasion</Label>
+                        <Label htmlFor="occasion">Occasions (comma-separated)</Label>
                         <Input
                           id="occasion"
                           value={newProduct.occasion}
                           onChange={(e) => setNewProduct({...newProduct, occasion: e.target.value})}
-                          placeholder="e.g., Wedding, Festival"
+                          placeholder="e.g., Wedding, Reception, Festival"
                         />
                       </div>
                       <div>
@@ -532,9 +1012,12 @@ const AdminDashboard = () => {
                     </div>
 
                     <div className="flex space-x-2">
-                      <Button onClick={handleAddProduct} className="bg-gold hover:bg-gold/90">
+                      <Button 
+                        onClick={isEditing ? updateProduct : handleAddProduct} 
+                        className="bg-gold hover:bg-gold/90"
+                      >
                         <Save className="h-4 w-4 mr-2" />
-                        Save Product
+                        {isEditing ? 'Update Product' : 'Save Product'}
                       </Button>
                       <Button variant="outline" onClick={() => setShowAddProduct(false)}>
                         Cancel
@@ -550,7 +1033,7 @@ const AdminDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {mockProducts.map((product) => (
+                    {products.map((product) => (
                       <div key={product.id} className="border rounded-lg hover:shadow-md transition-all">
                         {/* Desktop Layout */}
                         <div className="hidden md:flex items-center justify-between p-4">
@@ -575,13 +1058,25 @@ const AdminDashboard = () => {
                               {product.status}
                             </Badge>
                             <div className="flex items-center space-x-2">
-                              <Button variant="ghost" size="sm">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => viewProduct(product.id)}
+                              >
                                 <Eye className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="sm">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => editProduct(product.id)}
+                              >
                                 <Edit className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="sm">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => deleteProduct(product.id)}
+                              >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
@@ -676,7 +1171,7 @@ const AdminDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {mockProducts.map((product) => (
+                    {products.map((product) => (
                       <div key={product.id} className="border rounded-lg">
                         {/* Desktop Layout */}
                         <div className="hidden md:flex items-center justify-between p-4">
@@ -757,8 +1252,16 @@ const AdminDashboard = () => {
                   <CardTitle>Recent Orders</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {recentOrders.map((order) => (
+                  {isLoadingOrders ? (
+                    <div className="flex items-center justify-center py-12">
+                      <div className="text-center">
+                        <Activity className="h-12 w-12 text-gold animate-pulse mx-auto mb-2" />
+                        <p className="text-muted-foreground">Loading recent orders...</p>
+                      </div>
+                    </div>
+                  ) : recentOrders.length > 0 ? (
+                    <div className="space-y-4">
+                      {recentOrders.map((order) => (
                       <div key={order.id} className="border rounded-lg hover:shadow-md transition-all">
                         {/* Desktop Layout */}
                         <div className="hidden md:flex items-center justify-between p-4">
@@ -822,6 +1325,13 @@ const AdminDashboard = () => {
                       </div>
                     ))}
                   </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-muted-foreground">No orders found</p>
+                      <p className="text-sm text-muted-foreground">Orders will appear here once customers place them</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -836,15 +1346,22 @@ const AdminDashboard = () => {
 function ProtectedAdmin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const handleLogin = () => {
+  const handleLogin = (token: string) => {
     setIsAuthenticated(true);
-    // Store admin session (you might want to use a more secure approach in production)
+    // Store admin token
+    sessionStorage.setItem("mona-admin-token", token);
     sessionStorage.setItem("mona-admin-auth", "true");
   };
 
   // Check for existing admin session on component mount
   useEffect(() => {
-    const isAdminAuthenticated = sessionStorage.getItem("mona-admin-auth") === "true";
+    const token = sessionStorage.getItem("mona-admin-token");
+    const isAdminAuthenticated = sessionStorage.getItem("mona-admin-auth") === "true" && !!token;
+    if (!isAdminAuthenticated) {
+      // Clear any stale data
+      sessionStorage.removeItem("mona-admin-token");
+      sessionStorage.removeItem("mona-admin-auth");
+    }
     setIsAuthenticated(isAdminAuthenticated);
   }, []);
 
@@ -852,7 +1369,12 @@ function ProtectedAdmin() {
     return <AdminLogin onLogin={handleLogin} />;
   }
 
-  return <AdminDashboard />;
+  return (
+    <>
+      <AdminDashboard />
+      <Toaster />
+    </>
+  );
 }
 
 export default ProtectedAdmin;

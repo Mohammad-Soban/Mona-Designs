@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductGrid } from "@/components/ui/product-grid";
 import {
   allProducts,
-  getProductsByCategory,
+  getProductsByOccasion,
   sortProducts,
 } from "@/data/products";
 import { ChevronDown } from "lucide-react";
@@ -23,13 +23,33 @@ const categories = ["All", "Kurtas", "Sherwanis", "Suits", "Lehengas"];
 export default function Festivals() {
   const [sortBy, setSortBy] = useState("featured");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await getProductsByOccasion("festivals", {
+          category: selectedCategory !== "All" ? selectedCategory.toLowerCase() : undefined
+        });
+        setProducts(data);
+      } catch (error) {
+        console.error('Error fetching festival products:', error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [selectedCategory]);
 
   // Filter products suitable for Festivals (colorful, traditional styles)
   const festivalProducts = useMemo(() => {
-    const categoryProducts = getProductsByCategory(selectedCategory);
     // For demo, return all products. In real app, filter by occasion tags
-    return categoryProducts;
-  }, [selectedCategory]);
+    return products;
+  }, [products]);
 
   const filteredAndSortedProducts = useMemo(() => {
     return sortProducts(festivalProducts, sortBy);
@@ -46,7 +66,7 @@ export default function Festivals() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-64 bg-gradient-to-r from-purple-600/90 to-pink-600/90 flex items-center mt-20">
+      <section className="relative h-64 bg-gradient-to-r from-purple-600/90 to-pink-600/90 flex items-center -mt-20 pt-32">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
@@ -78,9 +98,7 @@ export default function Festivals() {
               >
                 {category}
                 <Badge variant="secondary" className="ml-2 text-xs">
-                  {category === "All"
-                    ? festivalProducts.length
-                    : getProductsByCategory(category).length}
+                  {category === "All" ? "All" : category}
                 </Badge>
               </button>
             ))}
@@ -129,7 +147,11 @@ export default function Festivals() {
       {/* Products Grid */}
       <section className="py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {filteredAndSortedProducts.length > 0 ? (
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold"></div>
+            </div>
+          ) : filteredAndSortedProducts.length > 0 ? (
             <>
               <ProductGrid products={filteredAndSortedProducts} showPagination={true} itemsPerPage={12} />
             </>

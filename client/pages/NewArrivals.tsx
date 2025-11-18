@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductGrid } from "@/components/ui/product-grid";
@@ -24,16 +24,39 @@ export default function NewArrivals() {
   const [sortBy, setSortBy] = useState("newest");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // Filter new arrivals (for demo, we'll show all products as new arrivals)
-  const newArrivalsProducts = useMemo(() => {
-    const categoryProducts = getProductsByCategory(selectedCategory);
-    // In a real app, you'd filter by a "new" flag or date
-    return categoryProducts;
+  // State to hold the loaded products
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [products, setProducts] = useState<any[]>([]);
+
+  // Load products when category changes
+  // useEffect is the correct hook for side-effects (async fetch). useMemo was being used incorrectly before.
+  useEffect(() => {
+    let mounted = true;
+    const loadProducts = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const categoryProducts = await getProductsByCategory(selectedCategory);
+        if (!mounted) return;
+        setProducts(categoryProducts);
+      } catch (err) {
+        if (!mounted) return;
+        setError('Failed to load products');
+        setProducts([]);
+      } finally {
+        if (!mounted) return;
+        setIsLoading(false);
+      }
+    };
+    loadProducts();
+    return () => { mounted = false; };
   }, [selectedCategory]);
 
+  // Sort the loaded products
   const filteredAndSortedProducts = useMemo(() => {
-    return sortProducts(newArrivalsProducts, sortBy);
-  }, [newArrivalsProducts, sortBy]);
+    return sortProducts(products, sortBy);
+  }, [products, sortBy]);
 
   const handleSortChange = (newSortBy: string) => {
     setSortBy(newSortBy);
@@ -45,9 +68,10 @@ export default function NewArrivals() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative h-72 bg-gradient-to-r from-emerald-600/90 to-teal-600/90 flex items-center mt-20">
+      {/* Hero Section with extended background */}
+      <section className="relative h-72 md:h-80 bg-gradient-to-r from-emerald-600/90 to-teal-600/90 flex items-center -mt-20 pt-28">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-700/20 to-cyan-700/20" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.1)_100%)]" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="flex items-center space-x-2 mb-4">
@@ -56,7 +80,7 @@ export default function NewArrivals() {
                 Fresh Arrivals
               </Badge>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif font-bold text-white mb-4 sm:mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif font-bold text-white mb-4 sm:mb-6 leading-tight drop-shadow-lg">
               New Arrivals
             </h1>
             <p className="text-emerald-100 text-base sm:text-lg md:text-xl mb-6 sm:mb-8 leading-relaxed">
@@ -127,9 +151,7 @@ export default function NewArrivals() {
               >
                 {category}
                 <Badge variant="secondary" className="ml-2 text-xs">
-                  {category === "All"
-                    ? newArrivalsProducts.length
-                    : getProductsByCategory(category).length}
+                  {category === selectedCategory ? products.length : '...'}
                 </Badge>
               </button>
             ))}
@@ -178,17 +200,27 @@ export default function NewArrivals() {
       {/* Products Grid */}
       <section className="py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {filteredAndSortedProducts.length > 0 ? (
-            <>
-              <ProductGrid products={filteredAndSortedProducts} showPagination={true} itemsPerPage={12} />
-            </>
+          {isLoading ? (
+            <div className="text-center py-16">
+              <h3 className="text-lg font-semibold mb-2">Loading products...</h3>
+              <p className="text-muted-foreground">Please wait while we fetch the latest arrivals.</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-16">
+              <h3 className="text-lg font-semibold mb-2 text-red-600">{error}</h3>
+              <p className="text-muted-foreground">
+                Please try refreshing the page or check back later.
+              </p>
+            </div>
+          ) : filteredAndSortedProducts.length > 0 ? (
+            <ProductGrid products={filteredAndSortedProducts} showPagination={true} itemsPerPage={12} />
           ) : (
             <div className="text-center py-16">
               <h3 className="text-lg font-semibold mb-2">
                 No new arrivals found
               </h3>
               <p className="text-muted-foreground">
-                Try adjusting your filters or check back soon for new products.
+                We are updating our collection soon. Try checking a different category or come back later.
               </p>
             </div>
           )}
