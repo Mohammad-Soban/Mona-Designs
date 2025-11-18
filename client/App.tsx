@@ -73,7 +73,8 @@ export default function App() {
                   <ScrollToTop />
                   <div className="min-h-screen flex flex-col">
                     <Navigation />
-                    <main className="flex-1">
+                    {/* Add consistent top padding for fixed navbar (h-20 = 80px) across all pages */}
+                    <main className="flex-1 pt-20">
                       <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/new-arrivals" element={<NewArrivals />} />

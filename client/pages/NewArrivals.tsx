@@ -68,9 +68,10 @@ export default function NewArrivals() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative h-72 bg-gradient-to-r from-emerald-600/90 to-teal-600/90 flex items-center mt-20">
+      {/* Hero Section with extended background */}
+      <section className="relative h-72 md:h-80 bg-gradient-to-r from-emerald-600/90 to-teal-600/90 flex items-center -mt-20 pt-28">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-700/20 to-cyan-700/20" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.1)_100%)]" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="flex items-center space-x-2 mb-4">
@@ -79,7 +80,7 @@ export default function NewArrivals() {
                 Fresh Arrivals
               </Badge>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif font-bold text-white mb-4 sm:mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif font-bold text-white mb-4 sm:mb-6 leading-tight drop-shadow-lg">
               New Arrivals
             </h1>
             <p className="text-emerald-100 text-base sm:text-lg md:text-xl mb-6 sm:mb-8 leading-relaxed">
