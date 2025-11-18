@@ -102,9 +102,9 @@ export function HeroVideoCarousel() {
     );
   };
 
-  // Return hero section — we'll control visual focal point with CSS instead of adding top padding
+  // Return hero section — negative margin to extend behind navbar for full-screen effect
   return (
-    <section className="relative h-screen overflow-hidden">
+    <section className="relative h-screen overflow-hidden -mt-20">
       {/* Background Animation */}
       <AnimatedBackground variant="hero" />
 

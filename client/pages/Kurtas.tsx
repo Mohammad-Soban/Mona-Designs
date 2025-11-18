@@ -52,12 +52,13 @@ export default function Kurtas() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative h-64 bg-gradient-to-r from-emerald-600/90 to-teal-600/90 flex items-center">
+      {/* Hero Section with extended background */}
+      <section className="relative h-72 md:h-80 bg-gradient-to-r from-emerald-600/90 to-teal-600/90 flex items-center -mt-20 pt-28">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-teal-600/20" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.1)_100%)]" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4 scroll-offset">
+            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4 scroll-offset drop-shadow-lg">
               Kurtas Collection
             </h1>
             <p className="text-emerald-100 text-lg">
