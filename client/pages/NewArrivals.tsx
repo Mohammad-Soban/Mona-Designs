@@ -103,32 +103,32 @@ export default function NewArrivals() {
       </section>
 
       {/* New Arrival Stats */}
-      <section className="py-8 bg-background border-b">
+      <section className="py-8 md:py-12 bg-emerald-50/50 dark:bg-emerald-950/20 border-b">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
-            <div>
-              <div className="text-2xl font-bold text-emerald-600 mb-1">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <div className="text-center p-4 md:p-6 rounded-lg">
+              <div className="text-2xl md:text-3xl font-bold text-emerald-600 dark:text-emerald-500 mb-1">
                 {filteredAndSortedProducts.length}+
               </div>
-              <p className="text-muted-foreground text-sm">New Products</p>
+              <p className="text-muted-foreground text-xs sm:text-sm">New Products</p>
             </div>
-            <div>
-              <div className="text-2xl font-bold text-emerald-600 mb-1">
+            <div className="text-center p-4 md:p-6 rounded-lg">
+              <div className="text-2xl md:text-3xl font-bold text-emerald-600 dark:text-emerald-500 mb-1">
                 4.8★
               </div>
-              <p className="text-muted-foreground text-sm">Average Rating</p>
+              <p className="text-muted-foreground text-xs sm:text-sm">Average Rating</p>
             </div>
-            <div>
-              <div className="text-2xl font-bold text-emerald-600 mb-1">
+            <div className="text-center p-4 md:p-6 rounded-lg">
+              <div className="text-2xl md:text-3xl font-bold text-emerald-600 dark:text-emerald-500 mb-1">
                 Weekly
               </div>
-              <p className="text-muted-foreground text-sm">Fresh Updates</p>
+              <p className="text-muted-foreground text-xs sm:text-sm">Fresh Updates</p>
             </div>
-            <div>
-              <div className="text-2xl font-bold text-emerald-600 mb-1">
+            <div className="text-center p-4 md:p-6 rounded-lg">
+              <div className="text-2xl md:text-3xl font-bold text-emerald-600 dark:text-emerald-500 mb-1">
                 Premium
               </div>
-              <p className="text-muted-foreground text-sm">Quality Assured</p>
+              <p className="text-muted-foreground text-xs sm:text-sm">Quality Assured</p>
             </div>
           </div>
         </div>
