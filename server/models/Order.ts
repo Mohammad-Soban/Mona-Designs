@@ -184,7 +184,7 @@ const orderSchema = new Schema<IOrder>({
 // Indexes
 orderSchema.index({ userId: 1 });
 orderSchema.index({ status: 1 });
-orderSchema.index({ receiptId: 1 });
+// orderSchema.index({ receiptId: 1 }); // Removed: receiptId already has unique: true
 orderSchema.index({ 'payment.orderId': 1 });
 
 export const Order = mongoose.model<IOrder>('Order', orderSchema);

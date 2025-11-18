@@ -64,14 +64,14 @@ export default function Mehendi() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-64 bg-gradient-to-r from-green-500/90 to-emerald-600/90 flex items-center -mt-20 pt-32">
+      <section className="relative bg-gradient-to-r from-green-500/90 to-emerald-600/90 flex items-center -mt-20 pt-32 pb-12 md:pb-16">
         <div className="absolute inset-0 bg-gradient-to-br from-green-600/20 to-teal-600/20" />
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="max-w-3xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-white mb-4 leading-tight">
               Mehendi Collection
             </h1>
-            <p className="text-green-100 text-lg">
+            <p className="text-green-100 text-base sm:text-lg leading-relaxed">
               Celebrate the art of henna with our vibrant mehendi collection
               featuring comfortable kurtas, flowing lehengas, and festive
               traditional wear.
@@ -81,15 +81,15 @@ export default function Mehendi() {
       </section>
 
       {/* Category Tabs */}
-      <section className="border-b bg-background">
+      <section className="border-b bg-background sticky top-20 z-40">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8 overflow-x-auto py-4">
+          <div className="flex items-center gap-1 sm:gap-8 overflow-x-auto py-4 no-scrollbar">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => handleCategoryChange(category)}
                 className={cn(
-                  "whitespace-nowrap pb-2 text-sm font-medium transition-colors",
+                  "whitespace-nowrap pb-2 text-xs sm:text-sm font-medium transition-colors flex-shrink-0",
                   selectedCategory === category
                     ? "border-b-2 border-gold text-gold"
                     : "text-muted-foreground hover:text-foreground",

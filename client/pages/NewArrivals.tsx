@@ -69,33 +69,33 @@ export default function NewArrivals() {
   return (
     <div className="min-h-screen">
       {/* Hero Section with extended background */}
-      <section className="relative h-72 md:h-80 bg-gradient-to-r from-emerald-600/90 to-teal-600/90 flex items-center -mt-20 pt-28">
+      <section className="relative bg-gradient-to-r from-emerald-600/90 to-teal-600/90 flex items-center -mt-20 pt-32 pb-12 md:pb-16">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-700/20 to-cyan-700/20" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.1)_100%)]" />
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="max-w-3xl">
             <div className="flex items-center space-x-2 mb-4">
-              <TrendingUp className="h-4 w-4 sm:h-6 sm:w-6 text-emerald-200" />
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-200" />
               <Badge className="bg-emerald-500/20 text-emerald-100 border-emerald-400/30 text-xs sm:text-sm">
                 Fresh Arrivals
               </Badge>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif font-bold text-white mb-4 sm:mb-6 leading-tight drop-shadow-lg">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-white mb-4 leading-tight drop-shadow-lg">
               New Arrivals
             </h1>
-            <p className="text-emerald-100 text-base sm:text-lg md:text-xl mb-6 sm:mb-8 leading-relaxed">
+            <p className="text-emerald-100 text-base sm:text-lg leading-relaxed mb-6">
               Discover our latest collection of premium ethnic wear. From
               contemporary designs to traditional masterpieces, explore what's
               trending now.
             </p>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-6">
-              <div className="flex items-center space-x-2 text-emerald-200">
-                <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
-                <span className="text-xs sm:text-sm">Updated Weekly</span>
+            <div className="flex flex-wrap items-center gap-4 text-emerald-200">
+              <div className="flex items-center space-x-2">
+                <Clock className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                <span className="text-xs sm:text-sm whitespace-nowrap">Updated Weekly</span>
               </div>
-              <div className="flex items-center space-x-2 text-emerald-200">
-                <Star className="h-4 w-4 sm:h-5 sm:w-5" />
-                <span className="text-xs sm:text-sm">Premium Quality</span>
+              <div className="flex items-center space-x-2">
+                <Star className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                <span className="text-xs sm:text-sm whitespace-nowrap">Premium Quality</span>
               </div>
             </div>
           </div>
@@ -135,15 +135,15 @@ export default function NewArrivals() {
       </section>
 
       {/* Category Tabs */}
-      <section className="border-b bg-background">
+      <section className="border-b bg-background sticky top-20 z-40">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8 overflow-x-auto py-4">
+          <div className="flex items-center gap-1 sm:gap-8 overflow-x-auto py-4 no-scrollbar">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => handleCategoryChange(category)}
                 className={cn(
-                  "whitespace-nowrap pb-2 text-sm font-medium transition-colors",
+                  "whitespace-nowrap pb-2 text-xs sm:text-sm font-medium transition-colors flex-shrink-0 flex items-center",
                   selectedCategory === category
                     ? "border-b-2 border-emerald-600 text-emerald-600"
                     : "text-muted-foreground hover:text-foreground",

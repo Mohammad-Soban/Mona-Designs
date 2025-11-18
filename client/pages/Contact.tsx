@@ -72,14 +72,14 @@ Please get back to me. Thank you!`;
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-64 bg-gradient-to-r from-blue-600/90 to-indigo-600/90 flex items-center -mt-20 pt-32">
+      <section className="relative bg-gradient-to-r from-blue-600/90 to-indigo-600/90 flex items-center -mt-20 pt-32 pb-12 md:pb-16">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-700/20 to-indigo-700/20" />
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="max-w-3xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-white mb-4 leading-tight">
               Contact Us
             </h1>
-            <p className="text-blue-100 text-lg">
+            <p className="text-blue-100 text-base sm:text-lg leading-relaxed">
               Get in touch with us for any questions about our ethnic wear
               collections, custom designs, or assistance with your orders.
             </p>

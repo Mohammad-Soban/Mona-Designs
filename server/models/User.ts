@@ -75,8 +75,8 @@ const userSchema = new Schema<IUser>({
   timestamps: true,
 });
 
-// Index for email
-userSchema.index({ email: 1 });
+// Indexes - email and username already have unique indexes from schema definition
+// userSchema.index({ email: 1 }); // Removed: email already has unique: true
 
 // Pre-save middleware to hash password
 userSchema.pre('save', async function (next) {

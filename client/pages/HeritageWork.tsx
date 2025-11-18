@@ -110,14 +110,14 @@ export default function HeritageWork() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-96 bg-gradient-to-r from-slate-700/90 to-gray-800/90 flex items-center -mt-20 pt-32">
+      <section className="relative bg-gradient-to-r from-slate-700/90 to-gray-800/90 flex items-center -mt-20 pt-32 pb-12 md:pb-16">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-800/20 to-gray-900/20" />
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif font-bold text-white mb-4 md:mb-6 leading-tight">
               Heritage Craftsmanship
             </h1>
-            <p className="text-slate-100 text-xl">
+            <p className="text-slate-100 text-base sm:text-lg md:text-xl leading-relaxed">
               Preserving centuries-old traditions through masterful artisanship.
               Each piece tells a story of cultural heritage and timeless beauty.
             </p>

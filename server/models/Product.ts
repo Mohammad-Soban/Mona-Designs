@@ -149,7 +149,7 @@ const productSchema = new Schema<IProduct>({
 });
 
 // Indexes
-productSchema.index({ slug: 1 });
+// productSchema.index({ slug: 1 }); // Removed: slug already has unique: true
 productSchema.index({ featured: 1 });
 productSchema.index({ categories: 1 });
 productSchema.index({ isActive: 1 });

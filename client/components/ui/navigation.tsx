@@ -86,8 +86,8 @@ export function Navigation() {
 
   return (
     <header className="fixed top-0 z-50 w-full">
-      {/* Enhanced navbar with better glass effect and subtle background */}
-      <div className="bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm">
+      {/* Enhanced navbar with transparent glass effect */}
+      <div className="bg-transparent backdrop-blur-xl border-b border-border/10 shadow-none">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-20 items-center justify-between">
             {/* Mobile Navbar Layout */}

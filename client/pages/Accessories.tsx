@@ -85,14 +85,14 @@ export default function Accessories() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-64 bg-gradient-to-r from-teal-600/90 to-cyan-600/90 flex items-center -mt-20 pt-32">
+      <section className="relative bg-gradient-to-r from-teal-600/90 to-cyan-600/90 flex items-center -mt-20 pt-32 pb-12 md:pb-16">
         <div className="absolute inset-0 bg-gradient-to-br from-teal-700/20 to-cyan-700/20" />
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="max-w-3xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-white mb-4 leading-tight">
               Accessories Collection
             </h1>
-            <p className="text-teal-100 text-lg">
+            <p className="text-teal-100 text-base sm:text-lg leading-relaxed">
               Complete your ethnic look with our exquisite collection of
               traditional jewelry, luxury watches, and premium wedding
               accessories.

@@ -88,7 +88,7 @@ export function HeroVideoCarousel() {
     }
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % videoCarousel.length);
-    }, 15000);
+    }, 25000);
     return () => clearInterval(interval);
   }, [isAutoPlaying, currentSlide]);
 
@@ -146,7 +146,7 @@ export function HeroVideoCarousel() {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center text-white space-y-8 max-w-5xl px-4">
                 {/* Badge */}
-                <div className="flex justify-center">
+                <div className="flex justify-center animate-fade-in" style={{ animationDelay: "0.1s" }}>
                   <Badge
                     variant="secondary"
                     className="text-sm bg-gold/20 text-gold border-gold/30 backdrop-blur-sm"
@@ -157,19 +157,19 @@ export function HeroVideoCarousel() {
                 </div>
 
                 {/* Title */}
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold tracking-tight">
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold tracking-tight animate-fade-in" style={{ animationDelay: "0.2s" }}>
                   <span className="bg-gradient-to-r from-white via-gold/90 to-white bg-clip-text text-transparent">
                     {slide.title}
                   </span>
                 </h1>
 
                 {/* Description */}
-                <p className="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
+                <p className="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: "0.3s" }}>
                   {slide.description}
                 </p>
 
                 {/* CTA Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 animate-fade-in" style={{ animationDelay: "0.4s" }}>
                   <Link to={slide.cta.primary.href}>
                     <Button
                       size="lg"
