@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductGrid } from "@/components/ui/product-grid";
 import {
   allProducts,
-  getProductsByCategory,
+  getProductsByOccasion,
   sortProducts,
 } from "@/data/products";
 import { ChevronDown } from "lucide-react";
@@ -18,16 +18,36 @@ const sortOptions = [
   { value: "rating", label: "Highest Rated" },
 ];
 
-const categories = ["All", "Suits", "Sherwanis", "Lehengas", "Kurtas"];
+const categories = ["All", "Sherwanis", "Lehengas", "Suits", "Kurtas"];
 
 export default function Reception() {
   const [sortBy, setSortBy] = useState("featured");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await getProductsByOccasion("reception", {
+          category: selectedCategory !== "All" ? selectedCategory.toLowerCase() : undefined
+        });
+        setProducts(data);
+      } catch (error) {
+        console.error('Error fetching reception products:', error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [selectedCategory]);
 
   const receptionProducts = useMemo(() => {
-    const categoryProducts = getProductsByCategory(selectedCategory);
-    return categoryProducts;
-  }, [selectedCategory]);
+    return products;
+  }, [products]);
 
   const filteredAndSortedProducts = useMemo(() => {
     return sortProducts(receptionProducts, sortBy);
@@ -44,7 +64,7 @@ export default function Reception() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-64 bg-gradient-to-r from-purple-600/90 to-indigo-600/90 flex items-center mt-20">
+      <section className="relative h-64 bg-gradient-to-r from-purple-600/90 to-indigo-600/90 flex items-center -mt-20 pt-32">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-700/20 to-indigo-600/20" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
@@ -76,11 +96,6 @@ export default function Reception() {
                 )}
               >
                 {category}
-                <Badge variant="secondary" className="ml-2 text-xs">
-                  {category === "All"
-                    ? receptionProducts.length
-                    : getProductsByCategory(category).length}
-                </Badge>
               </button>
             ))}
           </div>
@@ -129,12 +144,7 @@ export default function Reception() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {filteredAndSortedProducts.length > 0 ? (
             <>
-              <ProductGrid products={filteredAndSortedProducts} />
-              <div className="text-center mt-12">
-                <Button variant="outline" size="lg">
-                  Load More Products
-                </Button>
-              </div>
+              <ProductGrid products={filteredAndSortedProducts} showPagination={true} itemsPerPage={12} />
             </>
           ) : (
             <div className="text-center py-16">

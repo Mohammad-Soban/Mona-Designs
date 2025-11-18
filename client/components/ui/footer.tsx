@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom"
 import { Instagram, Twitter, Linkedin, Mail, Phone } from "lucide-react"
+import { ScrollToTopLink } from "./scroll-to-top-link"
 
 export function Footer() {
   return (
@@ -43,20 +44,20 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Categories</h3>
             <ul className="space-y-2">
-              <li><Link to="/sherwanis" className="text-muted-foreground hover:text-primary transition-colors">Sherwanis</Link></li>
-              <li><Link to="/kurtas" className="text-muted-foreground hover:text-primary transition-colors">Kurtas</Link></li>
-              <li><Link to="/suits" className="text-muted-foreground hover:text-primary transition-colors">Suits</Link></li>
-              <li><Link to="/lehengas" className="text-muted-foreground hover:text-primary transition-colors">Lehengas</Link></li>
+              <li><ScrollToTopLink to="/sherwanis" className="text-muted-foreground hover:text-primary transition-colors">Sherwanis</ScrollToTopLink></li>
+              <li><ScrollToTopLink to="/kurtas" className="text-muted-foreground hover:text-primary transition-colors">Kurtas</ScrollToTopLink></li>
+              <li><ScrollToTopLink to="/suits" className="text-muted-foreground hover:text-primary transition-colors">Suits</ScrollToTopLink></li>
+              <li><ScrollToTopLink to="/lehengas" className="text-muted-foreground hover:text-primary transition-colors">Lehengas</ScrollToTopLink></li>
             </ul>
           </div>
 
           <div>
             <h3 className="font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li><Link to="/collections" className="text-muted-foreground hover:text-primary transition-colors">Collections</Link></li>
-              <li><Link to="/size-guide" className="text-muted-foreground hover:text-primary transition-colors">Size Guide</Link></li>
-              <li><Link to="/returns" className="text-muted-foreground hover:text-primary transition-colors">Returns</Link></li>
-              <li><Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</Link></li>
+              <li><ScrollToTopLink to="/collections" className="text-muted-foreground hover:text-primary transition-colors">Collections</ScrollToTopLink></li>
+              <li><ScrollToTopLink to="/size-guide" className="text-muted-foreground hover:text-primary transition-colors">Size Guide</ScrollToTopLink></li>
+              <li><ScrollToTopLink to="/returns" className="text-muted-foreground hover:text-primary transition-colors">Returns</ScrollToTopLink></li>
+              <li><ScrollToTopLink to="/contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</ScrollToTopLink></li>
             </ul>
           </div>
 

@@ -1,10 +1,15 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ProductGrid } from "@/components/ui/product-grid";
-import { getProductsByCategory, sortProducts } from "@/data/products";
+import {
+  allProducts,
+  getProductsByCategory,
+  sortProducts,
+} from "@/data/products";
 import { 
   ChevronDown 
 } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const sortOptions = [
   { value: "featured", label: "Featured" },
@@ -16,12 +21,30 @@ const sortOptions = [
 
 export default function Lehengas() {
   const [sortBy, setSortBy] = useState("featured");
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await getProductsByCategory("lehengas");
+        setProducts(data);
+      } catch (error) {
+        console.error('Error fetching lehenga products:', error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   // Get Lehengas products and apply sorting
   const sortedProducts = useMemo(() => {
-    const lehengas = getProductsByCategory("Lehengas");
-    return sortProducts(lehengas, sortBy);
-  }, [sortBy]);
+    return sortProducts(products, sortBy);
+  }, [products, sortBy]);
 
   const handleSortChange = (newSortBy: string) => {
     setSortBy(newSortBy);
@@ -29,12 +52,13 @@ export default function Lehengas() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative h-64 bg-gradient-to-r from-pink-600/90 to-rose-600/90 flex items-center">
+      {/* Hero Section with extended background */}
+      <section className="relative h-72 md:h-80 bg-gradient-to-r from-pink-600/90 to-rose-600/90 flex items-center -mt-20 pt-28">
         <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-rose-600/20" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.1)_100%)]" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">
+            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4 scroll-offset drop-shadow-lg">
               Lehengas Collection
             </h1>
             <p className="text-pink-100 text-lg">
@@ -85,24 +109,17 @@ export default function Lehengas() {
       {/* Products Grid */}
       <section className="py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {sortedProducts.length > 0 ? (
-            <>
-              <ProductGrid products={sortedProducts} />
-
-              {/* Load More */}
-              <div className="text-center mt-12">
-                <button className="inline-flex items-center px-6 py-3 border border-border rounded-md text-sm font-medium text-foreground bg-background hover:bg-muted transition-colors">
-                  Load More Lehengas
-                </button>
-              </div>
-            </>
-          ) : (
-            <div className="text-center py-16">
-              <h3 className="text-lg font-semibold mb-2">No lehengas found</h3>
-              <p className="text-muted-foreground">
-                Try adjusting your search or browse other categories.
-              </p>
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold"></div>
             </div>
+          ) : sortedProducts.length > 0 ? (
+            <ProductGrid products={sortedProducts} showPagination={true} itemsPerPage={12} />
+          ) : (
+            <EmptyState 
+              title="Lehengas Coming Soon"
+              message="Our artisans are crafting an enchanting collection of lehengas. Visit us again soon to discover timeless elegance!"
+            />
           )}
         </div>
       </section>

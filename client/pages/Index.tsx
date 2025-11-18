@@ -1,29 +1,54 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { allProducts } from "@/data/products";
 import {
   ArrowRight,
   Star,
   Heart,
-  ShoppingCart,
   Truck,
   Shield,
   RotateCcw,
   Headphones,
   Sparkles,
   Phone,
-  Mail
+  Mail,
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HeroVideoCarousel } from "@/components/ui/hero-video-carousel";
 import { SectionWrapper } from "@/components/ui/section-wrapper";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+
+/**
+ * Product interface matching the backend Product model
+ */
+interface Product {
+  _id: string;
+  title: string;
+  slug: string;
+  description: string;
+  price: number;
+  images: Array<{
+    url: string;
+    alt: string;
+    role: string;
+  }>;
+  categories: Array<{
+    name: string;
+    rank: number;
+  }>;
+  metadata?: {
+    rating?: number;
+    reviews?: number;
+  };
+  featured?: boolean;
+}
 
 // Enhanced category data with better styling
-
 const categories = [
   {
     id: 1,
@@ -63,11 +88,62 @@ const categories = [
   }
 ];
 
-// Get featured products (products with badges)
-const featuredProducts = allProducts.filter(product => product.badge).slice(0, 4);
-
 export default function Index() {
   const { state: authState } = useAuth();
+  const { toast } = useToast();
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+
+  /**
+   * Fetch featured products from the API
+   * This function retrieves the latest product from each of the 4 main categories
+   */
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        setIsLoadingProducts(true);
+        const response = await fetch('/api/products/featured');
+        const data = await response.json();
+
+        if (data.success && data.products) {
+          setFeaturedProducts(data.products);
+        } else {
+          console.warn('Failed to fetch featured products:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching featured products:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load featured products. Please try again later.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoadingProducts(false);
+      }
+    };
+
+    fetchFeaturedProducts();
+  }, [toast]);
+
+  /**
+   * Format price in Indian Rupee format
+   */
+  const formatPrice = (price: number): string => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(price);
+  };
+
+  /**
+   * Get the primary image for a product
+   */
+  const getProductImage = (product: Product): string => {
+    const heroImage = product.images?.find(img => img.role === 'hero');
+    const thumbnailImage = product.images?.find(img => img.role === 'thumbnail');
+    return heroImage?.url || thumbnailImage?.url || product.images?.[0]?.url || '/placeholder-product.jpg';
+  };
 
   return (
     <div className="min-h-screen">
@@ -126,91 +202,97 @@ export default function Index() {
           <div className="text-center mb-16">
             <Badge variant="outline" className="mb-4 bg-gold/10 border-gold/30 text-gold">
               <Star className="w-3 h-3 mr-1 fill-current" />
-              Bestsellers
+              Latest Arrivals
             </Badge>
             <h2 className="text-4xl lg:text-5xl font-serif font-bold mb-6 bg-gradient-to-r from-foreground via-gold to-foreground bg-clip-text text-transparent">
               Featured Products
             </h2>
             <p className="text-muted-foreground text-xl max-w-3xl mx-auto leading-relaxed">
-              Handpicked premium ethnic wear that defines elegance and tradition, crafted with excellence
+              Discover our newest premium ethnic wear from each collection, crafted with excellence
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <Link key={product.id} to={`/product/${product.id}`}>
-                <Card className="group hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
-                  <div className="h-64 relative overflow-hidden bg-muted">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
-                    <Badge
-                      className="absolute top-3 left-3"
-                      variant={product.badge === "Sale" ? "destructive" : "secondary"}
-                    >
-                      {product.badge}
-                    </Badge>
-                    <div className="absolute top-3 right-3 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <Button
-                        size="icon"
-                        variant="secondary"
-                        className="h-8 w-8"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          // Add to wishlist logic here
-                        }}
-                      >
-                        <Heart className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <Button
-                        size="sm"
-                        className="bg-gold hover:bg-gold/90"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          // Add to cart logic here
-                        }}
-                      >
-                        <ShoppingCart className="h-4 w-4 mr-1" />
-                        Add
-                      </Button>
-                    </div>
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold mb-1">{product.name}</h3>
-                    <div className="flex items-center space-x-1 mb-2">
-                      <Star className="h-4 w-4 text-gold fill-current" />
-                      <span className="text-sm font-medium">{product.rating}</span>
-                      <span className="text-sm text-muted-foreground">({product.reviews})</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="font-bold text-lg">{product.price}</span>
-                      {product.originalPrice && (
-                        <span className="text-sm text-muted-foreground line-through">
-                          {product.originalPrice}
-                        </span>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+          {isLoadingProducts ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="h-12 w-12 text-gold animate-spin" />
+            </div>
+          ) : featuredProducts.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {featuredProducts.map((product) => (
+                  <Link key={product._id} to={`/product/${product._id}`}>
+                    <Card className="group hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer h-full">
+                      <div className="h-64 relative overflow-hidden bg-muted">
+                        <img
+                          src={getProductImage(product)}
+                          alt={product.title}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/placeholder-product.jpg';
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
+                        <Badge
+                          className="absolute top-3 left-3 bg-gold/90 text-white border-0"
+                        >
+                          New
+                        </Badge>
+                        <div className="absolute top-3 right-3 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <Button
+                            size="icon"
+                            variant="secondary"
+                            className="h-8 w-8"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              // Add to wishlist logic here
+                            }}
+                          >
+                            <Heart className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <CardContent className="p-4">
+                        <div className="mb-2">
+                          <Badge variant="outline" className="text-xs">
+                            {product.categories[0]?.name || 'Featured'}
+                          </Badge>
+                        </div>
+                        <h3 className="font-semibold mb-2 line-clamp-1">{product.title}</h3>
+                        <div className="flex items-center space-x-1 mb-2">
+                          <Star className="h-4 w-4 text-gold fill-current" />
+                          <span className="text-sm font-medium">
+                            {product.metadata?.rating || 4.5}
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            ({product.metadata?.reviews || 0})
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="font-bold text-lg">{formatPrice(product.price)}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
 
-          <div className="text-center mt-12">
-            <Link to="/collections">
-              <Button size="lg" className="bg-gold hover:bg-gold/90 text-white border-0 shadow-xl hover:shadow-2xl hover:shadow-gold/20 transition-all duration-300 hover:scale-105">
-                View All Products
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
+              <div className="text-center mt-12">
+                <Link to="/collections">
+                  <Button size="lg" className="bg-gold hover:bg-gold/90 text-white border-0 shadow-xl hover:shadow-2xl hover:shadow-gold/20 transition-all duration-300 hover:scale-105">
+                    View All Products
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-20">
+              <p className="text-muted-foreground text-lg">
+                No featured products available at the moment. Check back soon!
+              </p>
+            </div>
+          )}
         </div>
       </SectionWrapper>
 

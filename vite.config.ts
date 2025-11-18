@@ -12,6 +12,13 @@ export default defineConfig(({ mode }) => ({
       allow: ["./client", "./shared"],
       deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],
     },
+    hmr: {
+      protocol: 'ws',
+      host: 'localhost',
+    },
+    watch: {
+      usePolling: true,
+    },
   },
   build: {
     outDir: "dist/spa",

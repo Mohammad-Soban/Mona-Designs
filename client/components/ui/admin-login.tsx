@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, User, Lock, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";  
 
 interface AdminLoginProps {
-  onLogin: () => void;
+  onLogin: (token: string) => void;
 }
 
 export function AdminLogin({ onLogin }: AdminLoginProps) {
@@ -21,19 +21,34 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
     setIsLoading(true);
     setMessage("");
 
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const response = await fetch('/api/auth/admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username,
+          password
+        })
+      });
 
-    if (username === "Mona Designs" && password === "Mohammad@313") {
-      setMessage("Login successful!");
-      setTimeout(() => {
-        onLogin();
-      }, 500);
-    } else {
-      setMessage("Invalid username or password. Please try again.");
+      const data = await response.json();
+
+      if (data.success && data.token) {
+        setMessage("Login successful!");
+        setTimeout(() => {
+          onLogin(data.token);
+        }, 500);
+      } else {
+        setMessage(data.message || "Invalid username or password. Please try again.");
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setMessage("An error occurred during login. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   return (
@@ -74,7 +89,7 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
                     placeholder="Enter admin username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                    className="w-full pl-10 pr-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold bg-background text-foreground placeholder:text-muted-foreground"
                     required
                   />
                 </div>
@@ -93,7 +108,7 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
                     placeholder="Enter admin password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                    className="w-full pl-10 pr-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-gold bg-background text-foreground placeholder:text-muted-foreground"
                     required
                   />
                 </div>

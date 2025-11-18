@@ -102,8 +102,9 @@ export function HeroVideoCarousel() {
     );
   };
 
+  // Return hero section — negative margin to extend behind navbar for full-screen effect
   return (
-    <section className="relative h-screen overflow-hidden">
+    <section className="relative h-screen overflow-hidden -mt-20">
       {/* Background Animation */}
       <AnimatedBackground variant="hero" />
 
@@ -130,7 +131,7 @@ export function HeroVideoCarousel() {
                   loop
                   muted
                   playsInline
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover hero-video-media"
                   style={{ width: "100%", height: "100%" }}
                 />
               </div>

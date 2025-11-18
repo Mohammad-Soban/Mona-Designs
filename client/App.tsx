@@ -39,6 +39,8 @@ import Reception from "./pages/occasions/Reception";
 import Mehendi from "./pages/occasions/Mehendi";
 import Sangeet from "./pages/occasions/Sangeet";
 import General from "./pages/occasions/General";
+import Festivals from "./pages/occasions/Festivals";
+import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -71,7 +73,8 @@ export default function App() {
                   <ScrollToTop />
                   <div className="min-h-screen flex flex-col">
                     <Navigation />
-                    <main className="flex-1">
+                    {/* Add consistent top padding for fixed navbar (h-20 = 80px) across all pages */}
+                    <main className="flex-1 pt-20">
                       <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/new-arrivals" element={<NewArrivals />} />
@@ -98,6 +101,10 @@ export default function App() {
                           element={<Sangeet />}
                         />
                         <Route
+                          path="/collections/festivals"
+                          element={<Festivals />}
+                        />
+                        <Route
                           path="/collections/general"
                           element={<General />}
                         />
@@ -110,6 +117,7 @@ export default function App() {
                           path="/cart"
                           element={<PlaceholderPage title="Shopping Cart" />}
                         />
+                        <Route path="/checkout" element={<Checkout />} />
                         <Route path="/wishlist" element={<Wishlist />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />

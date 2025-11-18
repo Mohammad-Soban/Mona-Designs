@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductGrid } from "@/components/ui/product-grid";
@@ -109,7 +110,7 @@ export default function HeritageWork() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-96 bg-gradient-to-r from-slate-700/90 to-gray-800/90 flex items-center mt-20">
+      <section className="relative h-96 bg-gradient-to-r from-slate-700/90 to-gray-800/90 flex items-center -mt-20 pt-32">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-800/20 to-gray-900/20" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
@@ -315,10 +316,6 @@ export default function HeritageWork() {
                 <p className="text-muted-foreground">Years of Experience</p>
               </div>
             </div>
-
-            <Button size="lg" className="bg-gold hover:bg-gold/90">
-              Support Our Artisans
-            </Button>
           </div>
         </div>
       </section>

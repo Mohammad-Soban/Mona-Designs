@@ -8,9 +8,9 @@ import {
   Gem,
   Shield,
   Star,
-  ShoppingCart,
   Heart,
 } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const accessoryCategories = [
   {
@@ -77,10 +77,15 @@ const featuredProducts = [
 export default function Accessories() {
   const [selectedCategory, setSelectedCategory] = useState("all");
 
+  // Filter products based on selected category
+  const filteredProducts = selectedCategory === "all"
+    ? featuredProducts
+    : featuredProducts.filter(p => p.category === selectedCategory);
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-64 bg-gradient-to-r from-teal-600/90 to-cyan-600/90 flex items-center mt-20">
+      <section className="relative h-64 bg-gradient-to-r from-teal-600/90 to-cyan-600/90 flex items-center -mt-20 pt-32">
         <div className="absolute inset-0 bg-gradient-to-br from-teal-700/20 to-cyan-700/20" />
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
@@ -141,50 +146,62 @@ export default function Accessories() {
         </div>
       </section>
 
-      {/* Featured Products */}
+          {/* Featured Products */}
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-serif font-bold text-center mb-12">
             Featured Accessories
+            {selectedCategory !== "all" && (
+              <Badge variant="outline" className="ml-2 text-base">
+                {accessoryCategories.find(c => c.id === selectedCategory)?.name}
+              </Badge>
+            )}
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <Card
-                key={product.id}
-                className="group hover:shadow-lg transition-all duration-300"
-              >
-                <div className="aspect-square bg-muted rounded-t-lg relative overflow-hidden">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-2 right-2 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button size="icon" variant="secondary" className="h-8 w-8">
-                      <Heart className="h-4 w-4" />
-                    </Button>
+          {filteredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {filteredProducts.map((product) => (
+                <Card
+                  key={product.id}
+                  className="group hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="aspect-square bg-muted rounded-t-lg relative overflow-hidden">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute top-2 right-2 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button size="icon" variant="secondary" className="h-8 w-8">
+                        <Heart className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <CardContent className="p-4">
-                  <h3 className="font-semibold mb-2">{product.name}</h3>
-                  <p className="text-gold font-bold text-lg mb-3">
-                    {product.price}
-                  </p>
-                  <Button className="w-full bg-gold hover:bg-gold/90">
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Add to Cart
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Button variant="outline" size="lg">
-              View All Accessories
-            </Button>
-          </div>
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold mb-2">{product.name}</h3>
+                    <p className="text-gold font-bold text-lg mb-3">
+                      {product.price}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title={selectedCategory === "all" ? "Accessories Coming Soon" : `${accessoryCategories.find(c => c.id === selectedCategory)?.name} Coming Soon`}
+              message={selectedCategory === "all"
+                ? "Our craftsmen are designing exquisite accessories to complement your ethnic wear. Check back soon for our premium collection!"
+                : `We're working on adding new ${accessoryCategories.find(c => c.id === selectedCategory)?.name.toLowerCase() || 'accessories'} to our collection. Please check back soon!`}
+              icon={<Gem className="h-12 w-12 text-gold/50" />}
+            />
+          )}
+          {featuredProducts.length > 0 && (
+            <div className="text-center mt-12">
+              <Button variant="outline" size="lg">
+                View All {selectedCategory === "all" ? "Accessories" : accessoryCategories.find(c => c.id === selectedCategory)?.name}
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
